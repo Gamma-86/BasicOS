@@ -1,0 +1,8 @@
+Path_To_LowLevel_Functions = ./main/Kernel/32bit/miscellanious/LowLevel_Functions
+Path_To_NASM_DEFAULT_MACROSES = ./
+Path_To_Where_To_Dump_READY_OBJ_FILE = ./BIN_OBJ_filesDump
+
+
+
+LowLevel_Functions.o: $(Path_To_LowLevel_Functions)/LowLevel_Functions.nasm
+	nasm -f elf32 $(Path_To_LowLevel_Functions)/LowLevel_Functions.nasm -o $(Path_To_Where_To_Dump_READY_OBJ_FILE)/LowLevel_Functions.o

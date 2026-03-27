@@ -1,0 +1,80 @@
+#include <stdint.h>
+
+#include "OS_return_codes.h"
+#include "multiboot_structures.h"
+
+
+
+
+
+
+void* OurBaseAddress;
+
+
+int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
+    uint32_t MB2_type = MB2_structure->Type;
+
+    switch(MB2_type){
+        case MB2Info_CMDline_type:
+            MB2_structure = (struct MB2Info_CMDline*)MB2_structure;
+            break;
+        case MB2Info_LoaderName_type:
+            MB2_structure = (struct MB2Info_LoaderName*)MB2_structure;
+            break;
+        case MB2Info_Module_type:
+            MB2_structure = (struct MB2Info_Module*)MB2_structure;
+            break;
+        case MB2Info_RAMmap_type:
+            MB2_structure = (struct MB2Info_RAMMap*)MB2_structure;
+            break;
+        case MB2Info_APM_type:
+            MB2_structure = (struct MB2Info_APM*)MB2_structure;
+            break;
+        case MB2Info_VBE_type:
+            MB2_structure = (struct MB2Info_VBIOS*)MB2_structure;
+            break;
+        case MB2Info_VRAM_type:
+            MB2_structure = (struct MB2Info_VRAM*)MB2_structure;
+            break;
+        case MB2Info_UEFI32table_type:
+            MB2_structure = (struct MB2Info_UEFI32table*)MB2_structure;
+            break;
+        case MB2Info_UEFI64table_type:
+            MB2_structure = (struct MB2Info_UEFI64table*)MB2_structure;
+            break;
+        case MB2Info_SMBIOS_type:
+            MB2_structure = (struct MB2Info_SMBIOS*)MB2_structure;
+            break;
+        case MB2Info_ACPIv1_type:
+            MB2_structure = (struct MB2Info_ACPIv1*)MB2_structure;
+            break;
+        case MB2Info_ACPIv2_type:
+            MB2_structure = (struct MB2Info_ACPIv2*)MB2_structure;
+            break;
+        case MB2Info_DHCP_ACK_type:
+            MB2_structure = (struct MB2Info_DHCP_ACK_network*)MB2_structure;
+            break;
+        case MB2Info_UEFI_RAM_MAP_type:
+            MB2_structure = (struct MB2Info_UEFI_RAM_MAP*)MB2_structure;
+            break;
+        case MB2Info_UEFIBootActive_type:
+            MB2_structure = (struct MB2Info_UEFIBootActive*)MB2_structure;
+            break;
+        case MB2Info_UEFI32handle_type:
+            MB2_structure = (struct MB2Info_UEFI32handle*)MB2_structure;
+            break;
+        case MB2Info_UEFI64handle_type:
+            MB2_structure = (struct MB2Info_UEFI64handle*)MB2_structure;
+            break;
+
+        case MB2Info_BaseAddress_type:
+            struct MB2Info_BaseAddress* ThisStructure = \
+                (struct MB2Info_BaseAddress*)MB2_structure;
+            OurBaseAddress = ThisStructure->address;
+            break;
+        default:
+            break;
+    }
+
+    return 0;
+}
