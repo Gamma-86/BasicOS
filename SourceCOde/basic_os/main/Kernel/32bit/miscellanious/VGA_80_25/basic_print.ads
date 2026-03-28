@@ -43,8 +43,8 @@ package VGA_80_25 is
       BackColour_attrib at 1 range 7 .. 7;
    end record;
    for VRAM_word'Size use 16;
-
    type VRAM_word_PTR is access VRAM_word;
+
 
    type Row is range 0..24;
    type Column is range 0..79;
@@ -61,11 +61,23 @@ package VGA_80_25 is
 
 
 
-   function PutChar (Char : Character;ForeColour : CharColour  ;BackColour : CharColour) return ReturnBitfields.GeneralOS;
+   function PutChar (Char : Character;ForeColour : CharColour  ;BackColour : CharColour) return ReturnBitfields.GeneralOS
+      with
+         Export => True,
+         Convention => C,
+         External_Name => "PutChar";
+   
+   function PutChar_XY (Char : Character; X:Integer; Y:Integer) return ReturnBitfields.GeneralOS
+      with
+         Export => True,
+         Convention => C,
+         External_Name => "PutChar_XY";
 
-   function PutChar_XY (Char : Character; X:Integer; Y:Integer) return ReturnBitfields.GeneralOS;
-
-   function Set_Internal_WritePage(Index : Integer) return ReturnBitfields.GeneralOS;
+   function Set_Internal_WritePage(Index : Integer) return ReturnBitfields.GeneralOS
+      with
+         Export => True,
+         Convention => C,
+         External_Name => "Set_Internal_WritePage";
 
 
 private
@@ -75,13 +87,14 @@ private
    function IncreaseXCord (IncreasedXCordPTR : ColumnPTR) return Column;
    function IncreaseYCord (IncreasedYCordPTR : RowPTR) return Row;
 
-   Main_VRAM : VGA_VRAM_array;
-   for Main_VRAM'Address use System'To_Address (16#B_8000#);
+   Main_VRAM_PTR : VGA_VRAM_array;
+   for Main_VRAM_PTR'Address use System'To_Address (16#B_8000#);
 
    Glob_CursorYCord : Row := 0;
    Glob_CursorXCord : Column := 0   ;
 
 
    TextPage1, TextPage2, TextPage3, TextPage4 : aliased VGA_VRAM_array;
-   CurrentPage : VRAM_Array_PTR := TextPage1'Address;
+   CurrentPagePTR : VRAM_Array_PTR := TextPage1'Address;
+   CurrentPageIndex : Integer;
 end VGA_80_25;
