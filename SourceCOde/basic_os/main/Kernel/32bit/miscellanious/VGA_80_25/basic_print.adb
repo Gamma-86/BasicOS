@@ -52,10 +52,17 @@ end Get_Corresponing_Page_PTR;
 
 
 
-procedure ShiftCharsUp is
-
+procedure ShiftCharsUp(Page : VRAM_Array_PTR) is 
 begin
-   
+   for I in Row'First+1 .. Row'Last loop
+      for J in 0 .. Column'Last loop
+         Page.all(I-1, J) := Page.all(I, J);  --Upper Row = Current Row
+      end loop;
+   end loop;
+
+   for I in Column'First .. Column'Last loop
+      Page.all(Row'Last, I) := 0;
+   end loop;
 end ShiftCharsUp;
 
 
