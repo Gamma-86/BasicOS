@@ -85,17 +85,24 @@ private
    procedure ShiftCharsUp(Page : VRAM_Array_PTR);  --for everything in ROW
    --Move characters in current ROW to the ROW upper
    procedure MoveCursorForward;
-   function IncreaseXCord (IncreasedXCordPTR : ColumnPTR) return Column;
-   function IncreaseYCord (IncreasedYCordPTR : RowPTR) return Row;
+   function IncreaseXCord (IncreasedXCord : Column) return Column;
+   function IncreaseYCord (IncreasedYCord : Row) return Row;
 
    Main_VRAM_PTR : VGA_VRAM_array;
    for Main_VRAM_PTR'Address use System'To_Address (16#B_8000#);
-
-   Glob_CursorYCord : Row := 0;
-   Glob_CursorXCord : Column := 0   ;
-
+   Main_VRAM_X : Column := 0;
+   Main_VRAM_Y : Row := 0;
 
    TextPage1, TextPage2, TextPage3, TextPage4 : aliased VGA_VRAM_array;
+   TextPage2_X, TextPage3_X, TextPage4_X : Column := 0;
+   TextPage2_Y, TextPage3_Y, TextPage4_Y : Row := 0;
+   TextPage1_X : Column := 0;
+   TextPage1_Y : Column := 0;
+
+
    CurrentPagePTR : VRAM_Array_PTR := TextPage1'Address;
-   CurrentPageIndex : Integer;
+   CurrentPageIndex : Integer := 1;
+   Current_CursorXCordPTR : ColumnPTR := TextPage1_X'Address;
+   Current_CursorYCordPTR : RowPTR := TextPage1_Y'Address;
+
 end VGA_80_25;
