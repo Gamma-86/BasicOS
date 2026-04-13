@@ -59,7 +59,7 @@ package VGA_80_25 is
 
 
 
-
+   procedure New_Line;
 
    function PutChar (Char : Character;ForeColour : CharColour  ;BackColour : CharColour) return ReturnBitfields.GeneralOS
       with
@@ -81,12 +81,14 @@ package VGA_80_25 is
 
 
 private
-
+   procedure MoveCursorForward;
    procedure ShiftCharsUp(Page : VRAM_Array_PTR);  --for everything in ROW
    --Move characters in current ROW to the ROW upper
-   procedure MoveCursorForward;
-   function IncreaseXCord (IncreasedXCord : Column) return Column;
-   function IncreaseYCord (IncreasedYCord : Row) return Row;
+   procedure IncreaseYcord_Full(IncreasedYCord_PTR : RowPTR);
+   function IncrementXCord(IncreasedXCord : Column) return Column;
+   function IncrementYCord(IncreasedYCord : Row) return Row;
+
+
 
    Main_VRAM_PTR : VGA_VRAM_array;
    for Main_VRAM_PTR'Address use System'To_Address (16#B_8000#);

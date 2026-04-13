@@ -1,6 +1,12 @@
 with ReturnBitfields;
 package body VGA_80_25 is
 
+procedure New_Line is
+begin
+--Steps:
+--1: 
+end New_line;
+
 function Set_Internal_WritePage (Index : Integer) return ReturnBitfields.GeneralOS is
    Return_Value : ReturnBitfields.GeneralOS;
 begin
@@ -84,39 +90,31 @@ procedure MoveCursorForward is
    New_X_Coordinate : Column;
    New_Y_Coordinate : Row;
 begin
---INcrease the X coordinate, if it's 0 - increase Y coordinate. If it's maximum
+--Increase the X coordinate, if it's 0 - increase Y coordinate. If it's maximum
 --Shift all chars up and call Increasy Y cord
 
 --1: Assign Current X,Y coordinates to local X,Y variables
 --2: Increase Local X variable with corresponding function
---3: If the X is not zero, return
---Update X coordinate IF 0 and EXIT;
+--3: If the X is not zero,Update X coordinate and EXIT;
 
 --ELSE:
 --If the X is 0, you should consider increasing Y
---4: CHeck if Y is equal or above Max Row index
--- 4.1  If it is, call shift chars up procedure
---5:Anyway, Call Increase Y CORD FUNCTION and update LOCAL Y variable
---6:Update Current X and Y coordinates from you local variables
+--4:Anyway, Call Increase Y CORD FUNCTION and update LOCAL Y variable
+--5:Update Current X and Y coordinates from you local variables
 
 --1:
    New_X_Coordinate := Current_CursorXCordPTR.all;
    New_Y_Coordinate := Current_CursorYCordPTR.all;
 --2:
-   New_X_Coordinate := IncreaseXCord(New_X_Coordinate);
+   New_X_Coordinate := IncrementXCord(New_X_Coordinate);
 --3:
    if  New_X_Coordinate /= 0 then
       Current_CursorXCordPTR.all := New_X_Coordinate;
       return;
    end if;
 --4:
-   if New_Y_Coordinate >= Row'Last then
---  4.1
-     ShiftCharsUp (CurrentPagePTR);
-   end if;
+   IncreaseYcord_Full(New_Y_Coordinate'Address);
 --5
-   New_Y_Coordinate := IncreaseYCord(New_Y_Coordinate);
---6
    Current_CursorXCordPTR.all := New_X_Coordinate;
    Current_CursorYCordPTR.all := New_Y_Coordinate;
 end MoveCursorForward;
@@ -150,10 +148,30 @@ begin
 end ShiftCharsUp;
 
 
+procedure IncreaseYcord_Full(IncreasedYCord_PTR : RowPTR) is
+begin
+--what to do: increase Y coordinate by 1, If it's Max - shift all chars up
+-- and dont increment Y coordinate
+
+--Steps:
+--1 Check if Increased Y coordinate is equal to Maximum
+--2 If it is, shift all chars up
+--2.1 is it is not, just increment Y with function
+--3 I think this is the end
+
+--1
+if IncreasedYCord_PTR.all >= Row'Last then 
+--2
+   ShiftCharsUp (CurrentPagePTR);
+   IncreasedYCord_PTR.all := Row'Last;
+else
+--2.1
+   IncreasedYCord_PTR.all := IncreasedYCord_PTR.all + 1;
+end if;
+end IncreaseYcord_Full;
 
 
-
-function IncreaseXCord (IncreasedXCord : Column) return Column is
+function IncrementXCord(IncreasedXCord : Column) return Column is
 begin
 --What to do:
 --the basic idea is to increase X by 1
@@ -166,11 +184,11 @@ begin
    end if;
 
    return IncreasedXCord;
-end IncreaseXCord;
+end IncrementXCord;
 
 
 
-function IncreaseYCord (IncreasedYCord : Row) return Row is 
+function IncrementYCord(IncreasedYCord : Row) return Row is 
 begin
 --You should Increase Y by one, 
 --But if Y is more than Possible Max Row index, Y cord = Max Row index
@@ -181,7 +199,7 @@ begin
    if IncreasedYCord > Row'Last then
       IncreasedYCord := Row'Last;
    end if;
-end Name;
+end IncrementYCord;
 
 
 end VGA_80_25;
