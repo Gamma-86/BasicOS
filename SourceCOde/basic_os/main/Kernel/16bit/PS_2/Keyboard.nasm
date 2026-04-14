@@ -24,14 +24,11 @@ endstruc
 times Descriptor_empty_space_left db 0
 
 struc Key_descriptor_packet
-    .ascii resb 4
-    .IsValid resb 1
-    .keycodes_space resb 1
+    .ascii resb 1
     .keycode resb 2
-    .pressed resb 1
     .KeyEverPressed_counter_low resb 2
     .KeyEverPressed_counter_high resb 2
-    .reserved1 resb 3
+    .Flags    resb 2
 endstruc
 
 
