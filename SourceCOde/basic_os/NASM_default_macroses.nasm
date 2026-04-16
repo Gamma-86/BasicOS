@@ -29,48 +29,288 @@
 			%error Bad pointer size
 		%endif
 
-		%define SYSTEM_V_ABI_CODE 1
-		%define CDCEL_ABI_CODE 2
-		%define MS64_ABI_CODE 3
-		%define MS32_ABI_CODE 4
-%define USED_ABI_CODE CDCEL_ABI_CODE
+		struc ABI_ENUM
+			.reserved resb 1
+			.SYSTEM_V resb 1
+			.CDCEL resb 1
+			.MS64 resb 1
+			.MS32 resb 1
+		endstruc
+;		%define ABI_ENUM.SYSTEM_V 1
+;		%define ABI_ENUM.CDCEL 2
+;		%define ABI_ENUM.MS64 3
+;		%define ABI_ENUM.MS32 4
+%define USED_ABI_CODE ABI_ENUM.CDCEL
 
-			%if   USED_ABI_CODE = SYSTEM_V_ABI_CODE
+			%if   USED_ABI_CODE = ABI_ENUM.SYSTEM_V
 				%if SizeOfPTR = 8
 				%else
 					%error Bad pointer size when using SYSTEM V ABI, it should be 8
 				%endif
-			%elif USED_ABI_CODE = CDCEL_ABI_CODE
+			%elif USED_ABI_CODE = ABI_ENUM.CDCEL
 				%if SizeOfPTR = 4
 				%else
 					%error Bad pointer size when using CDCEL, it should be 4
 				%endif
-			%elif USED_ABI_CODE = MS32_ABI_CODE
+			%elif USED_ABI_CODE = ABI_ENUM.MS32
 				%if SizeOfPTR = 4
 				%else
 					%error Bad pointer size when using MS32 abi, it should be 4
 				%endif
-			%elif USED_ABI_CODE = MS64_ABI_CODE
+			%elif USED_ABI_CODE = ABI_ENUM.MS64
 				%if SizeOfPTR = 8
 				%else
 					%error Bad pointer size when using MS64 ABI, it should be 8
 				%endif
 			%endif
 
+
+
+
+
+
+
+
+
+
+
+
+;DEFINING TYPES
+
+;Those types that are taken from C or whatever
+;It seems like people use insesnsitive, immediate define for some reason
+%ixdefine int8_t     byte
+%ixdefine uint8_t    byte
+%ixdefine int16_t    word
+%ixdefine uint16_t   word
+%ixdefine int32_t    dword
+%ixdefine uint32_t   dword
+%ixdefine long32_t   dword
+%ixdefine ulong32_t  dword
+%ixdefine int64_t    qword
+%ixdefine uint64_t   qword
+%ixdefine int80_t    tword
+%ixdefine uint80_t   tword
+%ixdefine int128_t   oword
+%ixdefine uint128_t  oword
+%ixdefine long64_t   qword
+%ixdefine ulong64_t  qword
+%ixdefine long128_t  oword
+%ixdefine ulong128_t oword
+%ixdefine float      dword
+%ixdefine double     qword
+%ixdefine long_double tword
+
+
+%IF USED_ABI_CODE = ABI_ENUM.SYSTEM_V
+		%define S_Char int8_t
+		%define U_Char uint8_t
+
+		%define S_Short int16_t
+		%define S_Short_Int int16_t
+		%define U_Short uint16_t
+		%define U_Short_Int uint16_t
+
+		%define S_int   int32_t
+		%define U_int   uint32_t
+
+		%define S_Long  int64_t
+		%define S_Long_Int int64_t
+		%define U_Long  uint64_t
+		%define U_Long_Int uint64_t
+
+		%define S_LongLong int64_t
+		%define S_LongLong_Int int64_t
+		%define U_LongLong uint64_t
+		%define U_LongLong_Int uint64_t
+
+
+		%define sizeOfInt 4
+		%define BitnessOfInt sizeOfInt*8
+%ELIF USED_ABI_CODE=ABI_ENUM.CDCEL
+		%define S_Char int8_t
+		%define U_Char uint8_t
+
+		%define S_Short int16_t
+		%define S_Short_Int int16_t
+		%define U_Short uint16_t
+		%define U_Short_Int uint16_t
+
+		%define S_int   int32_t
+		%define U_int   uint32_t
+
+		%define S_Long  int32_t
+		%define S_Long_Int int32_t
+		%define U_Long  uint32_t
+		%define U_Long_Int uint32_t
+
+		%define S_LongLong int64_t
+		%define S_LongLong_Int int64_t
+		%define U_LongLong uint64_t
+		%define U_LongLong_Int uint64_t
+
+		
+		%define SizeOfInt 4
+		%define BitnessOfInt SizeOfInt*8
+%ELIF USED_ABI_CODE=ABI_ENUM.MS64
+		%define S_Char int8_t
+		%define U_Char uint8_t
+
+		%define S_Short int16_t
+		%define S_Short_Int int16_t
+		%define U_Short uint16_t
+		%define U_Short_Int uint16_t
+
+		%define S_int   int32_t
+		%define U_int   uint32_t
+
+		%define S_Long  int32_t
+		%define S_Long_Int int32_t
+		%define U_Long  uint32_t
+		%define U_Long_Int uint32_t
+
+		%define S_LongLong int64_t
+		%define S_LongLong_Int int64_t
+		%define U_LongLong uint64_t
+		%define U_LongLong_Int uint64_t
+
+		
+		%define SizeOfInt 4
+		%define BitnessOfInt SizeOfInt*8
+%ELIF USED_ABI_CODE=ABI_ENUM.MS32
+		%define S_Char int8_t
+		%define U_Char uint8_t
+
+		%define S_Short int16_t
+		%define S_Short_Int int16_t
+		%define U_Short uint16_t
+		%define U_Short_Int uint16_t
+
+		%define S_int   int32_t
+		%define U_int   uint32_t
+
+		%define S_Long  int32_t
+		%define S_Long_Int int32_t
+		%define U_Long  uint32_t
+		%define U_Long_Int uint32_t
+
+		%define S_LongLong int64_t
+		%define S_LongLong_Int int64_t
+		%define U_LongLong uint64_t
+		%define U_LongLong_Int uint64_t
+
+
+		%define SizeOfInt 4
+		%define BitnessOfInt SizeOfInt*8
+%ELSE
+	%warning I didnt understand what ABI you use(It Is:USED_ABI_CODE)
+	%warning I will use type definition for Linux32/64 or MS DOS 16
+	%if SizeOfPTR = 8
+		%define S_Char int8_t
+		%define U_Char uint8_t
+
+		%define S_Short int16_t
+		%define S_Short_Int int16_t
+		%define U_Short uint16_t
+		%define U_Short_Int uint16_t
+
+		%define S_int   int32_t
+		%define U_int   uint32_t
+
+		%define S_Long  int64_t
+		%define S_Long_Int int64_t
+		%define U_Long  uint64_t
+		%define U_Long_Int uint64_t
+
+		%define S_LongLong int64_t
+		%define S_LongLong_Int int64_t
+		%define U_LongLong uint64_t
+		%define U_LongLong_Int uint64_t
+
+
+		%define SizeOfInt 4
+		%define BitnessOfInt SizeOfInt*8
+	%elif SizeOfPTR = 4
+		%define S_Char int8_t
+		%define U_Char uint8_t
+
+		%define S_Short int16_t
+		%define S_Short_Int int16_t
+		%define U_Short uint16_t
+		%define U_Short_Int uint16_t
+
+		%define S_int   int32_t
+		%define U_int   uint32_t
+
+		%define S_Long  int32_t
+		%define S_Long_Int int32_t
+		%define U_Long  uint32_t
+		%define U_Long_Int uint32_t
+
+		%define S_LongLong int64_t
+		%define S_LongLong_Int int64_t
+		%define U_LongLong uint64_t
+		%define U_LongLong_Int uint64_t
+
+		
+		%define SizeOfInt 4
+		%define BitnessOfInt SizeOfInt*8
+	%else ;It is 16 bit, so use MS DOS
+		%define S_Char int8_t
+		%define U_Char uint8_t
+
+		%define S_Short int16_t
+		%define S_Short_Int int16_t
+		%define U_Short uint16_t
+		%define U_Short_Int uint16_t
+
+		%define S_int   int16_t
+		%define U_int   uint16_t
+
+		%define S_Long  int32_t
+		%define S_Long_Int int32_t
+		%define U_Long  uint32_t
+		%define U_Long_Int uint32_t
+
+;		I guess it will be fine if we still use these guys
+		%define S_LongLong int64_t
+		%define S_LongLong_Int int64_t
+		%define U_LongLong uint64_t
+		%define U_LongLong_Int uint64_t
+
+
+		%define SizeOfInt 2
+		%define BitnessOfInt SizeOfInt*8
+	%endif
+%endif
+
+;Defining the most basic register aliases
+
 %define FREE_REG1_64 rax
 %define FREE_REG1_32 eax
 %define FREE_REG1_16 ax
 %define FREE_REG1_8LOW al
 %define FREE_REG1_8HIGH ah
-%define FREE_REG1_INTSIZE FREE_REG1_32
-
+%IF BitnessOfInt = 64
+	%define FREE_REG1_INTSIZE FREE_REG1_64
+%ELIF BitnessOfInt=32
+	%define FREE_REG1_INTSIZE FREE_REG1_32
+%ELSE
+	%define FREE_REG1_INTSIZE FREE_REG1_16
+%endif
 
 %define FREE_REG2_64 rcx
 %define FREE_REG2_32 ecx
 %define FREE_REG2_16 cx
 %define FREE_REG2_8LOW cl
 %define FREE_REG2_8HIGH ch
-%define FREE_REG2_INTSIZE FREE_REG2_32
+%IF BitnessOfInt = 64
+	%define FREE_REG2_INTSIZE FREE_REG2_64
+%ELIF BitnessOfInt=32
+	%define FREE_REG2_INTSIZE FREE_REG2_32
+%ELSE
+	%define FREE_REG2_INTSIZE FREE_REG2_16
+%endif
 
 
 
@@ -79,7 +319,13 @@
 %define FREE_REG3_16 dx
 %define FREE_REG3_8LOW dl
 %define FREE_REG3_8HIGH dh
-%define FREE_REG3_INTSIZE FREE_REG3_32
+%IF BitnessOfInt = 64
+	%define FREE_REG3_INTSIZE FREE_REG3_64
+%ELIF BitnessOfInt=32
+	%define FREE_REG3_INTSIZE FREE_REG3_32
+%ELSE
+	%define FREE_REG3_INTSIZE FREE_REG3_16
+%endif
 
 
 %define VOLATILE_REG1_64 rbx
@@ -87,11 +333,17 @@
 %define VOLATILE_REG1_16 bx
 %define VOLATILE_REG1_8LOW bl
 %define VOLATILE_REG1_8high bh
-%define VOLATILE_REG1_INTSIZE VOLATILE_REG1_32
+%IF BitnessOfInt = 64
+	%define VOLATILE_REG1_INTSIZE VOLATILE_REG1_64
+%ELIF BitnessOfInt=32
+	%define VOLATILE_REG1_INTSIZE VOLATILE_REG1_32
+%ELSE
+	%define VOLATILE_REG1_INTSIZE BOLATILE_REG1_16
+%endif
 
 
 ;DEFINING FREE REGISTERS FOR CURRENT SIZE OF POINTER
-
+;AND SOME OTHER POINTER SIZE SPECIFIC REGISTERS
 %if SizeOfPTR = 8
 	%define BP_NATIVE RBP
 	%define SP_NATIVE RSP
@@ -119,12 +371,12 @@
 		%define FREE_REG5_32 R9D
 		%define FREE_REG5_16 R9W
 		%define FREE_REG5_8LOW R9B
-	%define FREE_REG5_PTRSIZE R10
+	%define FREE_REG6_PTRSIZE R10
 		%define FREE_REG6_64 R10
 		%define FREE_REG6_32 R10D
 		%define FREE_REG6_16 R10W
 		%define FREE_REG6_8LOW R10B
-	%define FREE_REG5_PTRSIZE R11
+	%define FREE_REG7_PTRSIZE R11
 		%define FREE_REG7_64 R11
 		%define FREE_REG7_32 R11D
 		%define FREE_REG7_16 R11W
@@ -132,8 +384,8 @@
 
 	%define FREE_REG4_INTSIZE FREE_REG4_32
 	%define FREE_REG5_INTSIZE FREE_REG5_32
-	%define FREE_REG6_INTSIZE FREE_REG4_32
-	%define FREE_REG7_INTSIZE FREE_REG5_32
+	%define FREE_REG6_INTSIZE FREE_REG6_32
+	%define FREE_REG7_INTSIZE FREE_REG7_32
 
 %elif SizeOfPTR = 4
 	%define BP_NATIVE EBP
@@ -176,11 +428,11 @@
 %define NATIVE_SP SP_NATIVE
 
 %if SizeOfPTR = 4
-	%define DFINE_PTR dd
+	%define DEFINE_PTR dd
 %elif SizeOfPTR = 8
-	%define DFINE_PTR dq
+	%define DEFINE_PTR dq
 %elif SizeOfPTR = 2
-	%define DFINE_PTR dw
+	%define DEFINE_PTR dw
 %else
 	%error Bad pointer size
 %endif
@@ -190,7 +442,7 @@
 %define STACK_ARG_EBP(X) (BP_NATIVE +SizeOfPTR+SizeOfPTR*(X))
 %define LOCAL_VAR(X) (BP_NATIVE -SizeOfPTR*(X))
 
-;DEFINING ATGUMENTS LOCATION FOR CURRENT POINTER SIZE
+;DEFINING ARGUMENTS LOCATION FOR CURRENT POINTER SIZE
 
 %if   SizeOfPTR = 4
 	%define STACK_ARG1_SP [STACK_ARG_ESP(1)]
@@ -245,7 +497,7 @@
 		%define STACK_ARG6_BP16 word[STACK_ARG_EBP(6)]
 		%define STACK_ARG6_BP32 dword[STACK_ARG_EBP(6)]
 %elif SizeOfPTR = 8
-	%if  USED_ABI_CODE = MS64_ABI_CODE
+	%if  USED_ABI_CODE = ABI_ENUM.MS64
 		%define STACK_ARG1_SP rcx
 			%define STACK_ARG1_SP8 cl 
 			%define STACK_ARG1_SP16 cx
@@ -264,7 +516,7 @@
 			%define STACK_ARG4_SP32 r9d
 		%DEFINE STACK_ARG5_SP [STACK_ARG_ESP(1)]
 			%define STACK_ARG5_SP8 byte[STACK_ARG_ESP(1)] 
-			%define STACK_ARG5_SP16LOW word[STACK_ARG_ESP(1)]
+			%define STACK_ARG5_SP16 word[STACK_ARG_ESP(1)]
 			%define STACK_ARG5_SP32 dword[STACK_ARG_ESP(1)]
 		%DEFINE STACK_ARG6_SP [STACK_ARG_ESP(2)]
 			%define STACK_ARG6_SP8 byte[STACK_ARG_ESP(2)] 
@@ -280,9 +532,9 @@
 			%define STACK_ARG2_BP16 dx
 			%define STACK_ARG2_BP32 edx
 		%DEFINE STACK_ARG3_BP r8
-			%define STACK_ARG3_BP8 dl 
-			%define STACK_ARG3_BP16 dx
-			%define STACK_ARG3_BP32 edx
+			%define STACK_ARG3_BP8 r8b 
+			%define STACK_ARG3_BP16 r8w
+			%define STACK_ARG3_BP32 r8d
 		%DEFINE STACK_ARG4_BP r9
 			%define STACK_ARG4_BP8 r9b 
 			%define STACK_ARG4_BP16 r9w
@@ -297,7 +549,7 @@
 			%define STACK_ARG6_BP32 dword[STACK_ARG_EBP(2)]
 
 
-	%elif USED_ABI_CODE = SYSTEM_V_ABI_CODE
+	%elif USED_ABI_CODE = ABI_ENUM.SYSTEM_V
 		%define STACK_ARG1_SP rdi
 			%define STACK_ARG1_SP8 dil
 			%define STACK_ARG1_SP16 di
@@ -325,29 +577,29 @@
 
 
 		%DEFINE STACK_ARG1_BP rdi
-			%define STACK_ARG1_SP8 dil
-			%define STACK_ARG1_SP16 di
-			%define STACK_ARG1_SP32 edi
+			%define STACK_ARG1_BP8 dil
+			%define STACK_ARG1_BP16 di
+			%define STACK_ARG1_BP32 edi
 		%DEFINE STACK_ARG2_BP rsi
-			%define STACK_ARG2_SP8 sil
-			%define STACK_ARG2_SP16 si
-			%define STACK_ARG2_SP32 esi
+			%define STACK_ARG2_BP8 sil
+			%define STACK_ARG2_BP16 si
+			%define STACK_ARG2_BP32 esi
 		%DEFINE STACK_ARG3_BP rdx
-			%define STACK_ARG3_SP8 dl
-			%define STACK_ARG3_SP16 dx
-			%define STACK_ARG3_SP32 edx
+			%define STACK_ARG3_BP8 dl
+			%define STACK_ARG3_BP16 dx
+			%define STACK_ARG3_BP32 edx
 		%DEFINE STACK_ARG4_BP rcx
-			%define STACK_ARG4_SP8 cl
-			%define STACK_ARG4_SP16 cx
-			%define STACK_ARG4_SP32 ecx
+			%define STACK_ARG4_BP8 cl
+			%define STACK_ARG4_BP16 cx
+			%define STACK_ARG4_BP32 ecx
 		%DEFINE STACK_ARG5_BP r8
-			%define STACK_ARG5_SP8 r8b
-			%define STACK_ARG5_SP16 r8w
-			%define STACK_ARG5_SP32 r8d
+			%define STACK_ARG5_BP8 r8b
+			%define STACK_ARG5_BP16 r8w
+			%define STACK_ARG5_BP32 r8d
 		%DEFINE STACK_ARG6_BP r9
-			%define STACK_ARG6_SP8 r9b
-			%define STACK_ARG6_SP16 r9w
-			%define STACK_ARG6_SP32 r9d
+			%define STACK_ARG6_BP8 r9b
+			%define STACK_ARG6_BP16 r9w
+			%define STACK_ARG6_BP32 r9d
 
 	%else
 		%error Could not define Arguments location for current combination of ABI and pointer size
@@ -357,12 +609,6 @@
 %endif
 
 
-%macro MOV_LITL_OPTIMIZED 2
-	%IFIDNI %1,%2
-	%ELSE
-	mov   %1,%2
-	%ENDIF
-%endmacro
 
 
 %define UINT8_MIN 0
@@ -384,6 +630,15 @@
 %define UINT64_MAX 0xFFFF_FFFF_FFFF_FFFF
 %define SINT64_MIN 0x8000_0000_0000_0000
 %define SINT64_MAX 0x7FFF_FFFF_FFFF_FFFF
+
+%macro MOV_LITL_OPTIMIZED 2
+	%IFIDNI %1,%2
+	%ELSE
+	mov   %1,%2
+	%ENDIF
+%endmacro
+
+
 
 %macro MACRO_ENTER16 2
 	%if %2=0
@@ -554,10 +809,14 @@
 
 
 %macro GET_REL_ADDRESS_TO_REG 2
+	%IF SizeOfPTR = 8
+	lea   %1, [rel %2]
+	%ELSE
 	call  .get_eip%$
 	.get_eip%$:
 	pop   %2
 	lea   %2, [%2-.get_eip%$ + %1]
+	%ENDIF
 %endmacro
 
 
@@ -606,6 +865,22 @@ mov %1, SP_NATIVE
 	and %1, 0xF
 add SP_NATIVE, %1
 %endmacro
+
+%macro COMPARE 2
+	%if   %2=0
+		test  %1, %2
+	%else
+		cmp   %1, %2
+	%endif
+%endmacro
+
+
+
+%define What_Segment_Does_BP_use ss
+%warning What_Segment_Does_BP_use
+
+
+%include "NASM_advanced_Macroses.nasm"
 
 
 %endif
