@@ -113,8 +113,9 @@ endstruc
 %pop
 
 %endmacro
+%if 0
 FOR_LOOP_START ecx, 0, 100000
 FOR_LOOP_END
-
+%endif
 
 %endif
