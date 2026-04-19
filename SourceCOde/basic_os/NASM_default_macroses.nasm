@@ -631,6 +631,44 @@
 %define SINT64_MIN 0x8000_0000_0000_0000
 %define SINT64_MAX 0x7FFF_FFFF_FFFF_FFFF
 
+;DEfining Native string instrucitons
+%IF SizeOfInt = 2
+	%ixdefine LODS_INT lodsw
+	%ixdefine STOS_INT stosw
+	%ixdefine CMPS_INT cmpsw
+	%ixdefine MOVS_INT movsw
+%ELIF SizeOfInt = 4
+	%ixdefine LODS_INT lodsd
+	%ixdefine STOS_INT stosd
+	%ixdefine CMPS_INT cmpsd
+	%ixdefine MOVS_INT movsd
+%elif SizeOfInt = 8
+	%ixdefine LODS_INT lodsq
+	%ixdefine STOS_INT stosq
+	%ixdefine CMPS_INT cmpsq
+	%ixdefine MOVS_INT movsq
+%endif
+
+%IF SizeOfPTR = 2
+	%ixdefine LODS_PTR lodsw
+	%ixdefine STOS_PTR stosw
+	%ixdefine CMPS_PTR cmpsw
+	%ixdefine MOVS_PTR movsw
+%ELIF SizeOfPTR = 4
+	%ixdefine LODS_PTR lodsd
+	%ixdefine STOS_PTR stosd
+	%ixdefine CMPS_PTR cmpsd
+	%ixdefine MOVS_PTR movsd
+%elif SizeOfPTR = 8
+	%ixdefine LODS_PTR lodsq
+	%ixdefine STOS_PTR stosq
+	%ixdefine CMPS_PTR cmpsq
+	%ixdefine MOVS_PTR movsq
+%endif
+
+
+
+
 %macro MOV_LITL_OPTIMIZED 2
 	%IFIDNI %1,%2
 	%ELSE
@@ -821,6 +859,7 @@
 
 
 %define BIT_MASK(X) (1<<(X))
+%define NOT_BIT_MASK(X) (~(1<<(X)))
 
 
 %macro ALLOC_STACK__size_retReg 2
@@ -850,7 +889,7 @@
 
 
 %macro CLEAN_CALL_STACK__ArgsAmount 1
-	add   SP_NATIVE, %1*SizeOfPTR
+	add   SP_NATIVE, (%1)*SizeOfPTR
 %endmacro
 
 
@@ -868,16 +907,30 @@ add SP_NATIVE, %1
 
 %macro COMPARE 2
 	%if   %2=0
-		test  %1, %2
+		test  %1, %1
 	%else
 		cmp   %1, %2
 	%endif
 %endmacro
 
+%macro MOV_ALL_1s 1
+	xor   %1, %1
+	not   %1
+%endmacro
 
 
-%define What_Segment_Does_BP_use ss
-%warning What_Segment_Does_BP_use
+%define What_Segment_Does_BP_use ss_segment
+%define What_Segment_Does_SP_use ss_segment
+%define What_Segment_Does_EAX_use ds_segment
+%define What_Segment_Does_EBX_use ds_segment
+%define What_Segment_Does_ECX_use ds_segment
+%define What_Segment_Does_EDX_use ds_segment
+%define What_Segment_Does_Just_ESI_use ds_segment
+%define What_Segment_Does_Just_EDI_use ds_segment
+%define What_Address_does_Stos_use ES_DI_address
+%define What_Address_does_Lods_use DS_SI_address
+%define What_Destination_segment_string_instructions_use es_segment
+%define What_Source_segment_string_nstructions_use ds_segment
 
 
 %include "NASM_advanced_Macroses.nasm"

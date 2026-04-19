@@ -44,18 +44,6 @@ endstruc
 ;%warning SHowing VAR_TYPES ENUM Index : DEBUG_VAR_TYPES_ENUM_TEST
 
 
-%define What_Segment_Does_BP_use ss_segment
-%define What_Segment_Does_SP_use ss_segment
-%define What_Segment_Does_EAX_use ds_segment
-%define What_Segment_Does_EBX_use ds_segment
-%define What_Segment_Does_ECX_use ds_segment
-%define What_Segment_Does_EDX_use ds_segment
-%define What_Segment_Does_Just_ESI_use ds_segment
-%define What_Segment_Does_Just_EDI_use ds_segment
-%define What_Address_does_Stos_use ES_DI_address
-%define What_Address_does_Lods_use DS_SI_address
-%define What_Destination_segment_string_instructions_use es_segment
-%define What_Source_segment_string_nstructions_use ds_segment
 
 
 
@@ -93,29 +81,30 @@ endstruc
 
 %macro FOR_LOOP_START 3
 
-%push FOR_START
-
+%push FOR_START_CONTEXT
     %define Counter_VAR %1
     %define Start_NUM %2
     %define End_NUM %3
 
-    mov   Counter_VAR, Start_NUM
-
+    %if   Start_NUM = 0
+        xor   Counter_VAR, Counter_VAR
+    %else
+        mov   Counter_VAR, Start_NUM
+    %endif
     %$FOR_START:
-    COMPARE Counter_VAR, End_NUM
+    cmp Counter_VAR, End_NUM
     je    %$FOR_END
 
     %if Start_NUM>End_NUM
-        dec   %Counter_VAR
+        dec   Counter_VAR
     %else
-        inc   %Counter_VAR
+        inc   Counter_VAR
     %endif
-
 %endmacro
 
 %macro FOR_LOOP_END 0
-    %ifnctx FOR_START
-        %error Expected FOR_LOOP_START before FOR_LOOP_END
+    %ifnctx FOR_START_CONTEXT
+        %fatal Expected FOR_LOOP_START before FOR_LOOP_END
     %endif
 
     jmp   %$FOR_START
@@ -124,8 +113,8 @@ endstruc
 %pop
 
 %endmacro
-
-
+FOR_LOOP_START ecx, 0, 100000
+FOR_LOOP_END
 
 
 %endif
