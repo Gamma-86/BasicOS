@@ -32,15 +32,15 @@ package ReturnBitfields is
 type GeneralOS is record
    ReturnValNameSpace : LOW8_ReturnSpace;
    OtherError : Boolean;
-   NullPTR : Boolean;
-   InsertOverflow : Boolean;
-   ArrayInsertUnable : Boolean;
-   ArrayIndexOverflow : Boolean;
-   AllocationFailed : Boolean;
-   AllocationImpossible : Boolean;
-   SpinlockWatchdogSet : Boolean;
-   TooBigNumber : Boolean;
-   TooSmallNumber : Boolean;
+   NullPTR : Boolean; --use this when the error is related to NUll pointer
+   InsertOverflow : Boolean;--Use this when there is no space left, and you can't push/add thing to stack/queue
+   ArrayInsertUnable : Boolean;--Use this when you can't add thing to a static allocated memory part
+   ArrayIndexOverflow : Boolean;--Use this when the index to insert you were given, is too big or wrong in some other way
+   AllocationFailed : Boolean;--Use this when, for example, there is no free RAM left to alllocate
+   AllocationImpossible : Boolean;--Use this when, for example, allocation requirements are impossible (Like 1 TB of RAM)
+   SpinlockWatchdogSet : Boolean;--Use this when you need to indicate that watchdog timer was for some reason set
+   TooBigNumber : Boolean;--use this when the give argument is arithmetically too big, for example the float is Inf, or you want to set VGA mode too big
+   TooSmallNumber : Boolean;--THe same as Too big, but for small numbers
    Reserved18 : Boolean;
    Reserved19 : Boolean;
    Reserved20 : Boolean;
@@ -54,7 +54,7 @@ type GeneralOS is record
    Reserved28 : Boolean;
    Reserved29 : Boolean;
    Reserved30 : Boolean;
-   FulfilledWithError : Boolean;
+   FulfilledWithError : Boolean;--Use this when you 
 end record;
 
 for GeneralOS use record
