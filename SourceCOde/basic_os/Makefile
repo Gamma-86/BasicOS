@@ -11,10 +11,10 @@ PathTo_IntitalRAMAllocators = $(PathTo_MemoryManagers)/allocators/IntialAllocato
 
 
 PathTo_NASM_default_macroses = .
-PathTo_IA32Macroses_NASM = ./include_i686
+PathTo_IA32Macroses_NASM = ./includes_i686
 
-PathTo_ADA_INCLUDES = ./include_i686/adainclude
-PathTo_GNAT_ADC = ./include_i686/adaCompConfig/gnat.adc
+PathTo_ADA_INCLUDES = ./includes_i686/adainclude
+PathTo_GNAT_ADC = ./includes_i686/adaCompConfig/gnat.adc
 
 ADA_default_flags = -gnatp -ffreestanding -nostdlib -fno-exceptions -gnatec=$(PathTo_GNAT_ADC)
 NASM_default_flags = -i$(PathTo_NASM_default_macroses)/ -i$(PathTo_IA32Macroses_NASM)/ -g
