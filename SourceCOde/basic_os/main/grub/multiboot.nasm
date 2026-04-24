@@ -1,6 +1,6 @@
 %include "NASM_default_macroses.nasm"
-;%include "IA32Macroses.nasm"
-;%include "multiboot_structures.nasm"
+%include "IA32Macroses.nasm"
+%include "multiboot_structures.nasm"
 
 bits 32
 CPU WILLAMETTE
@@ -97,7 +97,7 @@ Get_next_eip:
 
 
 extern Multiboot2_info_main_parser
-%macro Roof_to_align8__reg_free_reg  2
+%macro Roof_to_align8__reg_FreeReg  2
     mov   %2, %1
     and   %2, 0x7
     ;to align first 3 bit to 8, we should

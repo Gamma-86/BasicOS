@@ -29,7 +29,7 @@ PathTo_LinkerScript = ./main/grub
 
 all:
 	make clean
-
+	make multiboot.o
 
 
 
@@ -38,3 +38,7 @@ multiboot.o: $(PathTo_Multiboot_files)/multiboot.nasm
 	$(C_compiler) $(C_default_flags) $(PathTo_Multiboot_files)/multiboot.c -o multiboot_C.o
 	$(LINKER) -r multiboot_ASM.o multiboot_C -o multiboot.o
 	mv  multiboot.o ./BIN_OBJ_filesDump/
+
+
+clean:
+	rm -f *.o *.so
