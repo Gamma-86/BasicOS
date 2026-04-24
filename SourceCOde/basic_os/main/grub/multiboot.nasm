@@ -71,6 +71,8 @@ section .text
 extern   kernel_main ;(unsigned int EAX_magic, void* EBX_structure)
 _start:
     CLI
+    mov   byte[0xb8000], 'A'
+    mov   byte[0xb8001], 0x0F
     mov   esp, stack_top
         cmp   eax, 0x36D76289
         jne   Not_multiboot
