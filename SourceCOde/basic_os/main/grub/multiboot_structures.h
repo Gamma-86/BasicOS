@@ -167,15 +167,16 @@ struct MB2Info_VRAM{
 };
 
     struct palette_colour_RGB;
-    struct VRAM_palette_info{
-        uint32_t Amount_of_colours;
-        struct palette_colour_RGB Colours_array[];
-    };
         struct palette_colour_RGB{
             char Red;
             char Green;
             char Blue;
         };
+    struct VRAM_palette_info{
+        uint32_t Amount_of_colours;
+        struct palette_colour_RGB Colours_array[];
+    };
+
     struct RGBInfo{
         char Red_position;
         char Red_bitness;
