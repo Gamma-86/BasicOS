@@ -18,7 +18,7 @@ SECTIONS
         *(.multiboot)
         header_end = .;
     
-    }>FREE_RAM_HIGH
+    } > FREE_RAM_HIGH
     .text  ALIGN(4096){*(.text*)}>FREE_RAM_HIGH
     .data  ALIGN(4096){*(.data*)}>FREE_RAM_HIGH
     .rodata  ALIGN(4096){*(.rodata*)}>FREE_RAM_HIGH
