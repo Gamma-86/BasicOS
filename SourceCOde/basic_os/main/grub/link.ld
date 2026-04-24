@@ -6,7 +6,7 @@ MEMORY
     FREE_RAM1 (rwx) : ORIGIN = 1280, LENGTH = 0x76FF
     BOOT(r) : ORIGIN = 0x7C00, LENGTH = 512
     FREE_RAM2 (rwx) : ORIGIN = 0x7E00, LENGTH = 0x78000
-    BIOS_and_others (r) : ORIGIN = 0x80000, LENGTH = 7FFFF
+    BIOS_and_others (r) : ORIGIN = 0x80000, LENGTH = 0x7FFFF
     FREE_RAM_HIGH (rwx) : ORIGIN = 0x100000, LENGTH = 14M
 }
 
