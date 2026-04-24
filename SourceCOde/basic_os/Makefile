@@ -46,6 +46,7 @@ multiboot.o: $(PathTo_Multiboot_files)/multiboot.nasm
 		$(C_default_flags) \
 		$(PathTo_Multiboot_files)/multiboot.c \
 		-I$(PathTo_Multiboot_files)\
+		-с
 		-o multiboot_C.o
 	$(LINKER) -r multiboot_ASM.o multiboot_C -o multiboot.o
 	mv  multiboot.o ./BIN_OBJ_filesDump/
