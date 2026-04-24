@@ -30,7 +30,7 @@ PathTo_LinkerScript = ./main/grub
 all:
 	make clean
 
-make_multiboot_files: $(PathTo_Multiboot_files)\multiboot.nasm
+multiboot.o: $(PathTo_Multiboot_files)\multiboot.nasm
 	nasm  $(NASM_default_flags) -f elf32 $(PathTo_Multiboot_files)\multiboot.nasm -o multiboot_ASM.o
 	$(C_compiler) $(C_default_flags) $(PathTo_Multiboot_files)\multiboot.c -o multiboot_C.o
 	$(LINKER) -r multiboot_ASM.o multiboot_C -o multiboot.o
