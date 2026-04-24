@@ -174,7 +174,8 @@ struct MB2Info_VRAM{
         };
     struct VRAM_palette_info{
         uint32_t Amount_of_colours;
-        struct palette_colour_RGB Colours_array[];
+        struct palette_colour_RGB Colours_array[];/*Basically this array for indexed colour pallette
+        that explains what is rgb encodement of every index in pallettes*/
     };
 
     struct RGBInfo{

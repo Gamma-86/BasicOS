@@ -70,7 +70,7 @@ int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
         case MB2Info_BaseAddress_type:
             struct MB2Info_BaseAddress* ThisStructure = \
                 (struct MB2Info_BaseAddress*)MB2_structure;
-            OurBaseAddress = ThisStructure->address;
+            OurBaseAddress = (void*) ThisStructure->address;
             break;
         default:
             break;
