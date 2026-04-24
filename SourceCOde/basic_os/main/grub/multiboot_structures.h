@@ -91,7 +91,7 @@ struct MB2Info_Module{
     uint32_t Size;
     uint32_t Start;    /*This*/
     uint32_t End;      /*and this are physical addresses*/
-    char Name_string[];
+    char* Name_string; /*the string*/
 };
 
 
@@ -117,7 +117,7 @@ struct RAMMap_entry{
 struct MB2Info_LoaderName{
     uint32_t Type;
     uint32_t Size;
-    char Name_string[]; 
+    char* Name_string; /*string*/
 };
 
 
@@ -219,7 +219,7 @@ struct MB2Info_SMBIOS{
 struct MB2Info_ACPIv1{
     uint32_t Type;
     uint32_t Size;
-    char RSDPcopy[];
+    char* RSDPcopy;/*I guess this is some kind of dynamic sized array*/
 };
 
 
@@ -227,14 +227,14 @@ struct MB2Info_ACPIv1{
 struct MB2Info_ACPIv2{
     uint32_t Type;
     uint32_t Size;
-    char RSDPcopy[];
+    char* RSDPcopy;/*I guess this is some kind of dynamic sized array*/
 };
 
 
 struct MB2Info_DHCP_ACK_network{
     uint32_t Type;
     uint32_t Size;
-    char DHCP_ACK[];
+    char* DHCP_ACK;/*I guess this is some kind of dynamic sized array too*/
 };
 
 
@@ -243,7 +243,7 @@ struct MB2Info_UEFI_RAM_MAP{
     uint32_t Size;
     uint32_t DescriptorSize;
     uint32_t DescriptorVersion;
-    char Map[];
+    char* Map; /*This is an array of RAM map descriptors*/
 };
 
 
