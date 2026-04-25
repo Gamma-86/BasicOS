@@ -13,17 +13,18 @@ MEMORY
 
 SECTIONS
 {
+    . = 0x100000;
     .multiboot : ALIGN(8)  
     {
         header_start = .;
         *(.multiboot)
         header_end = .;
     
-    } > FREE_RAM_HIGH
-    .text : ALIGN(4096){*(.text*)}>FREE_RAM_HIGH
-    .data : ALIGN(4096){*(.data*)}>FREE_RAM_HIGH
-    .rodata : ALIGN(4096){*(.rodata*)}>FREE_RAM_HIGH
-    .bss : ALIGN(4096){*(.bss*)}>FREE_RAM_HIGH
-    .heap1 : ALIGN(4096){*(.heap1*)}>FREE_RAM2
+    }
+    .text : ALIGN(4096){*(.text*)}
+    .data : ALIGN(4096){*(.data*)}
+    .rodata : ALIGN(4096){*(.rodata*)}
+    .bss : ALIGN(4096){*(.bss*)}
+    .heap1 : ALIGN(4096){*(.heap1*)}
 }
 
