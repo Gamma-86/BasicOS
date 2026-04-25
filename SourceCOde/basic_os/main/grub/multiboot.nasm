@@ -29,6 +29,7 @@ header_start:
     dd MB2_LENGTH
     dd MB2_CHECKSUM
 
+%if 0
 align 8
     istruc HeaderTagGeneral
         at .type, dw Tagtype_VideoMode
@@ -38,6 +39,7 @@ align 8
     dd   VMODEwidth
     dd   VMODEheight
     dd   VMODEdepth
+%endif
 
 align 8
     dw 0
@@ -73,7 +75,7 @@ global _start
 _start:
     CLI
     mov   byte[0xb8000], 'A'
-    mov   byte[0xb8001], 0x0F
+    mov   byte[0xb8001], 0x1F
     mov   esp, stack_top
         cmp   eax, 0x36D76289
         jne   Not_multiboot
