@@ -69,6 +69,7 @@ MultibootInfoPTR dd 0
 section .text
 
 extern   kernel_main ;(unsigned int EAX_magic, void* EBX_structure)
+global _start
 _start:
     CLI
     mov   byte[0xb8000], 'A'
