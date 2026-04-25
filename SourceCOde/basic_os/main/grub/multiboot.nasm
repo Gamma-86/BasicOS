@@ -80,7 +80,12 @@ _start:
         cmp   eax, 0x36D76289
         jne   Not_multiboot
     mov   [MultibootInfoPTR], ebx
+
+    cli 
+    hlt
+
     call  Sort_multiboot_struct ;Sort things that multiboot gave in EBX*
+    
 
 
 

@@ -50,6 +50,8 @@ multiboot.o: $(PathTo_Multiboot_files)/multiboot.nasm
 		-o multiboot_C.o
 	$(LINKER) -m elf_i386 -r multiboot_ASM.o multiboot_C.o -o multiboot.o
 	mv  multiboot.o ./BIN_OBJ_filesDump/
+	rm  multiboot_ASM.o
+	rm  multiboot_C.o
 
 
 clean:
