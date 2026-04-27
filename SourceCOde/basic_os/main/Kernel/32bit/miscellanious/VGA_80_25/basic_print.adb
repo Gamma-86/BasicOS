@@ -35,7 +35,10 @@ package body VGA_80_25 is
 procedure New_Line is
 begin
 --Steps:
---1: 
+--1:Call Increase y coordinate full
+--2:and assign 0 to X coordinate
+   IncreaseYcord_Full (CurrentPagePTR);
+   Current_CursorXCordPTR.all := 0;
 end New_line;
 
 function Set_Internal_WritePage (Index : Integer) 
