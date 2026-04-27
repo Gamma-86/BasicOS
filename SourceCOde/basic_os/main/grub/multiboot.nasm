@@ -68,6 +68,7 @@ stack_top:
 
 section .data
 MultibootInfoPTR dd 0
+MB2_WholeTagStruct_TotalSize dd 0
 section .text
 
 extern   kernel_main ;(unsigned int EAX_magic, void* EBX_structure)
@@ -77,25 +78,38 @@ _start:
     mov   byte[0xb8000], 'A'
     mov   byte[0xb8001], 0x1F
     mov   esp, stack_top
-        cmp   eax, 0x36D76289
-        jne   Not_multiboot
+        cmp   eax, 0x36D76289 ;Check them magic tag given by multiboot
+        jne   .not_multiboot
+
+        test  ebx, 0x7 ;check if the address is aligned(it should always be aligned)
+        jnz   .not_aligned
     mov   [MultibootInfoPTR], ebx
+    mov   eax, [ebx + MB2Info_MainHead.Total_size]
+        mov   [MB2_WholeTagStruct_TotalSize], eax
 
-    cli 
+    call  Sort_multiboot_struct ;Sort things that multiboot given in EBX*
+
+
+
+.not_multiboot:
+    mov   eax, 'E' | (0xF<<8) | ('1'<<16) | (0xF<<24)
+    mov   [0xb8000], eax
+
+    cli
     hlt
+    jmp $
+.not_aligned:
+    mov   eax, 'E' | (0xF<<8) | ('2'<<16) | (0xF<<24)
+    mov   [0xb8000], eax
 
-    call  Sort_multiboot_struct ;Sort things that multiboot gave in EBX*
-    
-
-
-
-
-Not_multiboot:
+    cli
     hlt
+    jmp $
 
 section .bss
-MB2_RAM_map_array resb RAMMap_entry_size*256
-MB2_WholeStruct_size resd 1
+    global MB2_RAM_map_array
+    MB2_RAM_map_array resb RAMMap_entry_size*128
+
 section .text
 Get_next_eip:
     mov   eax, [esp]
