@@ -1,16 +1,16 @@
 with ReturnBitfields;
 package body VGA_80_25 is
 --briefly what is here :
---1 procedure new_line: puts the coordinates as if tere was a new line 
---2 function Set_Internal_Writepage(Index:Integer)
+--10 procedure new_line: puts the coordinates as if tere was a new line 
+--11 function Set_Internal_Writepage(Index:Integer)
 --    return ReturnBitfields.GeneralOS
 --    It sets on what page should other writing function write 
---3 Get_Corresponing_Page_PTR (Index : Integer) return VRAM_Array_PTR is
+--12 Get_Corresponing_Page_PTR (Index : Integer) return VRAM_Array_PTR is
 --    Returns pointer to the corresponding page according to the Index
---4 procedure MoveCursorForward
+--13 procedure MoveCursorForward
 --  This procedure is moves cursor to the position of the next character
 --  It is expected to call this after printing the character
---5 procedure ShiftCharsUp(Page : Vram_Array_PTR)
+--14 procedure ShiftCharsUp(Page : Vram_Array_PTR)
 --  takes in pointer to the text array that you want to shift up
 --    ofcourse, it is expects 2d array 80x25 of 2 byte elementrs
 --  This thing moves all elements of array 1 Y coordinate upper
@@ -18,16 +18,16 @@ package body VGA_80_25 is
 --     So for examplle Row 1 will move to Row 0
 --     Row 0 will be overwritten
 --     Row 24 will be filled with zero
---6 procedure IncreaseYcord_Full(IncreaseYcord_Full(IncreasedYCord_PTR:RowPTR)
+--15 procedure IncreaseYcord_Full(IncreaseYcord_Full(IncreasedYCord_PTR:RowPTR)
 --  It increases y coordinate but also covers the case if the number was
 --     Maximum Row coordiante
 --  IT ALSO, IN THAT CASE CALLS SHIFT ALL CHARS UP
---7 function IncreaseXcord(IncreaseXCord (IncreasedXCord : Column)
+--16 function IncreaseXcord(IncreaseXCord (IncreasedXCord : Column)
 --   Return Column
 --  Usually increases X coordinate by 1, but also covers the bahaviour of X
 --     During the New line (If the X coordinate is the maximum column coordinate)
 --     returns 0
---8 IncrementYCord (IncreasedYCord : Row) return Row
+--17 IncrementYCord (IncreasedYCord : Row) return Row
 --  This functions usually returns Column that is increased by 1,
 --    In other case(which is if Increased Y coordinate is too big)
 --    It returns maximum possible y coordinate(probably 24) 
