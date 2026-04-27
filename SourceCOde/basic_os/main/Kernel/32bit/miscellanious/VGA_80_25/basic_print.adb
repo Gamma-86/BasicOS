@@ -1,5 +1,24 @@
 with ReturnBitfields;
 package body VGA_80_25 is
+--briefly what is here :
+--1 procedure new_line: puts the coordinates as if tere was a new line 
+--2 function Set_Internal_Writepage(Index:Integer)
+--    return ReturnBitfields.GeneralOS
+--    It sets on what page should other writing function write 
+--3 Get_Corresponing_Page_PTR (Index : Integer) return VRAM_Array_PTR is
+--    Returns pointer to the corresponding page according to the Index
+--4 procedure MoveCursorForward
+--  This procedure is moves cursor to the position of the next character
+--  It is expected to call this after printing the character
+--5 procedure ShiftCharsUp(Page : Vram_Array_PTR)
+--  takes in pointer to the text array that you want to shift up
+--    ofcourse, it is expects 2d array 80x25 of 2 byte elementrs
+--  This thing moves all elements of array 1 Y coordinate upper
+--    This means to lower Y index because Y starts from upper part of screen
+--     So for examplle Row 1 will move to Row 0
+--     Row 0 will be overwritten
+--     Row 24 will be filled with zero
+
 
 procedure New_Line is
 begin
@@ -7,7 +26,10 @@ begin
 --1: 
 end New_line;
 
-function Set_Internal_WritePage (Index : Integer) return ReturnBitfields.GeneralOS is
+function Set_Internal_WritePage (Index : Integer) 
+return ReturnBitfields.GeneralOS is
+
+
    Return_Value : ReturnBitfields.GeneralOS;
 begin
 --Steps:
