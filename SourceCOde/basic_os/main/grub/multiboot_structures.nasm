@@ -44,19 +44,24 @@ endstruc
 
 
 %define MB2Info_RAMmap_type 6
-%define RAMmap_type_FreeRAM 1
-%define RAMmap_type_ACPI 3
-%define RAMmap_type_Hibernation 4
+struc RAMmap_entry_types
+    .Rsrvd   resb 1
+    .FreeRAM resb 2
+    .ACPI resb 1
+    .Hibernation resb 1
+endstruc
 struc MB2Info_RAMMap
     .Type resd 1,
     .Size resd 1
-    .Entry_size resd 1
+    .One_Entry_size resd 1
     .Entry_version resd 1
     .Entries_start resb 1
 endstruc
-struc RAMMap_entry
-    .Address resq 1
-    .Length    resq 1
+struc MB2_RAMMap_entry
+    .Address4Low  resd 1
+    .Address4High resd 1
+    .Length4Low   resd 1
+    .Length4Hig   resd 1
     .Type    resd 1
     .Reserved resd 1
 endstruc

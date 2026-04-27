@@ -933,7 +933,7 @@ add SP_NATIVE, %1
 %define What_Source_segment_string_nstructions_use ds_segment
 
 
-;%include "NASM_advanced_Macroses.nasm"
+%include "NASM_advanced_Macroses.nasm"
 
 
 %endif
