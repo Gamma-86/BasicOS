@@ -1,13 +1,50 @@
 with ReturnBitfields;
 package body VGA_80_25 is
+--briefly what is here :
+--10 procedure new_line: puts the coordinates as if tere was a new line 
+--11 function Set_Internal_Writepage(Index:Integer)
+--    return ReturnBitfields.GeneralOS
+--    It sets on what page should other writing function write 
+--12 Get_Corresponing_Page_PTR (Index : Integer) return VRAM_Array_PTR is
+--    Returns pointer to the corresponding page according to the Index
+--13 procedure MoveCursorForward
+--  This procedure is moves cursor to the position of the next character
+--  It is expected to call this after printing the character
+--14 procedure ShiftCharsUp(Page : Vram_Array_PTR)
+--  takes in pointer to the text array that you want to shift up
+--    ofcourse, it is expects 2d array 80x25 of 2 byte elementrs
+--  This thing moves all elements of array 1 Y coordinate upper
+--    This means to lower Y index because Y starts from upper part of screen
+--     So for examplle Row 1 will move to Row 0
+--     Row 0 will be overwritten
+--     Row 24 will be filled with zero
+--15 procedure IncreaseYcord_Full(IncreaseYcord_Full(IncreasedYCord_PTR:RowPTR)
+--  It increases y coordinate but also covers the case if the number was
+--     Maximum Row coordiante
+--  IT ALSO, IN THAT CASE CALLS SHIFT ALL CHARS UP
+--16 function IncreaseXcord(IncreaseXCord (IncreasedXCord : Column)
+--   Return Column
+--  Usually increases X coordinate by 1, but also covers the bahaviour of X
+--     During the New line (If the X coordinate is the maximum column coordinate)
+--     returns 0
+--17 IncrementYCord (IncreasedYCord : Row) return Row
+--  This functions usually returns Column that is increased by 1,
+--    In other case(which is if Increased Y coordinate is too big)
+--    It returns maximum possible y coordinate(probably 24) 
 
 procedure New_Line is
 begin
 --Steps:
---1: 
+--1:Call Increase y coordinate full
+--2:and assign 0 to X coordinate
+   IncreaseYcord_Full (CurrentPagePTR);
+   Current_CursorXCordPTR.all := 0;
 end New_line;
 
-function Set_Internal_WritePage (Index : Integer) return ReturnBitfields.GeneralOS is
+function Set_Internal_WritePage (Index : Integer) 
+return ReturnBitfields.GeneralOS is
+
+
    Return_Value : ReturnBitfields.GeneralOS;
 begin
 --Steps:
@@ -171,7 +208,7 @@ end if;
 end IncreaseYcord_Full;
 
 
-function IncrementXCord(IncreasedXCord : Column) return Column is
+function IncreaseXCord(IncreasedXCord : Column) return Column is
 begin
 --What to do:
 --the basic idea is to increase X by 1
