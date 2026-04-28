@@ -61,7 +61,7 @@ struc MB2_RAMMap_entry
     .Address4Low  resd 1
     .Address4High resd 1
     .Length4Low   resd 1
-    .Length4Hig   resd 1
+    .Length4High  resd 1
     .Type    resd 1
     .Reserved resd 1
 endstruc
