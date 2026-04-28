@@ -61,11 +61,11 @@ section .data
 
 section .bss
     %define INITIAL_STACK_SIZE 65536+4096
-stack_end:
-resb  INITIAL_STACK_SIZE
-stack_top:
+    stack_end:
+    resb  INITIAL_STACK_SIZE
+    stack_top:
 section .data
-Initial_stack_size_VAR dd INITIAL_STACK_SIZE
+    Initial_stack_size_VAR dd INITIAL_STACK_SIZE
 
 
 MultibootInfoPTR dd 0
