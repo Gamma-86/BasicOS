@@ -225,9 +225,9 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
                 mov   dword[edi + RAMMapInfo_DLinkedList_entry.next], 0
                 mov   dword[edi + RAMMapInfo_DLinkedList_entry.prev], 0
                 pxor  mm0, mm0
-                mov   [edi + RAMMapInfo_DLinkedList_entry.Address4LOW], mm0
-                mov   [edi + RAMMapInfo_DLinkedList_entry.Length4LOW], mm0
-                mov   [edi + RAMMapInfo_DLinkedList_entry.EndAddress4LOW], mm0
+                movq  [edi + RAMMapInfo_DLinkedList_entry.Address4LOW], mm0
+                movq  [edi + RAMMapInfo_DLinkedList_entry.Length4LOW], mm0
+                movq  [edi + RAMMapInfo_DLinkedList_entry.EndAddress4LOW], mm0
 
             ;Now let's calculate where our MB2 entries start and end
             mov   eax, [CurrentTagPointerReg + MB2Info_RAMMap.Entries_start]

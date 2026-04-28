@@ -123,3 +123,28 @@ struc TSS_save_space
     .T_bit_Bool16 resb 2
     .IO_map_base resb 2
 endstruc
+
+struc cr0_indexes
+    .PE resb 0
+    .PE_Protected_enabled resb 1
+    .MP resb 0
+    .MP_FPU_monitored resb 1
+    .EM resb 0
+    .EM_FPU_emulated resb 1
+    .TS resb 0
+    .TS_Task_Was_Switched resb 1
+    .ET resb 0
+    .ET_X87_installed resb 1
+    .NE resb 0
+    .NE_X87_Exceptions_mode resb 11
+    .WP resb 0
+    .WP_Cant_Write_Pages resb 2
+    .AM resb 0
+    .AM_Check_Alignment resb 11
+    .NW resb 0
+    .NW_NonWrite_Cache resb 1
+    .CD resb 0
+    .CD_Cache_Deisabled resb 1
+    .PG resb 0
+    .PG_Pagind_Enabled resb 1
+endstruc
