@@ -9,8 +9,8 @@
 
 
 void* OurBaseAddress;
-
-
+unsigned char MB2ParseErrorFlag_RAMMap_IN_C_FUN = 0;
+unsigned char MB2ParseErrorFlag_Unknown_Tag_Type = 0;
 int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
     uint32_t MB2_type = MB2_structure->Type;
 
@@ -26,6 +26,7 @@ int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
             break;
         case MB2Info_RAMmap_type:
             struct MB2Info_RAMMap* RAMMap_TagPTR = (struct MB2Info_RAMMap*)MB2_structure;
+            MB2ParseErrorFlag_RAMMap_IN_C_FUN = 1;
             break;
         case MB2Info_APM_type:
             struct MB2Info_APM* APMtype_TagPTR = (struct MB2Info_APM*)MB2_structure;
@@ -73,6 +74,7 @@ int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
             OurBaseAddress = (void*) ThisStructure->address;
             break;
         default:
+            MB2ParseErrorFlag_Unknown_Tag_Type = 1;
             break;
     }
 

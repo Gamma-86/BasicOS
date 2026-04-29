@@ -134,7 +134,7 @@ struc RAMMapInfo_DLinkedList_entry
     .Length4High resb 4
     .EndAddress4Low resb 4
     .EndAddress4High resb 4
-    .type resb 4
+    .Type resb 4
 endstruc 
 %macro Roof_to_align8__reg_FreeReg  2
     mov   %2, %1
@@ -155,7 +155,7 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
 
     %define multi_struct ebp-4
     %define multi_struct_fullSize ebp-8
-    %define CurrentTagPointerReg ebx
+    %define CurrentTagPointerReg ebx ;already have pointer to struct
     %define MaxIteration ebp-12
     %define ReturnAddress ebp-16
     %define EBX_save      mm5
@@ -173,7 +173,8 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
     mov   eax, [ebx + MB2Info_MainHead.Total_size]
         mov   [multi_struct_fullSize], eax
     mov   [multi_struct], ebx
-    add   CurrentTagPointerReg, MB2Info_MainHead_size
+    add   CurrentTagPointerReg, MB2Info_MainHead_size;Exited Main head
+    ;      Entered multiboot tags
 
     ;while tag type !=0 analyze it
     ;but try repeating it only 8192 times
@@ -191,18 +192,16 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
         ;4 If loop ended, do something IDK
 
         ;1
-        mov   eax, [CurrentTagPointerReg + MB2Info_TagHead.type]
+        mov   eax, [CurrentTagPointerReg + MB2Info_TagHead.Type]
             test  eax, eax
             jz    .For_immediate_end
         cmp   eax, MB2Info_RAMmap_type
             sete  dl
 
         IF_BOOL_START dl
-            %define Current_List_entry_PTR ebp-20
-            %define First_list_entry_PTR ebp-24
-            %define MB2_AddressEntriesEnd ebp-28
-            %define CurrentMB2_RAMentryPTR ebp -32
-            %define Previous_List_entry_PTR ebp -36
+            %define First_list_entry_PTR ebp-20
+            %define MB2_AddressEntriesEnd ebp-24
+            %define Previous_List_entry_PTR ebp -28
 
             ;2 IF dl=1 This is RAM MAP thing
             ;2.1
@@ -220,7 +219,6 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
             ;Allocate some space on stack with subtract
             ;Let's initialize with first entry
             sub   esp, RAMMapInfo_DLinkedList_entry_size
-            mov   [Current_List_entry_PTR], esp
             mov   [First_list_entry_PTR], esp    ;Here is our first entry
             mov   edi, esp
                 mov   dword[edi + RAMMapInfo_DLinkedList_entry.next], 0
@@ -232,7 +230,7 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
                 movq  [edi + RAMMapInfo_DLinkedList_entry.EndAddress4Low], mm0
                 ;HEre we initialized it
             ;Now let's calculate where our MB2 entries start and end
-            mov   eax, [CurrentTagPointerReg + MB2Info_RAMMap.Entries_start]
+            lea   eax, [CurrentTagPointerReg + MB2Info_RAMMap.Entries_start]
             mov   edx, [CurrentTagPointerReg + MB2Info_RAMMap.Size]
                 add   edx, CurrentTagPointerReg
 
@@ -240,8 +238,18 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
             %define MB2Info_RAMentryRegPTR edi
             mov   MB2Info_RAMentryRegPTR, eax
             mov   [MB2_AddressEntriesEnd], edx
-            mov   LinkedList_entryRegPTR, [Current_List_entry_PTR] ;The list entry expected to be already allocated
+            mov   LinkedList_entryRegPTR, [First_list_entry_PTR] ;The list entry expected to be already allocated
             .Analyzing_MB2_Address_entries_start:
+                ;Plan:
+                ;Used Bariables: MB2_AddressEntriesEnd, MB2Info_RAMentryRegPTR
+                ;  LinkedList_entryRegPTR, Previous_List_entry_PTR,
+                ;
+                ;  get everything from MB2 info entry to CPU
+                ;  allocate linked list entry
+                ;  move everything needed to list from CPU
+                ;  Update all variables: 
+                ;  
+
                 ;Space for linked list is expected to be allcoated
                 ;LinkedList entry Reg PTR, MB2Entry reg pointer 
                 ;   Are expected to be here
@@ -257,35 +265,40 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
                 movq  mm1, [MB2Info_RAMentryRegPTR + MB2_RAMMap_entry.Length4Low]
                     movq mm3, mm0
                     paddq mm3, mm1
-                movd  mm2, [MB2Info_RAMentryRegPTR + MB2_RAMMap_entry.type]
+                movd  mm2, [MB2Info_RAMentryRegPTR + MB2_RAMMap_entry.Type]
 
                 ;2 part 2, initializing linked list
                 movq [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.Address4Low], mm0
                 movq [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.Length4Low],  mm1
                 movq [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.EndAddress4Low], mm3
-                movd [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.type], mm2
+                movd [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.Type], mm2
                 ;Next things to do:
                 ; 1 Initialize prev PTR in list with PREV entry PTR
-                ; 2 Allocate place for new entry (NEXT entry) and save pointer to the current one
+                ; 2 Allocate place for new entry (NEXT entry) and save NEXT in list
                 ; 3 Also we need to update local NEXT/PREV entry pointers
-                ;     Also update Linkedlist, MB2Entries reg pointer
-                
+                ;    for next list entry,update DLinkedlistReg, MB2EntryReg
+
                 ;1
                 mov   eax, [Previous_List_entry_PTR]
-                mov   [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.prev]
+                mov   [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.prev], eax
                 ;2
                 sub   esp, RAMMapInfo_DLinkedList_entry_size
                     mov   edx, esp
-                    mov   [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.next], eax
+                    mov   [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.next], edx
                 ;3
                 mov   [Previous_List_entry_PTR], LinkedList_entryRegPTR
-                mov   [Current_List_entry_PTR],  edx
                 mov   LinkedList_entryRegPTR, edx
 
-                add   MB2Info_RAMentryRegPTR, [MB2Info_RAMentryRegPTR + MB2_RAMMap_entry.size]
+                add   MB2Info_RAMentryRegPTR, [MB2Info_RAMentryRegPTR + MB2_RAMMap_entry.Size]
 
+                jmp   .Analyzing_MB2_Address_entries_start
             .Analyzing_MB2_Address_entries_end:
+                ;after that, we have to go to the next tag:
+                add   CurrentTagPointerReg, [CurrentTagPointerReg + MB2Info_RAMMap.Size]
         ELSE
+            push  CurrentTagPointerReg
+            call  Multiboot2_info_main_parser
+            add   esp, 4
         IF_BOOL_END
     FOR_END
 .For_immediate_end:
