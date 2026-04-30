@@ -23,7 +23,7 @@ PathTo_OS_include = ./main/Kernel/OS_includes
 
 ADA_default_flags = -I$(PathTo_OS_include)/ -gnatp -ffreestanding -nostdlib -fno-exceptions -gnatec=$(PathTo_GNAT_ADC)
 NASM_default_flags = -i$(PathTo_OS_include)/ -i$(PathTo_NASM_default_macroses)/ -i$(PathTo_IA32Macroses_NASM)/ -g
-C_default_flags = -I$(PathTo_OS_include)/ -m32 -ffreestanding -fno-stack-protector -fno-pic -fno-pie
+C_default_flags = -I$(PathTo_OS_include)/ -Wall -g -m32 -ffreestanding -fno-stack-protector -fno-pic -fno-pie
 
 C_compiler = ~/crossCOMPs/gccses/bin/i686-elfNoOS-gcc
 ADA_compiler = ~/crossCOMPs/gccses/bin/i686-elfNoOS-gcc
@@ -34,7 +34,7 @@ PathTo_LinkerScript = ./main/grub
 
 all:
 	make clean
-	make multiboot.elf
+	make multiboot_test.iso
 
 
 
@@ -59,6 +59,7 @@ multiboot.o: $(PathTo_Multiboot_files)/multiboot.nasm
 multiboot.elf:
 	make multiboot.o
 	ld -m elf_i386 -T $(Linker_Script_Full_Path)  $(PathTo_BIN_OBJ_filesDump)/multiboot.o -o $(PathTo_BIN_OBJ_filesDump)/multiboot.elf
+	rm $(PathTo_BIN_OBJ_filesDump)/multiboot.o
 
 multiboot_test.iso:
 	make multiboot.elf

@@ -302,6 +302,7 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
             push  CurrentTagPointerReg
             call  Multiboot2_info_main_parser
             add   esp, 4
+            add   CurrentTagPointerReg, eax
         IF_BOOL_END
     FOR_LOOP_END
 .For_immediate_end:
