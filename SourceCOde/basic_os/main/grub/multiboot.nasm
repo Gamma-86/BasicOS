@@ -148,7 +148,9 @@ endstruc
     add  %1, %2; Aligned
 %endmacro
 section .data
-    Not_Enough_Stack_for_RamMap db 0
+    MB2Error_Not_Enough_Stack_for_RamMap db 0
+    MB2Error_MaxIteration_Passed db 0
+    RAMMap_Description_LinkedList_FirstPTR dd 0
 section .text
 Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different arrays
     %push Sorting
@@ -220,6 +222,7 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
             ;Let's initialize with first entry
             sub   esp, RAMMapInfo_DLinkedList_entry_size
             mov   [First_list_entry_PTR], esp    ;Here is our first entry
+            mov   [RAMMap_Description_LinkedList_FirstPTR], esp
             mov   edi, esp
                 mov   dword[edi + RAMMapInfo_DLinkedList_entry.next], 0
                 mov   dword[edi + RAMMapInfo_DLinkedList_entry.prev], 0
@@ -302,11 +305,21 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
         IF_BOOL_END
     FOR_END
 .For_immediate_end:
+    test word[MaxIteration], 0xFFFF
+        setz  al
+        mov   [MB2Error_MaxIteration_Passed], al
 
-    movd   edi, EDI_save
-    movd   esi, ESI_save
-    movd   ebx, EBX_save
-    leave
+    movd  edi, EDI_save
+    movd  esi, ESI_save
+    movd  ebx, EBX_save
+
+    ;now we need to save the allocated stack space
+    sub   esp, 16
+    and   esp, ~(0xF)
+    sub   esp, 4
+        mov   eax, [ReturnAddress]
+        mov   [esp], eax
+    mov   ebp, [ebp]
     ret
 %undef MaxIteration
 %undef CurrentTagPointerReg

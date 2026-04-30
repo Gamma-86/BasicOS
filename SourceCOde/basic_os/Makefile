@@ -1,6 +1,8 @@
 PathTo_32bitKernel = ./main/32bit
 
 PathTo_Multiboot_files = ./main/grub
+Linker_Script_Full_Path = ./main/grub/link.ld
+PathTo_BIN_OBJ_filesDump = ./BIN_OBJ_filesDump
 
 PathTo_OS_return_codes = ./main/OS_includes
 
@@ -52,6 +54,10 @@ multiboot.o: $(PathTo_Multiboot_files)/multiboot.nasm
 	mv  multiboot.o ./BIN_OBJ_filesDump/
 	rm  multiboot_ASM.o
 	rm  multiboot_C.o
+
+multiboot.elf:
+	make multiboot.o
+	ld -m elf_i386 -T $(Linker_Script_Full_Path)  $(PathTo_BIN_OBJ_filesDump)/multiboot.o -o multiboot.elf
 
 
 clean:
