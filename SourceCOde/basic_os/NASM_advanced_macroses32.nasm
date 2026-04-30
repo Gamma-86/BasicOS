@@ -70,7 +70,7 @@ endstruc
     %ifctx IF
         %$IF_NOT:
         %pop
-    %ifctx ELSE
+    %elifctx ELSE
         %$IF_END:
         %pop
     %else
