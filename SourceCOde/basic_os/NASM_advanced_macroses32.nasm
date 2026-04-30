@@ -131,7 +131,7 @@ endstruc
     %ifnctx FOR_START_CONTEXT
         %error Cant break when no for loop
     %endif
-    j%-1 %$FOR_END
+    j%+1 %$FOR_END
 %endmacro
 
 

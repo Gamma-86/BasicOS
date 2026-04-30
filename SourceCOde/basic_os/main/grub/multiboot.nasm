@@ -92,7 +92,7 @@ _start:
         btr   eax, 1
         btr   eax, 2
         btr   eax, 3
-
+    mov   cr0, eax
     call  Sort_multiboot_struct ;Sort things that multiboot given in EBX*
 
 
