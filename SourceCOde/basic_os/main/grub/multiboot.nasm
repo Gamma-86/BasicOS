@@ -179,7 +179,7 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
     ;while tag type !=0 analyze it
     ;but try repeating it only 8192 times
 
-    FOR_LOOP_START word[MaxIteration], 8192, 0
+    FOR_LOOP_START_LOCAL word[MaxIteration], 8192, 0
         ;what to do here:
         ;1-Look at the current multiboot tag and check its type
         ; 1.1 If Tag is 0, it means end, end the loop
@@ -198,17 +198,19 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
         cmp   eax, MB2Info_RAMmap_type
             sete  dl
 
-        IF_BOOL_START dl
+        IF_BOOL_START_LOCAL dl
             %define First_list_entry_PTR ebp-20
             %define MB2_AddressEntriesEnd ebp-24
             %define Previous_List_entry_PTR ebp -28
-
+            %define One_MB2RAMMapEntry_size ebp -32
+            mov   eax, [CurrentTagPointerReg + MB2Info_RAMMap.One_Entry_size]
+            mov   [One_MB2RAMMapEntry_size], eax
             ;2 IF dl=1 This is RAM MAP thing
             ;2.1
             mov   eax, [CurrentTagPointerReg + MB2Info_RAMMap.Size]
-            cmp   eax, Initial_stack_size-4096-256
+            cmp   eax, INITIAL_STACK_SIZE-4096-256
                 setae al ;if eax is above or equal the max size, set al
-                mov   [Not_Enough_Stack_for_RamMap], al
+                mov   [MB2Error_Not_Enough_Stack_for_RamMap], al
             ;Since we have to still make list partially or not,
             ;And I dont know how many additional size will add when making
             ;list, We have constantly check for stack space left
@@ -290,18 +292,18 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
                 mov   [Previous_List_entry_PTR], LinkedList_entryRegPTR
                 mov   LinkedList_entryRegPTR, edx
 
-                add   MB2Info_RAMentryRegPTR, [MB2Info_RAMentryRegPTR + MB2_RAMMap_entry.Size]
+                add   MB2Info_RAMentryRegPTR, [One_MB2RAMMapEntry_size]
 
                 jmp   .Analyzing_MB2_Address_entries_start
             .Analyzing_MB2_Address_entries_end:
                 ;after that, we have to go to the next tag:
                 add   CurrentTagPointerReg, [CurrentTagPointerReg + MB2Info_RAMMap.Size]
-        ELSE
+        ELSE_LOCAL
             push  CurrentTagPointerReg
             call  Multiboot2_info_main_parser
             add   esp, 4
-        IF_BOOL_END
-    FOR_END
+        IF_BOOL_END_LOCAL
+    FOR_LOOP_END_LOCAL
 .For_immediate_end:
     test word[MaxIteration], 0xFFFF
         setz  al
