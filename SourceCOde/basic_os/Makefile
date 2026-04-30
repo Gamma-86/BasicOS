@@ -33,7 +33,7 @@ PathTo_LinkerScript = ./main/grub
 
 all:
 	make clean
-	make multiboot.o
+	make multiboot.elf
 
 
 
