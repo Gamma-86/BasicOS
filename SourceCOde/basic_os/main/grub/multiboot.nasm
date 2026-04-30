@@ -194,7 +194,7 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
         ;1
         mov   eax, [CurrentTagPointerReg + MB2Info_TagHead.Type]
             test  eax, eax
-            ;FOR_LOOP_BREAK_COND_JMP z
+            FOR_LOOP_BREAK_COND_JMP z
         cmp   eax, MB2Info_RAMmap_type
             sete  dl
 
