@@ -179,7 +179,7 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
     ;while tag type !=0 analyze it
     ;but try repeating it only 8192 times
 
-    FOR_LOOP_START_LOCAL word[MaxIteration], 8192, 0
+    FOR_LOOP_START word[MaxIteration], 8192, 0
         ;what to do here:
         ;1-Look at the current multiboot tag and check its type
         ; 1.1 If Tag is 0, it means end, end the loop
@@ -194,11 +194,11 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
         ;1
         mov   eax, [CurrentTagPointerReg + MB2Info_TagHead.Type]
             test  eax, eax
-            jz    .For_immediate_end
+            ;FOR_LOOP_BREAK_COND_JMP z
         cmp   eax, MB2Info_RAMmap_type
             sete  dl
 
-        IF_BOOL_START_LOCAL dl
+        IF_BOOL_START dl
             %define First_list_entry_PTR ebp-20
             %define MB2_AddressEntriesEnd ebp-24
             %define Previous_List_entry_PTR ebp -28
@@ -298,12 +298,12 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
             .Analyzing_MB2_Address_entries_end:
                 ;after that, we have to go to the next tag:
                 add   CurrentTagPointerReg, [CurrentTagPointerReg + MB2Info_RAMMap.Size]
-        ELSE_LOCAL
+        ELSE
             push  CurrentTagPointerReg
             call  Multiboot2_info_main_parser
             add   esp, 4
-        IF_BOOL_END_LOCAL
-    FOR_LOOP_END_LOCAL
+        IF_BOOL_END
+    FOR_LOOP_END
 .For_immediate_end:
     test word[MaxIteration], 0xFFFF
         setz  al

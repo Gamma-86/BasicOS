@@ -81,35 +81,7 @@ endstruc
 %endmacro
 
 
-%macro IF_BOOL_START_LOCAL 1
-    %push IF
-    test  %1, -1
-    jz    .%$IF_NOT
-%endmacro
 
-
-%macro ELSE_LOCAL 0
-    %ifctx IF
-        %repl ELSE
-        jmp   %$IF_END
-        .%$IF_NOT:
-    %else
-        %error there is supposed to be if before else
-    %endif
-%endmacro
-
-
-%macro IF_BOOL_END_LOCAL 0
-    %ifctx IF
-        .%$IF_NOT:
-        %pop
-    %elifctx ELSE
-        .%$IF_END:
-        %pop
-    %else
-        %error expected something like IF or ELSE before IF_BOOL_END
-    %endif
-%endmacro
 
 
 
@@ -148,44 +120,19 @@ endstruc
 
 %endmacro
 
-
-
-
-%macro FOR_LOOP_START_LOCAL 3
-
-%push FOR_START_CONTEXT
-    %define Counter_VAR %1
-    %define Start_NUM %2
-    %define End_NUM %3
-
-    %if   Start_NUM = 0
-        xor   Counter_VAR, Counter_VAR
-    %else
-        mov   Counter_VAR, Start_NUM
-    %endif
-    .%$FOR_START:
-    cmp Counter_VAR, End_NUM
-    je    .%$FOR_END
-
-    %if Start_NUM>End_NUM
-        dec   Counter_VAR
-    %else
-        inc   Counter_VAR
-    %endif
-%endmacro
-
-%macro FOR_LOOP_END_LOCAL 0
+%macro FOR_LOOP_BREAK 0
     %ifnctx FOR_START_CONTEXT
-        %fatal Expected FOR_LOOP_START before FOR_LOOP_END
+        %error Cant break when no for loop
     %endif
-
-    jmp   .%$FOR_START
-    .%$FOR_END:
-
-%pop
-
+    jmp   %$FOR_END
 %endmacro
 
+%macro FOR_LOOP_BREAK_COND_JMP 1
+    %ifnctx FOR_START_CONTEXT
+        %error Cant break when no for loop
+    %endif
+    j%-1
+%endmacro
 
 
 
