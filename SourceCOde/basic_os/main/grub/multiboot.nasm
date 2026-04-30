@@ -112,9 +112,7 @@ _start:
     hlt
     jmp $
 
-section .bss
-    global MB2_RAM_map_array
-    MB2_RAM_map_array resb RAMMap_entry_size*128
+
 
 section .text
 Get_next_eip:
