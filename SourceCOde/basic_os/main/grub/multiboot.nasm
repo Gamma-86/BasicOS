@@ -134,16 +134,9 @@ struc RAMMapInfo_DLinkedList_entry
     .EndAddress4High resb 4
     .Type resb 4
 endstruc 
-%macro Roof_to_align8__reg_FreeReg  2
-    mov   %2, %1
-    and   %2, 0x7
-    ;to align first 3 bit to 8, we should
-    ;   sub 3 bits from 8
-    ;   and add  result to 3 bit
-    ;   (8 - 3bit) + 3bit
-    sub  %2, 8 ; 3 bit - 8
-    neg  %2    ; 8 - 3bit
-    add  %1, %2; Aligned
+%macro ALIGNREG_ROOF8 1
+    add   %1, 7 ;100% not aligned, and is in the next align block
+    and   %1, ~(0x7) ;ALign to floor
 %endmacro
 section .data
     MB2Error_Not_Enough_Stack_for_RamMap db 0
@@ -298,11 +291,13 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
             .Analyzing_MB2_Address_entries_end:
                 ;after that, we have to go to the next tag:
                 add   CurrentTagPointerReg, [CurrentTagPointerReg + MB2Info_RAMMap.Size]
+                ALIGNREG_ROOF8 CurrentTagPointerReg
         ELSE
             push  CurrentTagPointerReg
             call  Multiboot2_info_main_parser
             add   esp, 4
             add   CurrentTagPointerReg, eax
+            ALIGNREG_ROOF8 CurrentTagPointerReg
         IF_BOOL_END
     FOR_LOOP_END
 .For_immediate_end:
