@@ -45,6 +45,10 @@ int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
             struct MB2Info_VRAM* VRAM_TagPTR = (struct MB2Info_VRAM*)MB2_structure;
             return VRAM_TagPTR->Size;
             break;
+        case MB2Info_ElfSymbols_type:
+            struct MB2Info_ElfSymbols* ElfSymbols_TagPTR = (struct MB2Info_ElfSymbols*)MB2_structure;
+            return ElfSymbols_TagPTR->size;
+            break;
         case MB2Info_UEFI32table_type:
             struct MB2Info_UEFI32table* UEFI32_TagPTR = (struct MB2Info_UEFI32table*)MB2_structure;
             return UEFI32_TagPTR->Size;

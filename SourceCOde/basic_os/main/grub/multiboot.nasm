@@ -130,8 +130,8 @@ struc RAMMapInfo_DLinkedList_entry
     .Address4High resb 4
     .Length4Low resb 4
     .Length4High resb 4
-    .EndAddress4Low resb 4
-    .EndAddress4High resb 4
+    .LastAddress4Low resb 4
+    .LastAddress4High resb 4
     .Type resb 4
 endstruc 
 %macro ALIGNREG_ROOF8 1
@@ -223,17 +223,16 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
                 pxor  mm0, mm0
                 movq  [edi + RAMMapInfo_DLinkedList_entry.Address4Low], mm0
                 movq  [edi + RAMMapInfo_DLinkedList_entry.Length4Low], mm0
-                movq  [edi + RAMMapInfo_DLinkedList_entry.EndAddress4Low], mm0
+                movq  [edi + RAMMapInfo_DLinkedList_entry.LastAddress4Low], mm0
                 ;HEre we initialized it
             ;Now let's calculate where our MB2 entries start and end
             lea   eax, [CurrentTagPointerReg + MB2Info_RAMMap.Entries_start]
             mov   edx, [CurrentTagPointerReg + MB2Info_RAMMap.Size]
-                add   edx, CurrentTagPointerReg
-
-            %define LinkedList_entryRegPTR esi
-            %define MB2Info_RAMentryRegPTR edi
+                add   edx, CurrentTagPointerReg ;So the end address = NExt tag
+                mov   [MB2_AddressEntriesEnd], edx
+            %define LinkedList_entryRegPTR edi
+            %define MB2Info_RAMentryRegPTR esi
             mov   MB2Info_RAMentryRegPTR, eax
-            mov   [MB2_AddressEntriesEnd], edx
             mov   LinkedList_entryRegPTR, [First_list_entry_PTR] ;The list entry expected to be already allocated
             .Analyzing_MB2_Address_entries_start:
                 ;Plan:
@@ -260,13 +259,15 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
                 movq  mm0, [MB2Info_RAMentryRegPTR + MB2_RAMMap_entry.Address4Low]
                 movq  mm1, [MB2Info_RAMentryRegPTR + MB2_RAMMap_entry.Length4Low]
                     movq mm3, mm0
-                    paddq mm3, mm1
+                    paddq mm3, mm1 ;ALso we need to sub 1
+                    pcmpeqb mm4, mm4 ;-1
+                    paddq mm3, mm4   ;mm3 + (-1)
                 movd  mm2, [MB2Info_RAMentryRegPTR + MB2_RAMMap_entry.Type]
 
                 ;2 part 2, initializing linked list
                 movq [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.Address4Low], mm0
                 movq [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.Length4Low],  mm1
-                movq [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.EndAddress4Low], mm3
+                movq [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.LastAddress4Low], mm3
                 movd [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.Type], mm2
                 ;Next things to do:
                 ; 1 Initialize prev PTR in list with PREV entry PTR
@@ -283,14 +284,20 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
                     mov   [LinkedList_entryRegPTR + RAMMapInfo_DLinkedList_entry.next], edx
                 ;3
                 mov   [Previous_List_entry_PTR], LinkedList_entryRegPTR
-                mov   LinkedList_entryRegPTR, edx
+                mov   LinkedList_entryRegPTR, edx 
+                ;Current List entry = next 
 
                 add   MB2Info_RAMentryRegPTR, [One_MB2RAMMapEntry_size]
 
                 jmp   .Analyzing_MB2_Address_entries_start
-            .Analyzing_MB2_Address_entries_end:
+            .Analyzing_MB2_Address_entries_end: 
+                ;After the end, the last entry is bad
+                ;and previous one has next NEXT pointer not nulled.
+                add   esp, RAMMapInfo_DLinkedList_entry_size
+                mov   dword[esp + RAMMapInfo_DLinkedList_entry.next], 0
+
                 ;after that, we have to go to the next tag:
-                add   CurrentTagPointerReg, [CurrentTagPointerReg + MB2Info_RAMMap.Size]
+                mov   CurrentTagPointerReg, [MB2_AddressEntriesEnd]
                 ALIGNREG_ROOF8 CurrentTagPointerReg
         ELSE
             push  CurrentTagPointerReg

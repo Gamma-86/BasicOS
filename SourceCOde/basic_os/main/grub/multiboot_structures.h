@@ -33,6 +33,7 @@ enum MB2Info_types{
         VRAM_RGBMode = 1,
         VRAM_EGAMode = 2,
 
+    MB2Info_ElfSymbols_type = 9,
 
     MB2Info_UEFI32table_type = 11,
     MB2Info_UEFI32table_fullsize = 12,
@@ -189,7 +190,15 @@ struct MB2Info_VRAM{
 
 
 
-
+struct MB2Info_ElfSymbols{
+    uint32_t type;
+    uint32_t size;
+    uint16_t num;
+    uint16_t entsize;
+    uint16_t shndx;
+    uint16_t reserved;
+    char*    Section_Headers;
+};
 
 struct MB2Info_UEFI32table{
     uint32_t Type;
