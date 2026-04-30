@@ -57,7 +57,7 @@ endstruc
 
 %macro ELSE 0
     %ifctx IF
-        %repl %ELSE
+        %repl ELSE
         jmp   %$IF_END
         %$IF_NOT:
     %else
