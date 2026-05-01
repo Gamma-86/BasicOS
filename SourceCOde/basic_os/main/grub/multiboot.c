@@ -98,7 +98,7 @@ int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
             break;
         default:
             MB2ParseErrorFlag_Unknown_Tag_Type = 1;
-            return -1;
+            return 0;
             break;
     }
 
