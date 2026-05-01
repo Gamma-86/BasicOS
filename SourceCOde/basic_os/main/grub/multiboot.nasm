@@ -307,7 +307,6 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
             ALIGNREG_ROOF8 CurrentTagPointerReg
         IF_BOOL_END
     FOR_LOOP_END
-.For_immediate_end:
     test word[MaxIteration], 0xFFFF
         setz  al
         mov   [MB2Error_MaxIteration_Passed], al
