@@ -11,9 +11,14 @@
 void* OurBaseAddress;
 unsigned char MB2ParseErrorFlag_RAMMap_IN_C_FUN = 0;
 unsigned char MB2ParseErrorFlag_Unknown_Tag_Type = 0;
+unsigned char MB2ParseErrorFlag_WrongAlignment = 0;
+unsigned char MB2ParseErrorFlag_WrongTagSize = 0;
 /*return size of structure*/
 int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
     uint32_t MB2_type = MB2_structure->Type;
+    if( (uintptr_t)MB2_structure & 7 ){
+        MB2ParseErrorFlag_WrongAlignment = 1;
+    }
 
     switch(MB2_type){
         case MB2Info_CMDline_type:
@@ -27,6 +32,20 @@ int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
         case MB2Info_Module_type:
             struct MB2Info_Module* Module_TagPTR = (struct MB2Info_Module*)MB2_structure;
             return Module_TagPTR->Size;
+            break;
+        case MB2Info_BasicRam_type:
+            struct MB2Info_BasicRAMInfo* BasicRAMInfo_TagPTR = (struct MB2Info_BasicRAMInfo*)MB2_structure;
+            if (BasicRAMInfo_TagPTR->Size != MB2Info_BasicRam_size){
+                MB2ParseErrorFlag_WrongTagSize = 1;
+            }
+            return BasicRAMInfo_TagPTR->Size;
+            break;
+        case MB2Info_BIOSBootDevice_type:
+            struct MB2Info_BIOSBootDevice* BIOSBootDevice_TagPTR = (struct MB2Info_BIOSBootDevice*)MB2_structure;
+            if(BIOSBootDevice_TagPTR->Size != MB2Info_BIOSBootDevice_size){
+                MB2ParseErrorFlag_WrongTagSize = 1;
+            }
+            return BIOSBootDevice_TagPTR->Size;
             break;
         case MB2Info_RAMmap_type:
             struct MB2Info_RAMMap* RAMMap_TagPTR = (struct MB2Info_RAMMap*)MB2_structure;

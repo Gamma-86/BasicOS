@@ -34,7 +34,7 @@ PathTo_LinkerScript = ./main/grub
 
 all:
 	make clean
-	make multiboot_test.iso
+	make multiboot_DVDtest.iso
 
 
 
@@ -61,7 +61,7 @@ multiboot.elf:
 	ld -m elf_i386 -T $(Linker_Script_Full_Path)  $(PathTo_BIN_OBJ_filesDump)/multiboot.o -o $(PathTo_BIN_OBJ_filesDump)/multiboot.elf
 	rm $(PathTo_BIN_OBJ_filesDump)/multiboot.o
 
-multiboot_test.iso:
+multiboot_DVDtest.iso:
 	make multiboot.elf
 	mv $(PathTo_BIN_OBJ_filesDump)/multiboot.elf $(PathTo_GrubDiskSystem)/boot
 	grub-mkrescue $(PathTo_GrubDiskSystem) -o $(PathTo_BIN_OBJ_filesDump)/multiboot_test.iso

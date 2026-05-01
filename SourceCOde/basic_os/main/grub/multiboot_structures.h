@@ -4,8 +4,7 @@
 #include <stdint.h>
 
 enum MB2Info_types{
-    MB2Info_BasicRam_type = 4,
-    MB2Info_BasicRam_size = 16,
+
 
     MB2Info_CMDline_type = 1,
 
@@ -13,6 +12,11 @@ enum MB2Info_types{
 
     MB2Info_Module_type = 3,
 
+    MB2Info_BasicRam_type = 4,
+    MB2Info_BasicRam_size = 16,
+    
+    MB2Info_BIOSBootDevice_type = 5,
+    MB2Info_BIOSBootDevice_size = 20,
 
     MB2Info_RAMmap_type = 6,
     RAMmap_type_FreeRAM = 1,
@@ -96,7 +100,13 @@ struct MB2Info_Module{
 };
 
 
-
+struct MB2Info_BIOSBootDevice{
+    uint32_t Type;
+    uint32_t Size;
+    uint32_t BIOSDriveNumber;
+    uint32_t Partition;
+    uint32_t Sub_partition;
+};
 
 struct MB2Info_RAMMap{
     uint32_t Type;
