@@ -48,7 +48,7 @@ struc ReturnBitfields_GeneralOS_BitIndexes
     .ArrayIndexOverflow resb 1
     .AllocationFailed resb 1;
     .AllocationImpossible resb 1;
-    .SpinlockWatchdogSet resb 1;
+    .WatchdogSet resb 1;
     .TooBigNumber resb 1;
     .TooSmallNumber resb 1;
     .Reserved18 resb 1;
@@ -93,6 +93,12 @@ struc ReturnBitfields_GeneralOSExtended1_BitIndexes
     .Reserved29 resb 1;
     .Reserved30 resb 1;
     .Reserved31 resb 1;
+endstruc
+
+struc LOW8_ReturnBitfield_Namespace
+    .SuccessCode resb 2
+    .GeneralOS resb 1
+    .GeneralOS_entended1 resb 1
 endstruc
 
 

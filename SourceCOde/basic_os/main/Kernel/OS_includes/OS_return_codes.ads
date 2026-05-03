@@ -38,7 +38,7 @@ type GeneralOS is record
    ArrayIndexOverflow : Boolean;--Use this when the index to insert you were given, is too big or wrong in some other way
    AllocationFailed : Boolean;--Use this when, for example, there is no free RAM left to alllocate
    AllocationImpossible : Boolean;--Use this when, for example, allocation requirements are impossible (Like 1 TB of RAM)
-   SpinlockWatchdogSet : Boolean;--Use this when you need to indicate that watchdog timer was for some reason set
+   WatchdogSet : Boolean;--Use this when you need to indicate that watchdog timer was for some reason set
    TooBigNumber : Boolean;--use this when the give argument is arithmetically too big, for example the float is Inf, or you want to set VGA mode too big
    TooSmallNumber : Boolean;--THe same as Too big, but for small numbers
    Reserved18 : Boolean;

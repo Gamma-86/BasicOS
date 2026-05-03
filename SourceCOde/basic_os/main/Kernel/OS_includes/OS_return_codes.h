@@ -11,7 +11,7 @@ enum ReturnBitfields_GeneralOS_BitIndexes
         ArrayIndexOverflow,
         AllocationFailed,
         AllocationImpossible,
-        SpinlockWatchdogSet,
+        WatchdogSet,
         TooBigNumber,
         TooSmallNumber,
         Reserved18,
