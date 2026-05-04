@@ -122,7 +122,7 @@ Print_str_lpt: ;OS_returnCodes Amount printed (pointer to string)
         out   dx, al
 
     test  byte[esi], 0xFF
-    loopz .lp1 
+    loopnz .lp1 
 lp1_end:
     jecxz .cx_zero
     nop
