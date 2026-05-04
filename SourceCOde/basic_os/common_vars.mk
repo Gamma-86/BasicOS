@@ -33,4 +33,3 @@ LINKER = ld
 
 PathTo_LinkerScript = ./main/grub
 
-CURRENT_DIR := $(CURDIR)
