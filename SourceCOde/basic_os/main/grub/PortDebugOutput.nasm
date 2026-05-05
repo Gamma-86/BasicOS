@@ -126,6 +126,7 @@ Print_str_lpt: ;OS_returnCodes Amount printed (pointer to string)
 lp1_end:
     jecxz .cx_zero
     nop
+
     jmp   .absolute_end
 .cx_zero:
     or    ebx, BIT_MASK(ReturnBitfields_GeneralOS_BitIndexes.WatchdogSet)
