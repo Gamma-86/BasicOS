@@ -1,6 +1,7 @@
 %include "NASM_default_macroses.nasm"
 %include "IA32Macroses.nasm"
 %include "multiboot_structures.nasm"
+%include "./PortDebugOutput/PortDebugOutput_NASMmacro.nasm"
 
 bits 32
 CPU WILLAMETTE
@@ -47,13 +48,6 @@ align 8
     dd 8
 
 header_end:
-
-
-
-
-section .data
-
-
 
 
 
