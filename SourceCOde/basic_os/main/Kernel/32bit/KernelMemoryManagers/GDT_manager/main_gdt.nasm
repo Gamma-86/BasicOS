@@ -29,9 +29,17 @@ MainGDT_Descriptor:
     dw   MainGDT_end-MainGDT-1
     dd   MainGDT
 
-globASM_FUN_lgdt:
+globASM_FUN_lgdt:;void (Pointer from where to load)
+    %push LocContext
+    %stacksize flat
+    %arg GDT_DESC_PTR:PTR_word
+
+    mov   eax, [PTR_word]
+    lgdt  [eax]
+
 
     ret
-globASM_FUN_sgdt:
+    %pop
+globASM_FUN_sgdt:;void (Pointer where to store)
 
     ret
