@@ -56,7 +56,7 @@ endstruc
 
 
 
-
+global Print_str_lpt
 Print_str_lpt: ;OS_returnCodes Amount printed (pointer to string)
 ;Idea:
 ; Put out char to lpt data port
