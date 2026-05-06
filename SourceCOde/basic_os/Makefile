@@ -21,6 +21,7 @@ multiboot.o: $(PathTo_Multiboot_files)/multiboot.nasm
 multiboot.elf:
 	$(MAKE) -C $(PathTo_Multiboot_files) ROOT=$(ROOT) \
 	Include1_For_MakeSubDirs_PathFull=$(Include1_For_MakeSubDirs_PathFull) \
+	multiboot.elf
 
 
 multiboot_DVDtest.iso: multiboot.elf
