@@ -111,7 +111,7 @@ Print_str_lpt: ;OS_returnCodes Amount printed (pointer to string)
     mov   dx, Base_address_of.LPT1 + LPT_offset_REG.control
         mov   al, BIT_MASK(LPT_ControlReg_Bit.NOTstrobe_index)
         out   dx, al
-    mov   dx, Base_address_of.LPT2 + LPT_offset_REG.contol
+    mov   dx, Base_address_of.LPT2 + LPT_offset_REG.control
         out   dx, al
 
     ;4
@@ -123,7 +123,7 @@ Print_str_lpt: ;OS_returnCodes Amount printed (pointer to string)
 
     test  byte[esi], 0xFF
     loopnz .lp1 
-lp1_end:
+.lp1_end:
     jecxz .cx_zero
     nop
 
