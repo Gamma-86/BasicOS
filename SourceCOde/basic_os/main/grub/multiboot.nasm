@@ -95,12 +95,17 @@ _start:
     mov   eax, 'E' | (0xF<<8) | ('1'<<16) | (0xF<<24)
     mov   [0xb8000], eax
 
+    CALL_PRINT_STR_LPT "The image was loaded with not multiboot standart"
+
     cli
     hlt
     jmp $
 .not_aligned:
     mov   eax, 'E' | (0xF<<8) | ('2'<<16) | (0xF<<24)
     mov   [0xb8000], eax
+
+    CALL_PRINT_STR_LPT "The address to multiboot stryctyre is not aligned"
+
 
     cli
     hlt
