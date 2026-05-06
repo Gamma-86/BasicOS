@@ -8,7 +8,7 @@ section .data
     %$String db %1
     db 0
 section .text
-
+    push %$String
     call Print_str_lpt
     add  SP_NATIVE, SizeOfPTR
 %pop
