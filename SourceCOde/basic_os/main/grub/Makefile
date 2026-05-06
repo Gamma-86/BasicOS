@@ -10,7 +10,7 @@ multiboot.o:
 		-o multiboot_ASM.o
 	nasm \
 		$(NASM_default_flags)\
-		-i$(PathTo_Multiboot_files)
+		-i$(PathTo_Multiboot_files) \
 		-f elf32 \
 		./PortDebugOutput/PortDebugOutput.nasm \
 		-o multiboot_port.o
