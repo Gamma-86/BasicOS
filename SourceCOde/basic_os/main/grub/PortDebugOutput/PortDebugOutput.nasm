@@ -1,7 +1,7 @@
 bits 32
 cpu WILLAMETTE
 %include "NASM_default_macroses.nasm"
-%inlcude "OS_return_codes.nasm"
+%include "OS_return_codes.nasm"
 ;LPT1=0x378
 ;LPT2=0x278
 ;COM1=0x3F8
