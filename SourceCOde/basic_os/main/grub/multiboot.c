@@ -2,7 +2,7 @@
 
 #include "OS_return_codes.h"
 #include "multiboot_structures.h"
-
+#include "./PortDebugOutput/PortDebugOutput.h"
 
 
 
@@ -18,6 +18,7 @@ int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
     uint32_t MB2_type = MB2_structure->Type;
     if( (uintptr_t)MB2_structure & 7 ){
         MB2ParseErrorFlag_WrongAlignment = 1;
+        Print_str_lpt("Te alignment of given pointer is wrong");
     }
 
     switch(MB2_type){
@@ -37,6 +38,8 @@ int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
             struct MB2Info_BasicRAMInfo* BasicRAMInfo_TagPTR = (struct MB2Info_BasicRAMInfo*)MB2_structure;
             if (BasicRAMInfo_TagPTR->Size != MB2Info_BasicRam_size){
                 MB2ParseErrorFlag_WrongTagSize = 1;
+                Print_str_lpt("The size of given tag(Basic RAM info)\
+                    is wrong \0");
             }
             return BasicRAMInfo_TagPTR->Size;
             break;
@@ -44,12 +47,16 @@ int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
             struct MB2Info_BIOSBootDevice* BIOSBootDevice_TagPTR = (struct MB2Info_BIOSBootDevice*)MB2_structure;
             if(BIOSBootDevice_TagPTR->Size != MB2Info_BIOSBootDevice_size){
                 MB2ParseErrorFlag_WrongTagSize = 1;
+                Print_str_lpt("The size of given multiboot2 tag\
+                    (BIOS boot device information)multiboot tag is wrong\0");
             }
             return BIOSBootDevice_TagPTR->Size;
             break;
         case MB2Info_RAMmap_type:
             struct MB2Info_RAMMap* RAMMap_TagPTR = (struct MB2Info_RAMMap*)MB2_structure;
             MB2ParseErrorFlag_RAMMap_IN_C_FUN = 1;
+            Print_str_lpt("The RAM map multiboot tag, \
+                somehow got to C function \0");
             return RAMMap_TagPTR->Size;
             break;
         case MB2Info_APM_type:
