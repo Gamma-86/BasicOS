@@ -3,7 +3,7 @@
 
 
 %macro CALL_PRINT_STR_LPT 1
-%push %$String
+%push Print_context
 section .data
     %$String db %1
     db 0
