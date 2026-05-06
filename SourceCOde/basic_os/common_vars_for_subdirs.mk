@@ -22,9 +22,9 @@ PathTo_GNAT_ADC = $(ROOT)/includes_i686/adaCompConfig/gnat.adc
 
 PathTo_OS_include = $(ROOT)/main/Kernel/OS_includes
 
-ADA_default_flags = -I$(ROOT)/$(PathTo_OS_include)/ -gnatp -ffreestanding -nostdlib -fno-exceptions -gnatec=$(ROOT)/$(PathTo_GNAT_ADC)
-NASM_default_flags = -i$(ROOT)/$(PathTo_OS_include)/ -i$(ROOT)/$(PathTo_NASM_default_macroses)/ -i$(ROOT)/$(PathTo_IA32Macroses_NASM)/ -g
-C_default_flags = -I$(ROOT)/$(PathTo_OS_include)/ -Wall -g -m32 -ffreestanding -fno-stack-protector -fno-pic -fno-pie
+ADA_default_flags = -I$(PathTo_OS_include)/ -gnatp -ffreestanding -nostdlib -fno-exceptions -gnatec=$(ROOT)/$(PathTo_GNAT_ADC)
+NASM_default_flags = -i$(PathTo_OS_include)/ -i$(ROOT)/$(PathTo_NASM_default_macroses)/ -i$(ROOT)/$(PathTo_IA32Macroses_NASM)/ -g
+C_default_flags = -I$(PathTo_OS_include)/ -Wall -g -m32 -ffreestanding -fno-stack-protector -fno-pic -fno-pie
 
 C_compiler = ~/crossCOMPs/gccses/bin/i686-elfNoOS-gcc
 ADA_compiler = ~/crossCOMPs/gccses/bin/i686-elfNoOS-gcc
