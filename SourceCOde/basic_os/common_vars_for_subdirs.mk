@@ -28,7 +28,7 @@ C_default_flags = -I$(ROOT)/$(PathTo_OS_include)/ -Wall -g -m32 -ffreestanding -
 
 C_compiler = ~/crossCOMPs/gccses/bin/i686-elfNoOS-gcc
 ADA_compiler = ~/crossCOMPs/gccses/bin/i686-elfNoOS-gcc
-ASSEMBLER = nasm
+ASSEMBLER = as
 LINKER = ld
 
 PathTo_LinkerScript = $(ROOT)/main/grub
