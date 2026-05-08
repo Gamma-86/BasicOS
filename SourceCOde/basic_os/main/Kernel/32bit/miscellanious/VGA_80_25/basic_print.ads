@@ -82,9 +82,12 @@ package VGA_80_25 is
 
 private
    procedure MoveCursorForward;
+      procedure MoveCursorForward_Xtimes (X:Integer);
    procedure ShiftCharsUp(Page : VRAM_Array_PTR);  --for everything in ROW
    --Move characters in current ROW to the ROW upper
+      procedure shiftCharsUp_ByX(X:integer);
    procedure IncreaseYcord_Full(IncreasedYCord_PTR : RowPTR);
+      procedure IncreaseYcord_Full_ByX (IncreasedYCord_PTR:RowPTR ; X:Integer);
    function IncrementXCord(IncreasedXCord : Column) return Column;
    function IncrementYCord(IncreasedYCord : Row) return Row;
 
