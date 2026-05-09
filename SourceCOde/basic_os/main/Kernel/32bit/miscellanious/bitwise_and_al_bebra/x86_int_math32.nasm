@@ -102,6 +102,9 @@ Sadd16_32:
     ret
     %pop
 
+
+
+
 Umul_8: ;uint16 (NUM1_8, NUM2_8, CaryPTR, OverPTR)
     %push Context
     %define NUM1_8 STACK_ARG1_SP8
@@ -124,8 +127,8 @@ Smul_8: ;sint16(NUM1_8, NUM2_8, CaryPTR, OverPTR)
     %define NUM2 STACK_ARG2_SP8
     %define CaryPTR STACK_ARG3_SP
     %define OverPTR STACK_ARG4_SP
-    movzx eax, NUM1
-    mov   ecx, CaryPTR
+    movsx eax, NUM1
+        mov   ecx, CaryPTR
         imul  NUM2
         setc  dl
         mov   [ecx], dl
@@ -135,14 +138,17 @@ Smul_8: ;sint16(NUM1_8, NUM2_8, CaryPTR, OverPTR)
     ret
     %pop
 
+
+
+
 Udiv8_8: ;uint8 Div Result (NUM1_8, NUM2_8, Remainder_8PTR)
     %push Context
     %define NUM1 STACK_ARG1_SP8
     %define NUM2 STACK_ARG2_SP8
     %define Remainder_8PTR STACK_ARG3_SP
-    mov   ecx, Remainder_8PTR
     movzx eax, NUM1
         div   NUM2
+        mov   ecx, Remainder_8PTR
         mov   [ecx], ah
     ret
     %pop
@@ -151,9 +157,9 @@ Sdiv8_8: ;uint8 Div Result(NUM1_8, NUM2_8, Remainder_8PTR)
     %define NUM1 STACK_ARG1_SP8
     %define NUM2 STACK_ARG2_SP8
     %define Remainder_8PTR STACK_ARG3_SP
-    mov   ecx, Remainder_8PTR
-    movzx ecx, NUM1
+    movsx eax, NUM1
         idiv  NUM2
+        mov   ecx, Remainder_8PTR
         mov   [ecx], ah
     ret
     %pop
@@ -163,9 +169,9 @@ Udiv16_8: ;uint8 Div Result(NUM1_16, NUM2_8, Remainder_8PTR)
     %define NUM1 STACK_ARG1_SP16
     %define NUM2 STACK_ARG2_SP8
     %define Remainder_8PTR STACK_ARG3_SP
-    mov   ecx, Remainder_8PTR
     movzx eax, NUM1
-        div   NUM2
+        div   NUM2;divide ax by NUM2_8
+        mov   ecx, Remainder_8PTR
         mov   [ecx], ah
     ret
     %pop
@@ -174,9 +180,50 @@ Sdiv16_8: ;uint8 Result(NUM1_16, NUM2_8, Remainder_8PTR)
     %define NUM1 STACK_ARG1_SP16
     %define NUM2 STACK_ARG2_SP8
     %define Remainder_8PTR STACK_ARG3_SP
-    mov   ecx, Remainder_8PTR
-    movzx eax, NUM1
+    movsx eax, NUM1
+        idiv  NUM2 ;divide ax by NUM2_8
+        mov   ecx, Remainder_8PTR
+        mov   [ecx], ah ;so that al=result, ah=remainder
+    ret
+    %pop
+
+Udiv16_16:; uint16 Result (NUM1_16, NUM2_16, Remainder_PTR)
+    %push Context
+    %define NUM1 STACK_ARG1_SP16
+    %define NUM2 STACK_ARG2_SP16
+    %define Remainder_PTR STACK_ARG3_SP
+    mov   ax, NUM1
+        xor   edx, edx
+        div   NUM2
+        mov   ecx, Remainder_PTR
+        mov   [ecx], dx
+    ret
+    %pop
+
+Sdiv32_16: ;uint16 Result (NUM1_32, NUM2_16, Remainder_PTR)
+    %push Context
+    %define NUM1 STACK_ARG1_SP16
+    %define NUM1_HIGH word[esp+4+2]
+    %define NUM2 STACK_ARG2_SP16
+    %define Remainder_PTR STACK_ARG3_SP
+    mov   ax, NUM1
+    mov   dx, NUM1_HIGH
         idiv  NUM2
-        mov   [ecx], ah
+        mov   ecx, Remainder_PTR
+        mov   [ecx], dx
+    ret
+    %pop
+
+Udiv32_16: ;uint16 Result(NUM1_32, NUM2_16, Remainder16_PTR)
+    %push  Context
+    %define NUM1 STACK_ARG1_SP16
+    %define NUM1_HIGH word[esp+4+2]
+    %define NUM2 STACK_ARG2_SP16
+    %define Remainder_PTR STACK_ARG3_SP
+    mov   ax, NUM1
+    mov   dx, NUM1_HIGH
+        div   NUM2
+        mov   ecx, Remainder_PTR
+        mov   [ecx], dx
     ret
     %pop
