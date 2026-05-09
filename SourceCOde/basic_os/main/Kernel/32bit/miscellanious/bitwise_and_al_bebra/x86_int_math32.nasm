@@ -1,5 +1,5 @@
 bits 32
-CPU Katmai
+CPU WILLAMETTE
 %include "NASM_default_macroses.nasm"
 
 global Usub8
@@ -140,7 +140,20 @@ Smul_8: ;sint16(NUM1_8, NUM2_8, CaryPTR, OverPTR)
 
 
 
+global Udiv8_8
+global Sdiv8_8
 
+global Udiv16_8
+global Sdiv16_8
+
+global Udiv16_16
+global Sdiv16_16
+
+global Udiv32_16
+global Sdiv32_16
+
+global Udiv32_32
+global Sdiv32_32
 Udiv8_8: ;uint8 Div Result (NUM1_8, NUM2_8, Remainder_8PTR)
     %push Context
     %define NUM1 STACK_ARG1_SP8
@@ -199,6 +212,19 @@ Udiv16_16:; uint16 Result (NUM1_16, NUM2_16, Remainder_PTR)
         mov   [ecx], dx
     ret
     %pop
+Sdiv16_16:;uint16 (NUM1_16, NUM2_16, Remainder16_PTR)
+    %push Context
+    %define NUM1 STACK_ARG1_SP16
+    %define NUM2 STACK_ARG2_SP16
+    %define Remainder_PTR STACK_ARG3_SP
+    movzx eax, NUM1
+        cwd
+        idiv  NUM2 ;divide dx:ax by NUM2_16
+        mov   ecx, Remainder_PTR
+        mov   [ecx], dx
+    ret
+    %pop
+
 
 Sdiv32_16: ;uint16 Result (NUM1_32, NUM2_16, Remainder_PTR)
     %push Context
@@ -213,7 +239,6 @@ Sdiv32_16: ;uint16 Result (NUM1_32, NUM2_16, Remainder_PTR)
         mov   [ecx], dx
     ret
     %pop
-
 Udiv32_16: ;uint16 Result(NUM1_32, NUM2_16, Remainder16_PTR)
     %push  Context
     %define NUM1 STACK_ARG1_SP16
@@ -227,3 +252,51 @@ Udiv32_16: ;uint16 Result(NUM1_32, NUM2_16, Remainder16_PTR)
         mov   [ecx], dx
     ret
     %pop
+
+Sdiv32_32:;uint32t (NUM1_32, NUM2_32, Remainder PTR)
+    %push Context
+    %define NUM1 STACK_ARG1_SP32
+    %define NUM2 STACK_ARG2_SP32
+    %define Remainder_PTR STACK_ARG3_SP
+    mov   eax, NUM1
+        cdq
+        idiv NUM2
+        mov   ecx, Remainder_PTR
+        mov   [ecx], edx
+    ret
+    %pop
+Udiv32_32:;uint32t (NUM1_32, NUM2_32, Remainder PTR)
+    %push Context
+    %define NUM1 STACK_ARG1_SP32
+    %define NUM2 STACK_ARG2_SP32
+    %define Remainder_PTR STACK_ARG3_SP
+    mov   eax, NUM1
+        xor   edx, edx
+        div   NUM2
+            mov   ecx, Remainder_PTR
+            mov   [ecx], edx
+    ret
+    %pop
+
+
+
+
+
+IntABS_8:;uint8 (NUM8)
+    movzx eax, byte[esp+4]
+    cbw
+    xor   al, ah
+    ret
+IntABS_16: ;uint16(NUM16)
+    movzx eax, word[esp+4]
+    cwd
+    xor   ax, dx
+    ret
+IntABS_32:
+    mov   eax, [esp+4]
+    cdq
+    xor   eax, edx
+    ret
+IntABS_64:
+
+    ret
