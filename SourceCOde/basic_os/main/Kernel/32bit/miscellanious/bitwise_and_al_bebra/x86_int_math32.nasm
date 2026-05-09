@@ -77,6 +77,30 @@ Uadd16:
     ret
     %pop
 
+Usub16_32:; uint32 (NUM1_16, NUM2_16, CaryPTR, OverPTR)
+Ssub16_32:
+    %push Context
+    %define NUM1 STACK_ARG1_SP16
+    %define NUM2 STACK_ARG2_SP16
+    %define CaryPTR STACK_ARG3_SP
+    %define OverPTR STACK_ARG4_SP
+    neg   NUM2
+Uadd16_32:
+Sadd16_32:
+    mov   ecx, CaryPTR
+    movzx eax, NUM1
+        add   ax, NUM2
+        setC  dl
+        setO  dh
+        rol   eax, 16
+            or   al, dl
+        rol   eax, 16
+        mov   [ecx], dl
+    mov   ecx, OverPTR
+        mov   [ecx], dh
+
+    ret
+    %pop
 
 Umul_8: ;uint16 (NUM1_8, NUM2_8, CaryPTR, OverPTR)
     %push Context
