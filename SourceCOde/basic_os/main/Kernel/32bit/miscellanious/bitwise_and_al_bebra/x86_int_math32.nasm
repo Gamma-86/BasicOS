@@ -286,17 +286,32 @@ IntABS_8:;uint8 (NUM8)
     movzx eax, byte[esp+4]
     cbw
     xor   al, ah
+    sub   al, ah
     ret
 IntABS_16: ;uint16(NUM16)
     movzx eax, word[esp+4]
     cwd
     xor   ax, dx
+    sub   ax, dx
     ret
 IntABS_32:
     mov   eax, [esp+4]
     cdq
     xor   eax, edx
+    sub   eax, edx
     ret
 IntABS_64:
-
+    %push Context
+    %define NUM_LOW STACK_ARG1_SP32
+    %define NUM_HIGH STACK_ARG2_SP32
+    mov   eax, NUM_LOW
+    mov   edx, NUM_HIGH
+        mov   ecx, edx
+            shr   ecx, 30
+            neg   ecx
+            xor   eax, ecx
+            xor   edx, ecx
+            sub   eax, ecx
+            sbb   edx, ecx
     ret
+    %pop
