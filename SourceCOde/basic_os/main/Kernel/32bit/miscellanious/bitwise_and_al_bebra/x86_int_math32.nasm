@@ -278,29 +278,68 @@ Udiv32_32:;uint32t (NUM1_32, NUM2_32, Remainder PTR)
     ret
     %pop
 
+Sdiv64_32:;sint32 (NUM1_64, NUM2_32, Remainder32_PTR)
+    %push Context
+    %define NUM1_LOW STACK_ARG1_SP32
+    %define NUM1_HIGH STACK_ARG2_SP32
+    %define NUM2 STACK_ARG3_SP32
+    %define Remainder_PTR STACK_ARG4_SP
+    mov   eax, NUM1_LOW
+    mov   edx, NUM1_HIGH
+        idiv  NUM2
+        mov   ecx, Remainder_PTR
+        mov   [ecx], edx
+    ret
+    %pop
+Udiv64_32:;sint32 (NUM1_64, NUM2_32, Remainder32_PTR)
+    %push Context
+    %define NUM1_LOW STACK_ARG1_SP32
+    %define NUM1_HIGH STACK_ARG2_SP32
+    %define NUM2 STACK_ARG3_SP32
+    %define Remainder_PTR STACK_ARG4_SP
+    mov   eax, NUM1_LOW
+    mov   edx, NUM1_HIGH
+        div   NUM2
+        mov   ecx, Remainder_PTR
+        mov   [ecx], edx
+    ret
+    %pop
 
+Sdiv64_64:
+Udiv64_64:;uint64 (NUM1_64, NUM2_64, Remainder64_PTR)
+    %push Context
+    %define NUM1LOW STACK_ARG1_SP32
+    %define NUM1HIGH STACK_ARG2_SP32
+    %define NUM2LOW STACK_ARG3_SP32
+    %define NUM2HIGH STACK_ARG4_SP32
+    %define Remainder_PTR STACK_ARG5_SP
+    
+    ret
+    %pop
 
-
-
-IntABS_8:;uint8 (NUM8)
+global IntABS_8
+global IntABS_16
+global IntABS_32
+global IntABS_64
+IntABS_8:;int8 (NUM8)
     movzx eax, byte[esp+4]
     cbw
     xor   al, ah
     sub   al, ah
     ret
-IntABS_16: ;uint16(NUM16)
+IntABS_16: ;int16(NUM16)
     movzx eax, word[esp+4]
     cwd
     xor   ax, dx
     sub   ax, dx
     ret
-IntABS_32:
+IntABS_32:; int32 (NUM32)
     mov   eax, [esp+4]
     cdq
     xor   eax, edx
     sub   eax, edx
     ret
-IntABS_64:
+IntABS_64:; int64 (NUM64)
     %push Context
     %define NUM_LOW STACK_ARG1_SP32
     %define NUM_HIGH STACK_ARG2_SP32
