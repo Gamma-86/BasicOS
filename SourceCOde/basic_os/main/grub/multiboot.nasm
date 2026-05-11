@@ -103,7 +103,7 @@ _start:
     emms
     fninit
 
-    %define NON_EXISTING_RAM (0x10_0000 * 1514)
+    %define NON_EXISTING_RAM (0x10_0000 * 1800)
     xor   ebx, ebx
     PRINT_STR_WITH_INITIALPTRINT "READING FROM NON RAM TO EBX,EBX=0"
         mov   ebx,[NON_EXISTING_RAM]
@@ -121,9 +121,30 @@ _start:
     push  ebx
     call  PrintInt32HEXIntial
     add   esp, 4
-    PRINT_STR_WITH_INITIALPTRINT "ENDING PROGRAM"
     
+    PRINT_STR_WITH_INITIALPTRINT "TRYING READ/WRITE 1 ANOTHER ADDRESS EBX=9"
+    mov   ebx, 9
+    mov   byte[NON_EXISTING_RAM+100], 1
+    mov   ebx, [NON_EXISTING_RAM+100]
+    PRINT_STR_WITH_INITIALPTRINT "NOW EBX IS"
+        push  ebx
+        call  PrintInt32HEXIntial
+        add   esp, 4
 
+    PRINT_STR_WITH_INITIALPTRINT "Reading and printing from address 3 times"
+        mov   ebx,[NON_EXISTING_RAM+256]
+            push  ebx
+            call PrintInt32HEXIntial
+            add   esp, 4
+        mov   ebx, [NON_EXISTING_RAM+256]
+            push  ebx
+            call PrintInt32HEXIntial
+            add   esp, 4
+        mov   ebx, [NON_EXISTING_RAM+256]
+            push  ebx
+            call PrintInt32HEXIntial
+            add   esp, 4
+    PRINT_STR_WITH_INITIALPTRINT "THE END"
     cli
     hlt
     jmp $
