@@ -103,23 +103,23 @@ _start:
     emms
     fninit
 
-    %define NON_EXISTING_RAM (0x1_0000 * 1514)
-    xor   eax, eax
-    PRINT_STR_WITH_INITIALPTRINT "READING FROM NON EXISTING RAM TO EAX, EAX = 0"
-        mov   eax,[NON_EXISTING_RAM]
+    %define NON_EXISTING_RAM (0x10_0000 * 1514)
+    xor   ebx, ebx
+    PRINT_STR_WITH_INITIALPTRINT "READING FROM NON EXISTING RAM TO EBX, EBX = 0"
+        mov   ebx,[NON_EXISTING_RAM]
     PRINT_STR_WITH_INITIALPTRINT "NOW EAX IS : "
-        push  eax
+        push  ebx
         call PrintInt32HEXIntial
         add   esp, 4
 
-    xor   eax, eax
+    xor   ebx, ebx
     PRINT_STR_WITH_INITIALPTRINT "WRITING 1 to NO RAM location"
         mov   dword[NON_EXISTING_RAM], 1
-    PRINT_STR_WITH_INITIALPTRINT "WROTE 1 TO NON EXISTING RAM, NOW READING TO EAX, EAX=0"
-        mov   eax, [NON_EXISTING_RAM]
-    PRINT_STR_WITH_INITIALPTRINT "READ FROM NON EXITING RAM TO EAX"
-    PRINT_STR_WITH_INITIALPTRINT "EAX IS"
-    push  eax
+    PRINT_STR_WITH_INITIALPTRINT "WROTE 1 TO NON EXISTING RAM, NOW READING TO EBX, EBX=0"
+        mov   ebx, [NON_EXISTING_RAM]
+    PRINT_STR_WITH_INITIALPTRINT "READ FROM NON EXITING RAM TO EBX"
+    PRINT_STR_WITH_INITIALPTRINT "EBX IS"
+    push  ebx
     call  PrintInt32HEXIntial
     add   esp, 4
     PRINT_STR_WITH_INITIALPTRINT "ENDING PROGRAM"
@@ -159,32 +159,14 @@ Get_next_eip:
 section .data
     Curnt_Y_cord db 0
 section .text
-PrintCharIntial: ;void (Char)
-    call Get_next_eip
-.next_eip:
-    lea   edx, [eax - .next_eip + Curnt_Y_cord]
-        mov   ecx, [edx]
-        inc   byte[edx]
-
-    ;*80 = *5*16
-    lea   ecx, [ecx + ecx*4];*5
-        shl   ecx, 4 ;*16
-    
-    lea   edx, [eax - .next_eip + 0xb8000 + ecx]
-        movzx ecx, byte[esp+4]
-        mov   [edx], cl
-    ret
 PrintStringInitial:; void (string ptr)
     MACRO_ENTER_NATIVE 0, 0
     push  esi
     push  edi
 
-    call Get_next_eip
-.next_eip:
     mov   esi, [ebp + 8]
-    lea   edx, [eax - .next_eip + Curnt_Y_cord]
-        mov   ecx, [edx]
-        inc   byte[edx]
+        movzx ecx, byte[Curnt_Y_cord]
+        inc   byte[Curnt_Y_cord]
 
     ;*80 = *5*16
     lea   ecx, [ecx + ecx*4];*5
@@ -196,6 +178,7 @@ PrintStringInitial:; void (string ptr)
     test   al, al
     jz    .lp1_end
     stosb
+    jmp   .lp1
 .lp1_end:
 
     pop   edi
@@ -238,7 +221,7 @@ PrintInt32HEXIntial:;void (int32)
             psrld mm%+i, 4*i
     %endrep
     
-    mov   edi, Curnt_Y_cord
+    movzx edi, byte[Curnt_Y_cord]
         lea   edi, [edi + edi*4]
         shl   edi, 4
         add   edi, 0xb8000
