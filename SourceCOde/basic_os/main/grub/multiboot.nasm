@@ -103,7 +103,11 @@ _start:
     emms
     fninit
 
-    %define NON_EXISTING_RAM (0x10_0000 * 1800)
+    %assign NON_EXISTING_RAM (0x10_0000 * 1513)
+    PRINT_STR_WITH_INITIALPTRINT "ADDRESS IS"
+        push  NON_EXISTING_RAM
+        call  PrintInt32HEXIntial
+        add   esp, 4
     xor   ebx, ebx
     PRINT_STR_WITH_INITIALPTRINT "READING FROM NON RAM TO EBX,EBX=0"
         mov   ebx,[NON_EXISTING_RAM]
