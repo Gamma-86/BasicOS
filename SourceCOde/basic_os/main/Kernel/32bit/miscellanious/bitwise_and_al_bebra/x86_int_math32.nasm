@@ -138,6 +138,12 @@ Smul_8: ;sint16(NUM1_8, NUM2_8, CaryPTR, OverPTR)
     ret
     %pop
 
+Umul8_16:
+
+    ret
+Smul8_16:
+
+    ret
 
 
 global Udiv8_8
@@ -205,7 +211,7 @@ Udiv16_16:; uint16 Result (NUM1_16, NUM2_16, Remainder_PTR)
     %define NUM1 STACK_ARG1_SP16
     %define NUM2 STACK_ARG2_SP16
     %define Remainder_PTR STACK_ARG3_SP
-    mov   ax, NUM1
+    movzx eax, NUM1
         xor   edx, edx
         div   NUM2
         mov   ecx, Remainder_PTR
