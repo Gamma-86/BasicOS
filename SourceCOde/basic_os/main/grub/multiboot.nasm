@@ -171,7 +171,7 @@ PrintStringInitial:; void (string ptr)
     ;*80 = *5*16
     lea   ecx, [ecx + ecx*4];*5
         shl   ecx, 4 ;*16
-        lea   edi, [eax - .next_eip + 0xb8000 + ecx]
+        lea   edi, [ecx + 0xb8000]
     cld
 .lp1:
     lodsb
