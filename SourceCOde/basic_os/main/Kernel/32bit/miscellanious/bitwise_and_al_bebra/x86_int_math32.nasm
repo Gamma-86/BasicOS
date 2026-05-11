@@ -340,9 +340,17 @@ Udiv64_32:;sint32 (NUM1_64, NUM2_32, Remainder32_PTR)
         mov   [ecx], edx
     ret
     %pop
-
-Sdiv64_64:
 Udiv64_64:;uint64 (NUM1_64, NUM2_64, Remainder64_PTR)
+    %push Context
+    %define NUM1LOW STACK_ARG1_SP32
+    %define NUM1HIGH STACK_ARG2_SP32
+    %define NUM2LOW STACK_ARG3_SP32
+    %define NUM2HIGH STACK_ARG4_SP32
+    %define Remainder_PTR STACK_ARG5_SP
+    
+    ret
+    %pop
+Sdiv64_64:;sint64 (NUM1_64, NUM2_64, Remainder64_PTR)
     %push Context
     %define NUM1LOW STACK_ARG1_SP32
     %define NUM1HIGH STACK_ARG2_SP32
