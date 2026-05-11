@@ -173,11 +173,12 @@ PrintStringInitial:; void (string ptr)
         shl   ecx, 4 ;*16
         lea   edi, [ecx + 0xb8000]
     cld
+    mov   ah, 0xF
 .lp1:
     lodsb
     test   al, al
     jz    .lp1_end
-    stosb
+    stosw
     jmp   .lp1
 .lp1_end:
 
@@ -232,7 +233,8 @@ PrintInt32HEXIntial:;void (int32)
     %rep 7
         movd   eax, mm%+i
         xlatb
-        stosb
+        mov   ah, 0xF
+        stosw
         %assign i i-1
     %endrep
 
