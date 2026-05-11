@@ -53,6 +53,18 @@ header_end:
 
 
 
+%macro PRINT_STR_WITH_INITIALPTRINT 1
+%push Intial_STR_Print
+section .data
+    %$STRING: db %1
+    db 0
+section .text
+    push   %$STRING
+    call   PrintStringInitial
+    add    esp, 4
+%pop 
+%endmacro
+
 section .bss
     %define INITIAL_STACK_SIZE 65536+4096
     stack_end:
@@ -87,9 +99,35 @@ _start:
         btr   eax, 2
         btr   eax, 3
     mov   cr0, eax
-    call  Sort_multiboot_struct ;Sort things that multiboot given in EBX*
+;    call  Sort_multiboot_struct ;Sort things that multiboot given in EBX*
+    emms
+    fninit
 
+    %define NON_EXISTING_RAM (0x1_0000 * 1514)
+    xor   eax, eax
+    PRINT_STR_WITH_INITIALPTRINT "READING FROM NON EXISTING RAM TO EAX, EAX = 0"
+        mov   eax,[NON_EXISTING_RAM]
+    PRINT_STR_WITH_INITIALPTRINT "NOW EAX IS : "
+        push  eax
+        call PrintInt32HEXIntial
+        add   esp, 4
 
+    xor   eax, eax
+    PRINT_STR_WITH_INITIALPTRINT "WRITING 1 to NO RAM location"
+        mov   dword[NON_EXISTING_RAM], 1
+    PRINT_STR_WITH_INITIALPTRINT "WROTE 1 TO NON EXISTING RAM, NOW READING TO EAX, EAX=0"
+        mov   eax, [NON_EXISTING_RAM]
+    PRINT_STR_WITH_INITIALPTRINT "READ FROM NON EXITING RAM TO EAX"
+    PRINT_STR_WITH_INITIALPTRINT "EAX IS"
+    push  eax
+    call  PrintInt32HEXIntial
+    add   esp, 4
+    PRINT_STR_WITH_INITIALPTRINT "ENDING PROGRAM"
+    
+
+    cli
+    hlt
+    jmp $
 
 .not_multiboot:
     mov   eax, 'E' | (0xF<<8) | ('1'<<16) | (0xF<<24)
@@ -118,9 +156,108 @@ Get_next_eip:
     mov   eax, [esp]
     ret
 
+section .data
+    Curnt_Y_cord db 0
+section .text
+PrintCharIntial: ;void (Char)
+    call Get_next_eip
+.next_eip:
+    lea   edx, [eax - .next_eip + Curnt_Y_cord]
+        mov   ecx, [edx]
+        inc   byte[edx]
 
+    ;*80 = *5*16
+    lea   ecx, [ecx + ecx*4];*5
+        shl   ecx, 4 ;*16
+    
+    lea   edx, [eax - .next_eip + 0xb8000 + ecx]
+        movzx ecx, byte[esp+4]
+        mov   [edx], cl
+    ret
+PrintStringInitial:; void (string ptr)
+    MACRO_ENTER_NATIVE 0, 0
+    push  esi
+    push  edi
 
+    call Get_next_eip
+.next_eip:
+    mov   esi, [ebp + 8]
+    lea   edx, [eax - .next_eip + Curnt_Y_cord]
+        mov   ecx, [edx]
+        inc   byte[edx]
 
+    ;*80 = *5*16
+    lea   ecx, [ecx + ecx*4];*5
+        shl   ecx, 4 ;*16
+        lea   edi, [eax - .next_eip + 0xb8000 + ecx]
+    cld
+.lp1:
+    lodsb
+    test   al, al
+    jz    .lp1_end
+    stosb
+.lp1_end:
+
+    pop   edi
+    pop   esi
+    leave
+    ret
+section .data
+    HEX_CharactersTable db '0123456789ABCDEF'
+    Int32_Nibble_Bitmasks
+    dq 0xF
+    dq 0xF0
+    dq 0xF00
+    dq 0xF000
+    dq 0xF_0000
+    dq 0xF0_0000
+    dq 0xF00_0000
+    dq 0xF000_0000
+
+section .text
+PrintInt32HEXIntial:;void (int32)
+    %push context
+    MACRO_ENTER_NATIVE 0, 0
+    push  ebx
+    push  edi
+
+    pxor  mm0, mm0
+    movd  mm0, STACK_ARG1_BP32
+        movq  mm1, mm0
+        movq  mm2, mm0
+        movq  mm3, mm0
+        movq  mm4, mm0
+        movq  mm5, mm0
+        movq  mm6, mm0
+        movq  mm7, mm0
+    pand   mm0, [Int32_Nibble_Bitmasks+0]
+    %assign i 0
+    %rep 7
+        %assign i i+1
+        pand mm%+i, [Int32_Nibble_Bitmasks+i*8]
+            psrld mm%+i, 4*i
+    %endrep
+    
+    mov   edi, Curnt_Y_cord
+        lea   edi, [edi + edi*4]
+        shl   edi, 4
+        add   edi, 0xb8000
+        inc   byte[Curnt_Y_cord]
+    mov   ebx, HEX_CharactersTable
+    cld
+    %assign i 7
+    %rep 7
+        movd   eax, mm%+i
+        xlatb
+        stosb
+        %assign i i-1
+    %endrep
+
+    pop   edi
+    pop   ebx
+    leave
+    ret
+    %pop
 extern Multiboot2_info_main_parser
 struc RAMMapInfo_DLinkedList_entry
     .next resb 4
