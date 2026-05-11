@@ -104,7 +104,11 @@ Sadd16_32:
 
 
 
+global Umul_8
+global Smul_8
 
+global Umul8_16
+global Smul8_16
 Umul_8: ;uint16 (NUM1_8, NUM2_8, CaryPTR, OverPTR)
     %push Context
     %define NUM1_8 STACK_ARG1_SP8
@@ -138,10 +142,36 @@ Smul_8: ;sint16(NUM1_8, NUM2_8, CaryPTR, OverPTR)
     ret
     %pop
 
-Umul8_16:
-
+Umul8_16:; uint16 (NUM1_8, NUM2_8, CarryPTR, OverPTR)
+    %push Context
+    %define NUM1 STACK_ARG1_SP8
+    %define NUM2 STACK_ARG2_SP8
+    %define CarryPTR STACK_ARG3_SP
+    %define OverPTR STACK_ARG4_SP
+    movzx   eax, NUM1
+        mul   NUM2
+        mov   ecx, CarryPTR
+            setc  dl
+            mov   [ecx], dl
+        mov   ecx, OverPTR
+            mov   [ecx], dl
     ret
-Smul8_16:
+    %pop
+Smul8_16:; sint16 (NUM1_8, NUM2_8, CarryPTR, OverPTR)
+    %push Context
+    %define NUM1 STACK_ARG1_SP8
+    %define NUM2 STACK_ARG2_SP8
+    %define CarryPTR STACK_ARG3_SP
+    %define OverPTR STACK_ARG4_SP
+    movzx   eax, NUM1
+        imul  NUM2
+        mov   ecx, CarryPTR
+            setc  dl
+            mov   [ecx], dl
+        mov   ecx, OverPTR
+            mov   [ecx], dl
+    ret
+    %pop
 
     ret
 
