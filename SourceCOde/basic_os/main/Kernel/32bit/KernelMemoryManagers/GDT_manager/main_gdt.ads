@@ -76,8 +76,8 @@ package SEGMENT_DESCRIPTORS is
       BaseLow  : Base_Low_Type;
       AccessByte:CodeAccessByte;
       LimitHigh: Limit_High_Type;
-      Flags : SizeTypeFlags;
-      BaseHigh: Base_High_Type;
+      Flags :    SizeTypeFlags;
+      BaseHigh:  Base_High_Type;
    end record;
    for CodeSegment use record
       LimitLow at 0 range 0 .. 15;
