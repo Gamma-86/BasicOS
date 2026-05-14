@@ -99,10 +99,10 @@ _start:
         btr   eax, 2
         btr   eax, 3
     mov   cr0, eax
-;    call  Sort_multiboot_struct ;Sort things that multiboot given in EBX*
+    call  Sort_multiboot_struct ;Sort things that multiboot given in EBX*
     emms
     fninit
-
+%IF 0
     %assign NON_EXISTING_RAM (0x10_0000 * 1513)
     PRINT_STR_WITH_INITIALPTRINT "ADDRESS IS"
         push  NON_EXISTING_RAM
@@ -149,6 +149,7 @@ _start:
             call PrintInt32HEXIntial
             add   esp, 4
     PRINT_STR_WITH_INITIALPTRINT "THE END"
+%endif
     cli
     hlt
     jmp $

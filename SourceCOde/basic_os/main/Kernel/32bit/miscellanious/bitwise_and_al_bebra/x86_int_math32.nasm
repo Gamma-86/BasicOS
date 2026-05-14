@@ -173,8 +173,6 @@ Smul8_16:; sint16 (NUM1_8, NUM2_8, CarryPTR, OverPTR)
     ret
     %pop
 
-    ret
-
 
 global Udiv8_8
 global Sdiv8_8
