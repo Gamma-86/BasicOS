@@ -1,7 +1,8 @@
 with System;
 with Interfaces;
+
 package Segmentation is
-package SEGMENT_DESCRIPTORS is
+package Descriptors is
    type DPL_type is mod 2**2;
    for  DPL_type'Size use 2;
 
@@ -206,9 +207,9 @@ package SEGMENT_DESCRIPTORS is
    end record;
    for LimitFragmented'Size use 20;
 
-   function Fragment_Address (Address : System.Address) return AddressFragmented;
+   function Fragment_Address (Address : System.Address) is new Ada.Unchecked_Conversion;
    function Fragment_Limit (Limit : Integer) return LimitFragmented;
 private
    
-end SEGMENT_DESCRIPTORS;
+end Descriptors;
 end Segmentation;
