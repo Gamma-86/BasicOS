@@ -236,6 +236,8 @@ begin
    if IncreasedYCord > Row'Last then
       IncreasedYCord := Row'Last;
    end if;
+
+   return IncreasedYCord;
 end IncrementYCord;
 
 

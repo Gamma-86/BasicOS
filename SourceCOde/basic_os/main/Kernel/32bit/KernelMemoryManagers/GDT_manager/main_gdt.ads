@@ -1,6 +1,9 @@
+with System;
+with Interfaces;
+package Segmentation is
 package SEGMENT_DESCRIPTORS is
    type DPL_type is mod 2**2;
-
+   for  DPL_type'Size use 2;
 
 
    type CodeAccessByte is record
@@ -22,9 +25,7 @@ package SEGMENT_DESCRIPTORS is
       IsPresent at 0 range 7 .. 7;
    end record;
    for CodeAccessByte'Size use 8;
-
-
-
+   
    type DataAccessByte is record
       Accessed : Boolean;
       Writable : Boolean;
@@ -45,7 +46,58 @@ package SEGMENT_DESCRIPTORS is
    end record;
    for DataAccessByte'Size use 8;
 
+   type SystemAccessByteType is
+   (
+      TSS16_Free,
+      LDT,
+      TSS16_Busy,
+      CallGate16,
+      TaskGate,
+      Interrupt16,
+      Trap16,
+      TSS32_Free,
+      TSS32_Busy,
+      CallGate32,
+      Interrupt32,
+      Trap32,
 
+      Reserved8,
+      Reserved10,
+      Reserved13
+   );
+   for SystemAccessByteType use
+   (
+      TSS16_Free = 2#0001#,
+      LDT =        2#0010#,
+      TSS16_Busy = 2#0011#,
+      CallGate16 = 2#0100#,
+      TaskGate   = 2#0101#,
+      Interrupt16= 2#0110#,
+      Trap16     = 2#0111#,
+      Reserved8  = 2#1000#,
+      TSS32_Free = 2#1001#,
+      Reserved10 = 2#1010#,
+      TSS32_Busy = 2#1011#,
+      CallGate32 = 2#1100#,
+      Reserved13 = 2#1101#,
+      Interrupt32= 2#1110#,
+      Trap32     = 2#1111#
+   );
+   for SystemAccessByteType'Size use 4;
+
+   type SystemAccessByte is record
+      TypeNibble  : SystemAccessByteType;
+      IsNotSystem : Boolean;
+      Privelege   : DPL_type;
+      IsPresent   : Boolean;
+   end record;
+   for SystemAccessByte use record
+      TypeNibble at 0 range 0 .. 3;
+      IsNotSystem at 0 range 4 .. 4;
+      Privelege at 0 range 5 .. 6;
+      IsPresent at 0 range 7 .. 7;
+   end record;
+   for SystemAccessByte'Size use 8;
 
    type SizeTypeFlags is record
       Available : Boolean;
@@ -64,10 +116,14 @@ package SEGMENT_DESCRIPTORS is
 
 
    type Base_Low_Type is mod 2**24;
+      for  Base_Low_Type'Size use 24;
    type Base_High_Type is mod 2**8;
-
+      for  Base_High_Type'Size use 8;
+   
    type Limit_Low_Type is mod 2**16;
+      for Limit_Low_Type'Size use 16;
    type Limit_High_Type is mod 2**4;
+      for Limit_High_Type'Size use 4;
 
 
 
@@ -110,17 +166,49 @@ package SEGMENT_DESCRIPTORS is
    for DataSegment'Size use 64;
 
 
+   type SystemSegment is record
+      LimitLow : Limit_Low_Type;
+      BaseLow  : Base_Low_Type;
+      AccessByte: SystemAccessByte;
+      LimitHigh:  Limit_High_Type;
+      Flags : SizeTypeFlags;
+      BaseHigh : Base_High_Type;
+   end record;
+   for  SystemSegment use record
+      LimitLow at 0 range 0 .. 15;
+      BaseLow at 0 range 16 .. 39;
+      AccessByte at 4 range 8..15;
+      LimitHigh at 4 range 16 .. 19;
+      Flags at 4 range 20 .. 23;
+      BaseHigh at 4 range 24 .. 31;
+   end record;
+   for  SystemSegment'Size use 64;
 
 
 
+   Type AddressFragmented is record
+      BaseLow : Base_Low_Type;
+      BaseHigh: Base_High_Type;
+   end record;
+   for  AddressFragmented use record
+      BaseLow at 0 range 0 .. 23;
+      BaseHigh at 0 range 24 .. 31;
+   end record;
+   for AddressFragmented'Size use 32;
 
+   type LimitFragmented is record
+      LimitLow : Limit_Low_Type;
+      LimitHigh: Limit_High_Type;
+   end record;
+   for  LimitFragmented use record
+      LimitLow at 0 range 0 .. 15;
+      LimitHigh at 0 range 16 .. 19;
+   end record;
+   for LimitFragmented'Size use 20;
 
-
-
-
-
-
-
+   function Fragment_Address (Address : System.Address) return AddressFragmented;
+   function Fragment_Limit (Limit : Integer) return LimitFragmented;
 private
    
 end SEGMENT_DESCRIPTORS;
+end Segmentation;
