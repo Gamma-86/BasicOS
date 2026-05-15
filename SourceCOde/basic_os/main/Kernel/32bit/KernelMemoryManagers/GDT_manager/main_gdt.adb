@@ -1,19 +1,41 @@
-package body SEGMENT_DESCRIPTORS is
-   function Fragment_Address (Address : System.Address) return AddressFragmented is
-      ReturnedAddress : AddressFragmented;
-   begin
+with Interfaces;
+package body Segmentation is
+   package body Descriptors is
+      function Fragment_Address
+        (Address : System.Address) return AddressFragmented
+      is
+         ReturnedAddress : AddressFragmented;
+         use Interfaces;
+         subtype Address_Int is Unsigned_32;
 
-   end Fragment_Address;
+         function To_INT is new
+           Ada.Unchecked_Conversion (System.Address, Address_Int);
 
-   function Fragment_Limit (Limit : Integer) return LimitFragmented is
-      ReturnedLimit : LimitFragmented;
-   begin
-      ReturnedLimit :=
-         (LimitLow => Limit_Low_Type (Limit),
-          LimitHigh => Limit_High_Type(Interfaces.Shift_Right(Limit, 16))
+         ConvertedIntAddress : Address_Int := To_INT (Address);
+         FragmentedAddress   : AddressFragmented;
+      begin
+         FragmentedAddress :=
+         (
+         BaseLow  => 
+            Base_Low_Type(ConvertedIntAddress and 16#FF_FFFF#),
+         BaseHigh =>
+            Base_High_Type( Shift_Right(ConvertedIntAddress, 24) )
          );
-   end Fragment_Limit;
 
-end SEGMENT_DESCRIPTORS;
+         return FragmentedAddress;
+      end Fragment_Address;
 
+      function Fragment_Limit (Limit : Integer) return LimitFragmented is
+         ReturnedLimit : LimitFragmented;
+         use Interfaces;
+      begin
+         ReturnedLimit :=
+         (
+            LimitLow  => Limit_Low_Type (Limit),
+            LimitHigh => Limit_High_Type (Shift_Right (Limit, 16))
+         );
+      end Fragment_Limit;
 
+   end Descriptors;
+
+end Segmentation;
