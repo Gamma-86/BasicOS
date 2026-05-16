@@ -17,14 +17,94 @@ package Segmentation is
 
       type DPL_type is mod 2 ** 2;
          for DPL_type'Size use 2;
-      type TypeField_type is mod 2**4;
-         for TypeField_type'Size use 4;
 
+      type TypeField_type is 
+      (
+         Data_R,
+         Data_R_A,
+         Data_R_W,
+         Data_R_W_A,
+         Data_R_EDown,
+         Data_R_EDown_A,
+         Data_R_W_EDown,
+         Data_R_W_EDown_A,
+
+         Code,
+         Code_A,
+         Code_R,
+         Code_R_A,
+         Code_C,
+         Code_C_A,
+         Code_R_C,
+         Code_R_C_A,
+
+         TSS16_Free,
+         LDT,
+         TSS16_Busy,
+         CallGate16,
+         TaskGate,
+         Interrupt16,
+         Trap16,
+         TSS32_Free,
+         TSS32_Busy,
+         CallGate32,
+         Interrupt32,
+         Trap32
+      );
+      for TypeField_type use
+      (
+         Data_R =>         2#0_0_000#,
+         Data_R_A =>       2#0_0_001#,
+         Data_R_W =>       2#0_0_010#,
+         Data_R_W_A =>     2#0_0_011#,
+         Data_R_EDown =>   2#0_0_100#,
+         Data_R_EDown_A => 2#0_0_101#,
+         Data_R_W_EDown => 2#0_0_110#,
+         Data_R_W_EDown_A=>2#0_0_111#,
+
+         Code       =>  2#0_1_000#,
+         Code_A =>      2#0_1_001#,
+         Code_R =>      2#0_1_010#,
+         Code_R_A =>    2#0_1_011#,
+         Code_C =>      2#0_1_100#,
+         Code_C_A =>    2#0_1_101#,
+         Code_R_C =>    2#0_1_110#,
+         Code_R_C_A =>  2#0_1_111#,
+
+         TSS16_Free =>  2#1_0001#,
+         LDT =>         2#1_0010#,
+         TSS16_Busy =>  2#1_0011#,
+         CallGate16 =>  2#1_0100#,
+         TaskGate =>    2#1_0101#,
+         Interrupt16 => 2#1_0110#,
+         Trap16 =>      2#1_0111#,
+         TSS32_Free =>  2#1_1001#,
+         TSS32_Busy =>  2#1_1011#,
+         CallGate32 =>  2#1_1100#,
+         Interrupt32 => 2#1_1110#,
+         Trap32 =>      2#1_111#
+--         Reserved8 = 2#1000#,
+--         Reserved10 = 2#1010#,
+--         Reserved13 = 2#1101#
+      );
+      for TypeField_type'Size use 5;
+
+      subtype TypeFieldData_type is TypeField_type 
+         range Data_R .. Data_R_W_EDown_A;
+         for TypeFieldData_type'Size use 5;
+      subtype TypeFieldCode_type  is TypeField_type range Code .. Code_R_C_A;
+         for TypeFieldCode_type'Size use 5;
+      subtype TypeFieldSystem_type is TypeField_type range TSS16_Free..Trap32;
+         for TypeFieldSystem_type'Size use 5;
       type AccessByteRaw is record
          TypeField : TypeField_type;
-         IsNotSystem:Boolean;
          Privelege : DPL_type;
          IsPresent : Boolean;
+      end record;
+      for  AccessByteRaw use record
+         TypeField at 0 range 0 .. 4;
+         Privelege at 0 range 5 .. 6;
+         IsPresent at 0 range 7 .. 7;
       end record;
       for AccessByteRaw'Size use 8;
 
@@ -62,87 +142,37 @@ package Segmentation is
 
             
       type CodeAccessByte is record
-         TypeField  : TypeField_type;
-         IsSegment  : Boolean;
+         TypeField  : TypeFieldCode_type;
          Privelege  : DPL_type;
          IsPresent  : Boolean;
       end record;
       for CodeAccessByte use record
-         TypeField  at 0 range 0 .. 3;
-         IsSegment  at 0 range 4 .. 4;
+         TypeField  at 0 range 0 .. 4;
          Privelege  at 0 range 5 .. 6;
          IsPresent  at 0 range 7 .. 7;
       end record;
       for CodeAccessByte'Size use 8;
 
       type DataAccessByte is record
-         Accessed   : Boolean;
-         Writable   : Boolean;
-         ExpandDown : Boolean;
-         Executable : Boolean;
-         IsSegment  : Boolean;
+         TypeField  : TypeFieldData_type;
          Privelege  : DPL_type;
          IsPresent  : Boolean;
       end record;
       for DataAccessByte use record
-         Accessed   at 0 range 0 .. 0;
-         Writable   at 0 range 1 .. 1;
-         ExpandDown at 0 range 2 .. 2;
-         Executable at 0 range 3 .. 3;
-         IsSegment  at 0 range 4 .. 4;
+         TypeField at 0 range 0 .. 4;
          Privelege  at 0 range 5 .. 6;
          IsPresent  at 0 range 7 .. 7;
       end record;
       for DataAccessByte'Size use 8;
 
-      type SystemAccessByteType is
-      (
-         TSS16_Free,
-         LDT,
-         TSS16_Busy,
-         CallGate16,
-         TaskGate,
-         Interrupt16,
-         Trap16,
-         TSS32_Free,
-         TSS32_Busy,
-         CallGate32,
-         Interrupt32,
-         Trap32,
-
-         Reserved8,
-         Reserved10,
-         Reserved13
-      );
-      for SystemAccessByteType use
-      (
-         TSS16_Free = 2#0001#,
-         LDT = 2#0010#,
-         TSS16_Busy = 2#0011#,
-         CallGate16 = 2#0100#,
-         TaskGate = 2#0101#,
-         Interrupt16 = 2#0110#,
-         Trap16 = 2#0111#,
-         Reserved8 = 2#1000#,
-         TSS32_Free = 2#1001#,
-         Reserved10 = 2#1010#,
-         TSS32_Busy = 2#1011#,
-         CallGate32 = 2#1100#,
-         Reserved13 = 2#1101#,
-         Interrupt32 = 2#1110#,
-         Trap32 = 2#1111#
-      );
-      for SystemAccessByteType'Size use 4;
 
       type SystemAccessByte is record
-         TypeNibble  : SystemAccessByteType;
-         IsNotSystem : Boolean;
+         TypeField   : TypeFieldSystem_type;
          Privelege   : DPL_type;
          IsPresent   : Boolean;
       end record;
       for SystemAccessByte use record
-         TypeNibble  at 0 range 0 .. 3;
-         IsNotSystem at 0 range 4 .. 4;
+         TypeField at 0 range 0 .. 4;
          Privelege   at 0 range 5 .. 6;
          IsPresent   at 0 range 7 .. 7;
       end record;
