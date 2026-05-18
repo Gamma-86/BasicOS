@@ -28,6 +28,7 @@ package ReturnBitfields is
       GeneralOS_ReturnSpace => 2,
       GeneralOS_ReturnSpace_Extended1 => 3
    );
+   for LOW8_ReturnSpace'Size use 8;
 
 type GeneralOS is record
    ReturnValNameSpace : LOW8_ReturnSpace;

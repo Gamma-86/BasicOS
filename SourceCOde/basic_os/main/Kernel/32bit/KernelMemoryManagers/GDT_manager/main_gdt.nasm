@@ -8,8 +8,8 @@ section .data
 global Main_GDT
 global MainGDT_Descriptor
 global MainGDT_end
-
-MainGDT:
+Align 8
+MainGDT_start:
     ;1
 dq 0
 .code32Flat: ;2
@@ -17,29 +17,24 @@ DEFINE_GDT_FLATCODE386
 .data32Flat: ;3
 DEFINE_GDT_FLATDATA386
 
-.code16FlatMax:;4
-DEFINE_GDT_FLAT286CODE
-.data16FlatMax:;5
-DEFINE_GDT_FLAT286DATA
-.vga_VramMain: ;6
-DEFINE_GDT_286DATA__limit_base_writable_down_privilege 65536, 0xA000, 1, 0, 0
-
+%rep 8179 ; because we have 3 segments and 8192 is maximum amount
+    dq 0 | BIT_MASK(DataSegment_Descriptor_Bits.Available)
+%endrep
 MainGDT_end:
+
+Align 8
+times 6 db 0
 MainGDT_Descriptor:
-    dw   MainGDT_end-MainGDT-1
-    dd   MainGDT
+    dw   MainGDT_end-MainGDT_start-1
+    dd   MainGDT_start
+
+
 
 globASM_FUN_lgdt:;void (Pointer from where to load)
-    %push LocContext
-    %stacksize flat
-    %arg GDT_DESC_PTR:PTR_word
-
-    mov   eax, [PTR_word]
-    lgdt  [eax]
-
-
+    mov   eax, [esp+4]
+        lgdt  [eax]
     ret
-    %pop
 globASM_FUN_sgdt:;void (Pointer where to store)
-
+    mov   eax, [esp+4]
+        sgdt [eax]
     ret
