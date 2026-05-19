@@ -5,18 +5,23 @@ with Interfaces;
 with Ada.Unchecked_Conversion;
 
 package x86_protection is
-   type Privelege_LVL_type is mod 2 ** 2;
+   type Privelege_LVL_type is mod 2 ** 2
+      with Size => 2;
       for Privelege_LVL_type'Size use 2;
 
-   type Base_Low_Type is mod 2 ** 24;
+   type Base_Low_Type is mod 2 ** 24
+      with Size => 24;
       for Base_Low_Type'Size use 24;
-   type Base_High_Type is mod 2 ** 8;
+   type Base_High_Type is mod 2 ** 8
+      with Size => 8;
       for Base_High_Type'Size use 8;
 
 
-   type Limit_Low_Type is mod 2 ** 16;
+   type Limit_Low_Type is mod 2 ** 16
+      with Size => 16;
       for Limit_Low_Type'Size use 16;
-   type Limit_High_Type is mod 2 ** 4;
+   type Limit_High_Type is mod 2 ** 4
+      with Size => 4;
       for Limit_High_Type'Size use 4;
 
    type TypeField_type is 
@@ -51,7 +56,8 @@ package x86_protection is
       CallGate32,
       Interrupt32,
       Trap32
-   );
+   )
+   with Size => 5;
    for TypeField_type use
    (
       Data_R =>         2#0_0_000#,
@@ -94,7 +100,8 @@ package x86_protection is
       TypeField : TypeField_type;
       Privelege : Privelege_LVL_type;
       IsPresent : Boolean;
-   end record;
+   end record
+      with Size => 8;
    for  AccessByteRaw use record
       TypeField at 0 range 0 .. 4;
       Privelege at 0 range 5 .. 6;
@@ -107,7 +114,8 @@ package x86_protection is
       Reserved64 : Boolean;
       Is32bit    : Boolean;
       Granular   : Boolean;
-   end record;
+   end record
+      with Size => 4;
    for SizeTypeFlags use record
       Available  at 0 range 0 .. 0;
       Reserved64 at 0 range 1 .. 1;
@@ -123,7 +131,8 @@ package x86_protection is
       LimitHigh: Limit_High_Type;
       Flags    : SizeTypeFlags;
       BaseHigh : Base_High_Type;
-   end record;
+   end record
+      with Size => 64;
    for SegmentRaw use record
       LimitLow   at 0 range 0 .. 15;
       BaseLow    at 0 range 16 .. 39;
@@ -144,7 +153,8 @@ package x86_protection is
       Requested_Privelege : Privelege_LVL_type;
       IsIn_LDT : Boolean;
       Segment_Index : Segment_Index_type;
-   end record;
+   end record
+      with Size => 16;
    for Segment_Selector use record
       Requested_Privelege at 0 range 0 .. 1;
       IsIn_LDT at 0 range 2 .. 2;
@@ -152,7 +162,8 @@ package x86_protection is
    end record;
    for  Segment_Selector'Size use 16;
 
-   type Segment_Index_type is new Integer range 0 .. 8191;
+   type Segment_Index_type is new Integer range 0 .. 8191
+      with Size => 13;
    for Segment_Index_type'Size use 13;
 
 
@@ -164,7 +175,8 @@ package x86_protection is
    type GDT_descriptor is record
       limit : Interfaces.Unsigned_16;
       Address: Segments_TablePTR;
-   end record;
+   end record
+      with Size => 48;
    for GDT_descriptor use record
       limit at 0 range 0 .. 15;
       Address at 0 range 16 .. 47;
@@ -194,7 +206,8 @@ package x86_protection.Interrupts is
       Trap16,
       Interrupt32,
       Trap32
-   );
+   )
+      with Size => 4;
    for Gate_Type use 
    (
       Task_Gate =>   2#0101#,
@@ -214,7 +227,8 @@ package x86_protection.Interrupts is
       Privelege  : Privelege_LVL_type;
       Is_Present : Boolean;
       Offset_High : Interfaces.Unsigned_16; 
-   end record;
+   end record
+      with Size => 64;
    for  Gate_Descriptor use record
       Offset_Low at 0 range 0 .. 15;
       Selector   at 0 range 16 .. 31;
@@ -228,7 +242,8 @@ package x86_protection.Interrupts is
    for  Gate_Descriptor'Size use 64;
 
 
-   subtype Interrupt_Index is Integer range 0 .. 255; 
+   subtype Interrupt_Index is Integer range 0 .. 255 with Size => 8;
+      for Interrupt_Index'Size use 8; 
    type Interrupts_Table is array(Interrupt_Index) of Gate_Descriptor;
    type Interrupts_TablePTR is access all Interrupts_Table;
 
@@ -236,7 +251,9 @@ package x86_protection.Interrupts is
    type IDT_descriptor is record 
       Size : Interfaces.Unsigned_16;
       Address : Interrupts_TablePTR;
-   end record;
+   end record
+      with Size => 48;
+   For IDT_descriptor'Size use 64;
 
 end Interrupts;
 
@@ -246,11 +263,14 @@ end Interrupts;
 
 package x86_protection.Segmentation is
    subtype TypeFieldData_type is TypeField_type 
-      range Data_R .. Data_R_W_EDown_A;
+      range Data_R .. Data_R_W_EDown_A
+      with Size => 5;
       for TypeFieldData_type'Size use 5;
-   subtype TypeFieldCode_type  is TypeField_type range Code .. Code_R_C_A;
+   subtype TypeFieldCode_type  is TypeField_type range Code .. Code_R_C_A
+      with Size => 5;
       for TypeFieldCode_type'Size use 5;
-   subtype TypeFieldSystem_type is TypeField_type range TSS16_Free..Trap32;
+   subtype TypeFieldSystem_type is TypeField_type range TSS16_Free..Trap32
+      with Size => 5;
       for TypeFieldSystem_type'Size use 5;
 
 
@@ -258,7 +278,8 @@ package x86_protection.Segmentation is
       TypeField  : TypeFieldCode_type;
       Privelege  : Privelege_LVL_type;
       IsPresent  : Boolean;
-   end record;
+   end record
+      With Size => 8;
    for CodeAccessByte use record
       TypeField  at 0 range 0 .. 4;
       Privelege  at 0 range 5 .. 6;
@@ -270,7 +291,8 @@ package x86_protection.Segmentation is
       TypeField  : TypeFieldData_type;
       Privelege  : Privelege_LVL_type;
       IsPresent  : Boolean;
-   end record;
+   end record
+      with Size => 8;
    for DataAccessByte use record
       TypeField at 0 range 0 .. 4;
       Privelege  at 0 range 5 .. 6;
@@ -283,7 +305,8 @@ package x86_protection.Segmentation is
       TypeField   : TypeFieldSystem_type;
       Privelege   : Privelege_LVL_type;
       IsPresent   : Boolean;
-   end record;
+   end record
+      With Size => 8;
    for SystemAccessByte use record
       TypeField at 0 range 0 .. 4;
       Privelege   at 0 range 5 .. 6;
@@ -302,7 +325,8 @@ package x86_protection.Segmentation is
       LimitHigh  : Limit_High_Type;
       Flags      : SizeTypeFlags;
       BaseHigh   : Base_High_Type;
-   end record;
+   end record
+      with Size => 64;
    for CodeSegment use record
       LimitLow   at 0 range 0 .. 15;
       BaseLow    at 0 range 16 .. 39;
@@ -320,7 +344,8 @@ package x86_protection.Segmentation is
       LimitHigh  : Limit_High_Type;
       Flags      : SizeTypeFlags;
       BaseHigh   : Base_High_Type;
-   end record;
+   end record
+      with Size => 64;
    for DataSegment use record
       LimitLow   at 0 range 0 .. 15;
       BaseLow    at 0 range 16 .. 39;
@@ -338,7 +363,8 @@ package x86_protection.Segmentation is
       LimitHigh  : Limit_High_Type;
       Flags      : SizeTypeFlags;
       BaseHigh   : Base_High_Type;
-   end record;
+   end record
+      with Size => 64;
    for SystemSegment use record
       LimitLow   at 0 range 0 .. 15;
       BaseLow    at 0 range 16 .. 39;
@@ -352,7 +378,8 @@ package x86_protection.Segmentation is
    type AddressFragmented is record
       BaseLow  : Base_Low_Type;
       BaseHigh : Base_High_Type;
-   end record;
+   end record
+      with Size => 32;
    for AddressFragmented use record
       BaseLow  at 0 range 0 .. 23;
       BaseHigh at 0 range 24 .. 31;
@@ -362,7 +389,8 @@ package x86_protection.Segmentation is
    type LimitFragmented is record
       LimitLow  : Limit_Low_Type;
       LimitHigh : Limit_High_Type;
-   end record;
+   end record
+      with Size => 20;
    for LimitFragmented use record
       LimitLow  at 0 range 0 .. 15;
       LimitHigh at 0 range 16 .. 19;
