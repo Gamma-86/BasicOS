@@ -139,8 +139,6 @@ package x86_protection is
 
 
 
-   type Segment_Index_type is new Integer range 0 .. 8191;
-      for Segment_Index_type'Size use 13;
 
    type Segment_Selector is record
       Requested_Privelege : Privelege_LVL_type;
@@ -154,8 +152,8 @@ package x86_protection is
    end record;
    for  Segment_Selector'Size use 16;
 
-
-
+   type Segment_Index_type is new Integer range 0 .. 8191;
+   for Segment_Index_type'Size use 13;
 
 
 
