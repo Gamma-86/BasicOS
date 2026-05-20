@@ -33,6 +33,8 @@ globASM_FUN_outd: ;void (short int address, unsigned int TheDoubleWord)
     out   dx,  eax
     ret
 
+
+
 global inB
 global globASM_FUN_inB
 global inW
@@ -41,24 +43,24 @@ global inD
 global globASM_FUN_inD
 inB:
 globASM_FUN_inB: ; unsgined char (Uint16 PortAddress)
-    mov   dx, STACK_ARG1_SP16
+    movzx edx, STACK_ARG1_SP16
     in    al, dx
     ret
 inW:
 globASM_FUN_inW: ; Uint16 (Uint16 PortAddress)
-    mov   dx, STACK_ARG1_SP16
+    movzx edx, STACK_ARG1_SP16
     in    ax, dx
     ret
 inD:
 globASM_FUN_inD:;uint32 (uint16 PortAddress)
-    mov   dx, STACK_ARG1_SP16
+    movzx edx, STACK_ARG1_SP16
     in    eax, dx
     ret
 
 
 
-global set_IOPL_minLvl
 
+global set_IOPL_minLvl
 set_IOPL_minLvl: ;void(char level)
     movzx eax,byte[esp+4]
     and   eax,3

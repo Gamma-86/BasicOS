@@ -77,7 +77,7 @@ function globASM_FUN_inD(PortAddress : Unsigned_16) return Unsigned_16
 
 type Privelege_LVL_type is mod 2**2;
    for Privelege_LVL_type'Size use 2;
-procedure set_IOPL_minLvl (PrivelegeLevel : Privelege_LVL_type);
+procedure set_IOPL_minLvl (PrivelegeLevel : Privelege_LVL_type)
    with
       Import => True,
       Convention => C,
