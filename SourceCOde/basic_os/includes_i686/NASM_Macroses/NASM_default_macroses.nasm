@@ -5,42 +5,45 @@
 			%define FALSE 0
 			%define NULL 0
 
-%define force_16_bit TRUE
+	struc ABI_ENUM
+		.reserved resb 1
+		.SYSTEM_V resb 1
+		.CDCEL resb 1
+		.MS64 resb 1
+		.MS32 resb 1
 
+		;.Pascall16
+		;.STDCall16
+		;.FastCall16
+	endstruc
 %define SizeOfPTR 4
 %define BitnessOfPTR SizeOfPTR*8
 %define PTR_BITNESS BitnessOfPTR
-		
+%define USED_ABI_CODE ABI_ENUM.CDCEL
+
 		%if SizeOfPTR = 4
 			bits 32
 			%define PTR_word dword
+			%define FarPTR_present
+			%define SizeOfFarPTR 6
+			%define BitnessOfFarPTR SizeOfFarPTR*8
 		%elif SizeOfPTR = 8
 			bits 64
 			%define PTR_word qword
 		%elif SizeOfPTR = 2
-			%if force_16_bit
-				bits 16
-				%define NearPTR_word word
-				%define FarPTR_word dword
-			%else
-				%error does not support other pointer sizes except 32 and 64
-			%endif
+			bits 16
+			%define NearPTR_word word
+			%define FarPTR_word dword
+			%define FarPTR_present
+			%define SizeOfFarPTR 4
+			%define BitnessOfFarPTR SizeOfFarPTR*8
 		%else
 			%error Bad pointer size
 		%endif
-
-		struc ABI_ENUM
-			.reserved resb 1
-			.SYSTEM_V resb 1
-			.CDCEL resb 1
-			.MS64 resb 1
-			.MS32 resb 1
-		endstruc
 ;		%define ABI_ENUM.SYSTEM_V 1
 ;		%define ABI_ENUM.CDCEL 2
 ;		%define ABI_ENUM.MS64 3
 ;		%define ABI_ENUM.MS32 4
-%define USED_ABI_CODE ABI_ENUM.CDCEL
 
 			%if   USED_ABI_CODE = ABI_ENUM.SYSTEM_V
 				%if SizeOfPTR = 8
@@ -101,7 +104,7 @@
 %ixdefine double     qword
 %ixdefine long_double tword
 
-
+;Settign C types depending on used ABI
 %IF USED_ABI_CODE = ABI_ENUM.SYSTEM_V
 		%define S_Char int8_t
 		%define U_Char uint8_t
@@ -252,7 +255,7 @@
 		%define U_LongLong uint64_t
 		%define U_LongLong_Int uint64_t
 
-		
+
 		%define SizeOfInt 4
 		%define BitnessOfInt SizeOfInt*8
 	%else ;It is 16 bit, so use MS DOS
@@ -283,7 +286,6 @@
 		%define BitnessOfInt SizeOfInt*8
 	%endif
 %endif
-
 ;Defining the most basic register aliases
 
 %define FREE_REG1_64 rax
@@ -343,7 +345,7 @@
 
 
 ;DEFINING FREE REGISTERS FOR CURRENT SIZE OF POINTER
-;AND SOME OTHER POINTER SIZE SPECIFIC REGISTERS
+;AND SOME OTHER POINTER SIZE SPECIFIC REGISTERS(like esp, ebp)
 %if SizeOfPTR = 8
 	%define BP_NATIVE RBP
 	%define SP_NATIVE RSP
@@ -433,6 +435,7 @@
 	%define DEFINE_PTR dq
 %elif SizeOfPTR = 2
 	%define DEFINE_PTR dw
+	%define DEFINE_FAR_PTR(Segment, Offset) dw (Offset), (Segment)
 %else
 	%error Bad pointer size
 %endif
@@ -442,6 +445,12 @@
 %define STACK_ARG_EBP(X) (BP_NATIVE +SizeOfPTR+SizeOfPTR*(X))
 %define LOCAL_VAR(X) (BP_NATIVE -SizeOfPTR*(X))
 
+
+%define STACK_ARG_ESP_FAR(X) (SP_NATIVE +SizeOfPTR*(X) +SizeOfPTR*1)
+%define STACK_ARG_EBP_FAR(X) (BP_NATIVE +SizeOfPTR*(X) +SizeOfPTR*2)
+
+%define STACK_ARG_ESP_INT(X) (SP_NATIVE +SizeOfPTR*(X) + SizeOfPTR*2)
+%define STACK_ARG_EBP_INT(X) (BP_NATIVE +SizeOfPTR*(X) + SizeOfPTR*3)
 ;DEFINING ARGUMENTS LOCATION FOR CURRENT POINTER SIZE
 
 %if   SizeOfPTR = 4
@@ -603,7 +612,38 @@
 
 	%else
 		%error Could not define Arguments location for current combination of ABI and pointer size
-	%endif	
+	%endif
+%elif SizeOfPTR = 2
+	%if USED_ABI_CODE = ABI_ENUM.CDCEL
+
+		%assign i 1
+		%rep 10
+			%define STACK_ARG%[i]_SP        [STACK_ARG_ESP(i)]
+				%define STACK_ARG1_SP8  byte[STACK_ARG_ESP(i)]
+				%define STACK_ARG1_SP16 word[STACK_ARG_ESP(i)]
+
+			%define STACK_ARG1_SP_FAR       [STACK_ARG_ESP_FAR(i)]
+				%define STACK_ARG1_SP_FAR8  byte[STACK_ARG_ESP_FAR(i)]
+				%define STACK_ARG1_SP_FAT16 word[STACK_ARG_ESP_FAR(i)]
+
+			%define STACK_ARG1_SP_INT           [STACK_ARG_ESP_INT(i)]
+				%define STACK_ARG1_SP_INT8  byte[STACK_ARG_ESP_INT(i)]
+				%define STACK_ARG1_SP_INT16 word[STACK_ARG_ESP_INT(i)]
+
+			%define STACK_ARG1_BP           [STACK_ARG_EBP(i)]
+				%define STACK_ARG1_BP8  byte[STACK_ARG_EBP(i)]
+				%define STACK_ARG1_BP16 word[STACK_ARG_EBP(i)]
+
+			%define STACK_ARG1_BP_FAR           [STACK_ARG_EBP_FAR(i)]
+				%define STACK_ARG1_BP_FAR8  byte[STACK_ARG_EBP_FAR(i)]
+				%define STACK_ARG1_BP_FAR16 word[STACK_ARG_EBP_FAR(i)]
+
+			%define STACK_ARG1_BP_INT           [STACK_ARG_EBP_INT(i)]
+				%define STACK_ARG1_BP_INT8  byte[STACK_ARG_EBP_INT(i)]
+				%define STACK_ARG1_BP_INT16 word[STACK_ARG_EBP_INT(i)]
+		%endrep
+		%undef i
+	%endif
 %else
 	%error Cound not define Arguments location for current Pointer size in bytes
 %endif
@@ -876,7 +916,8 @@
 
 
 %macro ALIGN16_CALL_STACK__ArgsAmount 1
-	%assign ArgsSizeBytes %1*SizeOfPTR
+	%push CONTEXT
+	%assign ArgsSizeBytes (%1)*SizeOfPTR
 	%assign SubAmount ArgsSizeBytes&0xF
 	%assign SubAmount 16-SubAmount
 	%assign SubAmount SubAmount&0xF
@@ -885,6 +926,7 @@
 
 	%undef ArgsSizeBytes
 	%undef SubAmount
+	%pop
 %endmacro
 
 
@@ -893,16 +935,33 @@
 %endmacro
 
 
-%macro ALIGN16_STACK_FLOOR 0
-	and   SP_NATIVE, ~(0xF)
+%macro ALIGN16_REG_FLOOR 1
+	and   %1, ~(0xF)
+%endmacro
+%macro ALIGN16_REG_ROOF 1
+add   %1, 15
+and   %1, 0xF
+%endmacro
+%macro ALIGN_16_STACK_FLOOR 0
+	ALIGN16_REG_FLOOR SP_NATIVE
+%endmacro
+%macro ALIGN16_STACK_ROOF 0
+	ALIGN16_REG_ROOF SP_NATIVE
 %endmacro
 
 
-%macro ALIGN16_STACK_ROOF__freeReg 1
-mov %1, SP_NATIVE
-	neg %1
-	and %1, 0xF
-add SP_NATIVE, %1
+%macro ALIGN8_REG_FLOOR 1
+	and   %1, 7
+%endmacro
+%macro ALIGN8_REG_ROOF 1
+	add   %1, 7
+	and   %1, 7
+%endmacro
+%macro ALIGN8_STACK_FLOOR 0
+	ALIGN8_REG_FLOOR SP_NATIVE
+%endmacro
+%macro ALIGN8_STACK_ROOF 0
+	ALIGN8_REG_ROOF SP_NATIVE
 %endmacro
 
 %macro COMPARE 2
@@ -918,6 +977,202 @@ add SP_NATIVE, %1
 	not   %1
 %endmacro
 
+%macro Is_It_General_Register64 1
+	%IFIDNI %1, rax
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, rbx
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, rcx
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, rdx
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, rsi
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, rdi
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, rbp
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, rsp
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, r8
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, r9
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, r10
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, r11
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, r12
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, r13
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, r14
+		%define Is_It_General_Register64_BOOL 1
+	%elifidni %1, r15
+		%define Is_It_General_Register64_BOOL 1
+	%else
+		%define Is_It_General_Register64_BOOL 0
+	%endif
+%endmacro
+
+%macro Is_It_General_Register32 1
+	%IFIDNI %1, eax
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, ebx
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, ecx
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, edx
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, esi
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, edi
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, ebp
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, esp
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, r8d
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, r9d
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, r10d
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, r11d
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, r12d
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, r13d
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, r14d
+		%define Is_It_General_Register32_BOOL 1
+	%elifidni %1, r15d
+		%define Is_It_General_Register32_BOOL 1
+	%else
+		%define Is_It_General_Register32_BOOL 0
+	%endif
+%endmacro
+
+%macro Is_It_General_Register16 1
+	%IFIDNI %1, ax
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, bx
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, cx
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, dx
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, si
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, di
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, bp
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, sp
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, r8w
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, r9w
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, r10w
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, r11w
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, r12w
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, r13w
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, r14w
+		%define Is_It_General_Register16_BOOL 1
+	%elifidni %1, r15w
+		%define Is_It_General_Register16_BOOL 1
+	%else
+		%define Is_It_General_Register16_BOOL 0
+	%endif
+	
+%endmacro
+
+%macro Is_It_General_Register8 1
+	%IFIDNI %1, al
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, ah
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, bl
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, bh
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, cl
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, ch
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, dl
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, dh
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, sil
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, dil
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, bpl
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, spl
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, r8l
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, r9l
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, r10l
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, r11l
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, r12l
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, r13l
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, r14l
+		%define Is_It_General_Register8_BOOL 1
+	%elifidni %1, r15l
+		%define Is_It_General_Register8_BOOL 1
+	%else
+		%define Is_It_General_Register8_BOOL 0
+	%endif
+%endmacro
+
+%macro Is_It_General_Register 1
+	Is_It_General_Register8 %1
+	Is_It_General_Register16 %1
+	Is_It_General_Register32 %1
+	Is_It_General_Register64 %1
+
+	%xdefine Is_It_General_Register (Is_It_General_Register8_BOOL || Is_It_General_Register16_BOOL || Is_It_General_Register32_BOOL || Is_It_General_Register64_BOOL)
+
+	%undef Is_It_General_Register8_BOOL
+	%undef Is_It_General_Register16_BOOL
+	%undef Is_It_General_Register32_BOOL
+	%undef Is_It_General_Register64_BOOL
+%endmacro
+
+%macro Is_It_MMX_Register 1
+	%ifidni %1, mm0
+		%define Is_It_MMX_Register_BOOL 1
+	%elifidni %1, mm1
+		%define Is_It_MMX_Register_BOOL 1
+	%elifidni %1, mm2
+		%define Is_It_MMX_Register_BOOL 1
+	%elifidni %1, mm3
+		%define Is_It_MMX_Register_BOOL 1
+	%elifidni %1, mm4
+		%define Is_It_MMX_Register_BOOL 1
+	%elifidni %1, mm5
+		%define Is_It_MMX_Register_BOOL 1
+	%elifidni %1, mm6
+		%define Is_It_MMX_Register_BOOL 1
+	%elifidni %1, mm7
+		%define Is_It_MMX_Register_BOOL 1
+	%else
+		%define Is_It_MMX_Register_BOOL 0
+	%endif
+%endmacro
 
 %define What_Segment_Does_BP_use ss_segment
 %define What_Segment_Does_SP_use ss_segment
@@ -931,9 +1186,10 @@ add SP_NATIVE, %1
 %define What_Address_does_Lods_use DS_SI_address
 %define What_Destination_segment_string_instructions_use es_segment
 %define What_Source_segment_string_nstructions_use ds_segment
+%define HOW_Is_Far_Pointer_Stored_in_RAM Offset_IsFirst_In_LowerAddresses_Then_Segment
+%define HOW_ToPush_FarPointer_ToRAM First_Push_Segment_Then_Offset
 
-
-%include "NASM_advanced_macroses32.nasm"
+;%include "NASM_advanced_macroses32.nasm"
 
 
 %endif
