@@ -1,38 +1,41 @@
+#Important Pathes
+PathTo_Kernel = $(ROOT)/main/Kernel
+PathTo_LinkerScript = $(ROOT)/main/grub
+PathTo_GrubDiskSystem = $(ROOT)/test_disk
 
-PathTo_32bitKernel = ./main/32bit
-#different pathes to building and compiling things
-PathTo_Multiboot_files = ./main/grub
-Linker_Script_Full_Path = ./main/grub/link.ld
-PathTo_BIN_OBJ_filesDump = ./BIN_OBJ_filesDump
-PathTo_GrubDiskSystem = ./test_disk
-
-PathTo_OS_return_codes = ./main/OS_includes
+#Pathes for assemblers and compilers setting
+PathTo_Multiboot_files = $(ROOT)/main/grub
+Linker_Script_Full_Path = $(ROOT)/main/grub/link.ld
+PathTo_BIN_OBJ_filesDump = $(ROOT)/BIN_OBJ_filesDump
 
 
+#General Include Pathes
+PathTo_OS_return_codes = $(ROOT)/main/OS_includes
+PathTo_OS_include = $(ROOT)/main/Kernel/OS_includes
 
-PathTo_MemoryManagers = ./main/32bit/KernelMemoryManagers
+#Pathes to different modules and other stuff
+PathTo_MemoryManagers = $(ROOT)/$(PathTo_Kernel)/KernelMemoryManagers
 PathTo_IntitalRAMAllocators = $(PathTo_MemoryManagers)/allocators/IntialAllocators
 
-#NASM include pathes
-PathTo_NASM_Macroses = ./includes_i686/NASM_Macroses
-PathTo_NASM_default_macroses = $(PathTo_NASM_Macroses)
-PathTo_IA32Macroses_NASM = $(PathTo_NASM_Macroses)
+#Pathes for NASM includes
+PathTo_NASM_default_macroses = $(ROOT)/includes_i686/NASM_Macroses
+PathTo_IA32Macroses_NASM = $(ROOT)/includes_i686/NASM_Macroses
 
-# Ada include pathes
-PathTo_ADA_INCLUDES = ./includes_i686/adainclude
-PathTo_GNAT_ADC = ./includes_i686/adaCompConfig/gnat.adc
+#path for ADA includes
+PathTo_ADA_INCLUDES = $(ROOT)/includes_i686/adainclude
+PathTo_GNAT_ADC = $(ROOT)/includes_i686/adaCompConfig/gnat.adc
 
-PathTo_OS_include = ./main/Kernel/OS_includes
 
-#languages flags
+#Compilers options
 ADA_default_flags = -I$(PathTo_OS_include)/ -gnatp -ffreestanding -nostdlib -fno-exceptions -gnatec=$(PathTo_GNAT_ADC)
 NASM_default_flags = -i$(PathTo_OS_include)/ -i$(PathTo_NASM_default_macroses)/ -i$(PathTo_IA32Macroses_NASM)/ -g
 C_default_flags = -I$(PathTo_OS_include)/ -Wall -g -m32 -ffreestanding -fno-stack-protector -fno-pic -fno-pie
 
+#Compilers themselves
 C_compiler = ~/crossCOMPs/gccses/bin/i686-elfNoOS-gcc
 ADA_compiler = ~/crossCOMPs/gccses/bin/i686-elfNoOS-gcc
-ASSEMBLER = nasm
+ASSEMBLER = as
 LINKER = ld
 
-PathTo_LinkerScript = ./main/grub
+
 
