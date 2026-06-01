@@ -214,3 +214,73 @@ memchr:
     leave
     ret
 %pop
+
+
+
+;void* memset(&where, what char, how many)
+global memset
+memset:
+%push SAVE_CONTEXT
+;set memory starting from "where" pointer with given char for "How many" times
+;Plan:
+;1    used eax, edi, ecx, flags ; save flags, edi
+;2-   move where pointer to the edi
+;2.1  check for null pointer and apropriate stuff
+;3    move how many to the ecx
+;3.1  check if it is 0 and dont do anything basically
+;4    clear direction flag
+;5    div ecx by 2 (shr 1)
+;5.1  move Char to al
+;5.2  move al to ah
+;5.3  use rep stosw
+;6    move how many to ecx
+;6.1  remainder ecx by 2 (and 1)
+;6.2  use rep stosb
+;7    restore flags, edi
+;8    return original given pointer
+    %define Where STACK_ARG1_BP
+    %define What_Char STACK_ARG2_BP8
+    %define How_Many  STACK_ARG3_BP
+    MACRO_ENTER_NATIVE 0, 0
+;1
+    pushf
+    push  DI_PTRSIZE
+;2
+    mov   DI_PTRSIZE, Where
+;2.1
+        TEST_REG_NULL_PTR DI_PTRSIZE
+        jz    .Null_pointer_detectd
+;3
+    mov   CX_PTRSIZE, How_Many
+;3.1
+    jecxz .absolute_return
+;4
+    cld
+
+
+;5
+    shr   CX_PTRSIZE, 1
+;5.1
+    movzx AX_PTRSIZE, What_Char
+;5.2
+    mov   ah, al
+;5.3
+    rep stosw
+
+;6
+    mov   CX_PTRSIZE, How_Many
+;6.1
+    and   CX_PTRSIZE, 1
+;6.2
+    rep   stosb
+.absolute_return:
+;8
+    mov   AX_PTRSIZE, Where
+;7
+    pop   DI_PTRSIZE
+    popf
+    leave
+    ret
+.Null_pointer_detectd:
+    int 14h
+%pop

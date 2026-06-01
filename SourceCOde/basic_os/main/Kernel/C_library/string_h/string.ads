@@ -41,12 +41,18 @@ with
    Import,
    Convention => C,
    Link_Name => "memchr",
-   Pre  => Source /= Null_Address      and then
-            Destination /= Null_Address and then
-            not Overlapping (Destination, Source, Length),
-   Post => MemCopy'Result = Destination;
+   Pre  => Seacrh_Location /= Null_Address;
 
 
-
-   
+function memset
+   (Where_Set : System.Address;
+   With_What_set : Interfaces.C.unsigned_char;
+   How_Many_Bytes : Natural)
+return System.Address
+with
+   Import,
+   Convention => C,
+   Link_Name => "memset",
+   Pre => Where_Set /= null,
+   Post => memset'Result = Where_Set;
 end STRING_H;
