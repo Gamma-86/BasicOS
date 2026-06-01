@@ -873,6 +873,9 @@
 	TEST_REG_NULL_PTR %1
 %endmacro
 
+%macro MOV_REG_NULL 1
+	xor   %1, %1
+%endmacro
 
 %macro MOV_REG_IMM 2
 	%if %2=0

@@ -1,7 +1,8 @@
-%include "NASM_default_macroses.nasm"
-
 bits 32
 CPU KATMAI
+%include "NASM_default_macroses.nasm"
+
+
 
 ;void* source memcpy(&dest, &source, amount)
 ;void* source memmove(&dest, &source, amount)
@@ -11,7 +12,7 @@ CPU KATMAI
 ;int memcmp(&cmp1, &cmp2, how many chars compare)
 
 
-
+global memcpy
 memcpy: ;void* dest memcpy(*dest, *source, amount)
     ;The functions moves some bytes from one place to another
     ;If locations overlap, the result is undefined
@@ -83,13 +84,14 @@ memcpy: ;void* dest memcpy(*dest, *source, amount)
     popf
     pop   esi
     pop   edi
+    leave
     ret
 
 
 
 
 
-
+global memmove
 memmove:;void* dest memmove(&dest, &source, amount)
     ;THE BEGAVIOUR IS LITERALY THE SAME AS MEMCPY
 
@@ -138,4 +140,77 @@ memmove:;void* dest memmove(&dest, &source, amount)
     popf
     pop   esi
     pop   edi
+    leave
     ret
+
+
+
+
+
+
+
+global memchr
+;void* PTR memchr(&SearchPTR, Char, How long)
+memchr:
+%push MACRO_CONTEXT
+;   main goal : scan for 'Char' starting from &SearchPTR for How Long bytes
+;       if you find, return pointer
+;       if dint find return null
+;   How to do it:
+;1  CREATE STACK FRAME, SAVE EDI, FLAGS
+;   Use repne scasb
+;2  move &SearchPTR to edi
+;2.1    check for null pointer, if null do stuff (int 14h for now)
+;3  move how Long to ecx
+;3.1    Check if it is 0 if no null(checked in 2), return null pointer
+;4  Move character to al
+;5  Clear direction flag
+;6  repne scasb
+
+;7  Whem repne scasb ended
+;    we could have found byte, but also could not find it and ended
+;7.1    If we found : zero flag set, edi is POINTING to BYTE AFTER FOUNDED
+;7.2    If we did not, ecx = 0 !!!IMPORTANT!!!
+;       IF FOUND BYTE IS LAST ITERATION OF ECX IT WILL BE BOTH ZF=1 ECX=0
+;            SO WE FIRST CHECK FOR ZF=1 THEN ECX=0
+
+    %define SearchPTR STACK_ARG1_BP
+    %define Searched_Character STACK_ARG2_BP8
+    %define How_Long STACK_ARG3_BP
+;1
+    MACRO_ENTER_NATIVE 0, 0
+    push   DI_PTRSIZE
+    pushf
+;2
+    mov   DI_PTRSIZE, SearchPTR
+;   2.1
+        TEST_REG_NULL_PTR DI_PTRSIZE
+        jz    .Null_detected
+;3
+    mov   CX_PTRSIZE, How_Long
+;   3.1
+        jecxz  .Dont_need_To_Check
+;4
+    mov   al, Searched_Character
+;5
+    cld
+;6
+    repne scasb
+    jz    .found_byte    ;7.1
+    jecxz .Did_not_find  ;7.2
+
+.Null_detected:
+    int 14h
+.Dont_need_To_Search:
+.Did_not_find:
+    MOV_REG_NULL AX_PTRSIZE
+    jmp   .absolute_end
+.found_byte:
+    mov   AX_PTRSIZE, DI_PTRSIZE
+    dec   AX_PTRSIZE
+.absolute_end:
+    popf
+    pop   DI_PTRSIZE
+    leave
+    ret
+%pop
