@@ -1,0 +1,25 @@
+project BasicOS is
+   for Languages use ("Ada", "C", "NASM_ASM", "AS_ASM");
+
+   type Build_Mode is ("normal", "debug", "current");
+   Version : Build_Mode := external("normal","debug");
+
+   for Source_Dirs use ("SourceCode/main/grub", "SourceCode/main/Kernel");
+   for Object_Dir use "SourceCode/BIN_OBJ_filesDump";
+   for Exec_Dir use "SourceCode/BIN_OBJ_filesDump";
+
+   package Compiler is
+      case Version is 
+         when "debug" =>
+         when "normal" =>
+         when "current" =>
+            for Switches("Ada") use ("-g", "-O0", "-gnatp", "-ffreestanding", "-nostdlib", "-fno-exceptions");
+            for Switches("C")   use ("-Wall", "-g", "-m32", "-ffreestanding", "-fno-stack-protector", "-fno-pic", "-fno-pie");
+            for Swotches("NASM_ASM") use ("-i${PathTo_OS_include}/", "-i$(PathTo_NASM_default_macroses)/", "-i$(PathTo_IA32Macroses_NASM)/", "-g");
+      end case;
+   end Compiler;
+
+   package Linker is
+      for Switches("Ada") use ("-T", "SourceCode/main/grub/linker.ld", "-nostdlib", "-nostartfiles");
+   end Linker;
+end BasicOS;

@@ -1,6 +1,3 @@
-include $(Include1_For_MakeSubDirs_PathFull)
-
-
 multiboot.o:
 	nasm  \
 		$(NASM_default_flags) \
