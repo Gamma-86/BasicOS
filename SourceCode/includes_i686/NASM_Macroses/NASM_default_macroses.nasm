@@ -889,16 +889,7 @@
 %endmacro
 
 
-%macro GET_REL_ADDRESS_TO_REG 2
-	%IF SizeOfPTR = 8
-	lea   %1, [rel %2]
-	%ELSE
-	call  .get_eip%$
-	.get_eip%$:
-	pop   %2
-	lea   %2, [%2-.get_eip%$ + %1]
-	%ENDIF
-%endmacro
+
 
 
 %define BIT_MASK(X) (1<<(X))

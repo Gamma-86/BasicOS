@@ -1,8 +1,33 @@
 project BasicOS is
    for Languages use ("Ada", "C", "NASM_ASM", "AS_ASM");
 
-   type Build_Mode is ("normal", "debug", "current");
-   Version : Build_Mode := external("normal","debug");
+   type Build_Mode is ("normal", "debug", "InDev");
+   Version : Build_Mode := external("normal", "InDev");
+
+   PathTo_Kernel := external("PathTo_Kernel", "No_Path");
+   PathTo_LinkerScript := external("PathTo_LinkerScript", "No_Path");
+   PathTo_GrubDiskSystem := external("PathTo_GrubDiskSystem", "No_Path");
+
+   PathTo_Multiboot_files := external("PathTo_Multiboot_files", "No_Path");
+   Linker_Script_Full_Path := external("Linker_Script_Full_Path", "No_Path");
+   PathTo_BIN_OBJ_filesDump := external("PathTo_BIN_OBJ_filesDump", "No_Path");
+
+   PathTo_OS_return_codes := external("PathTo_OS_return_codes", "No_Path");
+   PathTo_OS_include := external("PathTo_OS_include", "No_Path");
+
+   PathTo_MemoryManagers := external("PathTo_MemoryManagers", "No_Path");
+   PathTo_IntitalRAMAllocators:=external("PathTo_IntitalRAMAllocators", "No_Path");
+   PathTo_GDTManager := external("PathTo_GDTManager", "No_Path");
+
+   PathTo_NASM_default_macroses := external("PathTo_NASM_default_macroses", "No_Path");
+   PathTo_IA32Macroses_NASM := external("PathTo_IA32Macroses_NASM", "No_Path");
+
+   PathTo_ADA_INCLUDES := external("PathTo_ADA_INCLUDES", "No_Path");
+   PathTo_GNAT_ADC := external("PathTo_GNAT_ADC", "No_Path");
+
+   ADA_default_flags := external("ADA_default_flags", "-No_ADA_Flags");
+   NASM_default_flags:= external("NASM_default_flags","-No_NASM_Flags");
+   C_default_flags := external("C_default_flags", "-No_C_Flags");
 
    for Source_Dirs use ("SourceCode/main/grub", "SourceCode/main/Kernel");
    for Object_Dir use "SourceCode/BIN_OBJ_filesDump";
@@ -12,10 +37,10 @@ project BasicOS is
       case Version is 
          when "debug" =>
          when "normal" =>
-         when "current" =>
-            for Switches("Ada") use ("-g", "-O0", "-gnatp", "-ffreestanding", "-nostdlib", "-fno-exceptions");
+         when "InDev" =>
+            for Switches("Ada") use ("-g", "-O0", "-gnatp", "-ffreestanding", "-nostdlib", "-fno-exceptions", "-m32");
             for Switches("C")   use ("-Wall", "-g", "-m32", "-ffreestanding", "-fno-stack-protector", "-fno-pic", "-fno-pie");
-            for Swotches("NASM_ASM") use ("-i${PathTo_OS_include}/", "-i$(PathTo_NASM_default_macroses)/", "-i$(PathTo_IA32Macroses_NASM)/", "-g");
+            for Switches("NASM_ASM") use ("-i${PathTo_OS_include}/", "-i$(PathTo_NASM_default_macroses)/", "-i$(PathTo_IA32Macroses_NASM)/", "-g");
       end case;
    end Compiler;
 
