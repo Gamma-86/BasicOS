@@ -362,7 +362,7 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
             sub   esp, RAMMapInfo_DLinkedList_entry_size
             mov   [First_list_entry_PTR], esp    ;Here is our first entry
             mov   [RAMMap_Description_LinkedList_FirstPTR], esp
-            mov   edi, esp
+            mov   edi, esp ;just a temporary register to initialize list
                 mov   dword[edi + RAMMapInfo_DLinkedList_entry.next], 0
                 mov   dword[edi + RAMMapInfo_DLinkedList_entry.prev], 0
                 mov   dword[Previous_List_entry_PTR], 0
@@ -370,19 +370,19 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
                 movq  [edi + RAMMapInfo_DLinkedList_entry.Address4Low], mm0
                 movq  [edi + RAMMapInfo_DLinkedList_entry.Length4Low], mm0
                 movq  [edi + RAMMapInfo_DLinkedList_entry.LastAddress4Low], mm0
-                ;HEre we initialized it
+                ;We initialized it
             ;Now let's calculate where our MB2 entries start and end
-            lea   eax, [CurrentTagPointerReg + MB2Info_RAMMap.Entries_start]
             mov   edx, [CurrentTagPointerReg + MB2Info_RAMMap.Size]
-                add   edx, CurrentTagPointerReg ;So the end address = NExt tag
-                mov   [MB2_AddressEntriesEnd], edx
+                add   edx, CurrentTagPointerReg ;Tagsize + TagPTR = TagEnd  
+                mov   [MB2_AddressEntriesEnd], edx 
             %define LinkedList_entryRegPTR edi
             %define MB2Info_RAMentryRegPTR esi
+            lea   eax, [CurrentTagPointerReg + MB2Info_RAMMap.Entries_start]
             mov   MB2Info_RAMentryRegPTR, eax
             mov   LinkedList_entryRegPTR, [First_list_entry_PTR] ;The list entry expected to be already allocated
             .Analyzing_MB2_Address_entries_start:
                 ;Plan:
-                ;Used Bariables: MB2_AddressEntriesEnd, MB2Info_RAMentryRegPTR
+                ;Used Variables: MB2_AddressEntriesEnd, MB2Info_RAMentryRegPTR
                 ;  LinkedList_entryRegPTR, Previous_List_entry_PTR,
                 ;
                 ;  get everything from MB2 info entry to CPU
@@ -391,7 +391,7 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
                 ;  Update all variables: 
                 ;  
 
-                ;Space for linked list is expected to be allcoated
+                ;Space for first linked list is expected to be allcoated
                 ;LinkedList entry Reg PTR, MB2Entry reg pointer 
                 ;   Are expected to be here
 
@@ -437,14 +437,14 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
 
                 jmp   .Analyzing_MB2_Address_entries_start
             .Analyzing_MB2_Address_entries_end: 
-                ;After the end, the last entry is bad
-                ;and previous one has next NEXT pointer not nulled.
-                add   esp, RAMMapInfo_DLinkedList_entry_size
-                mov   dword[esp + RAMMapInfo_DLinkedList_entry.next], 0
+            ;After the end, the last entry is bad
+            ;and previous one has next NEXT pointer not nulled.
+            add   esp, RAMMapInfo_DLinkedList_entry_size
+            mov   dword[esp + RAMMapInfo_DLinkedList_entry.next], 0
 
-                ;after that, we have to go to the next tag:
-                mov   CurrentTagPointerReg, [MB2_AddressEntriesEnd]
-                ALIGNREG_ROOF8 CurrentTagPointerReg
+            ;after that, we have to go to the next tag:
+            mov   CurrentTagPointerReg, [MB2_AddressEntriesEnd]
+            ALIGNREG_ROOF8 CurrentTagPointerReg
         ELSE
             push  CurrentTagPointerReg
             call  Multiboot2_info_main_parser

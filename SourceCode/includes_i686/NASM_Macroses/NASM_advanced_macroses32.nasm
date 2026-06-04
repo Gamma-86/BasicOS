@@ -45,11 +45,63 @@ endstruc
 %assign DEBUG_VAR_TYPES_ENUM_TEST VAR_TYPES_ENUM.sint64
 ;%warning SHowing VAR_TYPES ENUM Index : DEBUG_VAR_TYPES_ENUM_TEST
 
+%define Above a
+%define AboveOrEqual ae
+%define NotAbove na
+%define NotAboveOrEqual nae
 
-;%include "NASM_default_macroses.nasm"
+%define Equal e
+%define Zero  z
+%define NotEqual ne
+%define NotZero nz
 
+%define Below b
+%define BelowOrEqual be
+%define NotBelow nb
+%define NotBelowOrEqual nbe
 
+%define Less l
+%define LessOrEqual le
+%define NotLess nl
+%define NotLessOrEqual nle
 
+%define Carry c
+%define NotCarry nc
+
+%define Sign s
+%define NotSign ns
+
+%define Parity p
+%define NotParity np
+
+%define Overflow o
+%defien NotOverflow no
+
+%define 
+
+%macro IF_COND_START 1
+    %push IF_COND_CONTEXT
+    j%-1  %$IF_COND_NOT
+%endmacro
+%macro ELSE_COND 0
+    %ifctx IF_COND_CONTEXT
+        %repl ELSE_COND_CONTEXT
+        jmp %$IF_COND_END
+        %$IF_COND_NOT:
+    %else
+        %error cant make else condition without IF_COND_START
+    %endif
+%endmacro
+%macro IF_COND_END 0
+    %ifctx IF_COND_CONTEXT
+        %$IF_COND_NOT:
+    %elifctx ELSE_COND_CONTEXT
+        %$IF_COND_END:
+    %else
+        %error expected IF_COND or ELSE_COND before IF_COND_END
+    %endif
+    %pop
+%endmacro
 
 
 
@@ -296,7 +348,7 @@ endstruc
 
 
 
-%if 1
+%if 0
 THE_NUMBER dd 0
 
 

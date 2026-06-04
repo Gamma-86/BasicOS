@@ -92,7 +92,7 @@ struc ReturnBitfields_GeneralOSExtended1_BitIndexes
     .Reserved28 resb 1;
     .Reserved29 resb 1;
     .Reserved30 resb 1;
-    .Reserved31 resb 1;
+    .FulfilledWithError resb 1;
 endstruc
 
 struc LOW8_ReturnBitfield_Namespace

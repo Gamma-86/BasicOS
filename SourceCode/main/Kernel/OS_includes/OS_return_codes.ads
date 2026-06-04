@@ -15,16 +15,19 @@
 --       HIGH_TaskFulfilWithErrorBit = 0x80000000,
 --    };
 
+--IF THERE IS NO ERROR, RETURN ABSOLUTE 0
 
 package ReturnBitfields is
 
    type LOW8_ReturnSpace is 
    (
+      SuccessCode,
       GeneralOS_ReturnSpace,
       GeneralOS_ReturnSpace_Extended1
    );
    for LOW8_ReturnSpace use
    (
+      SuccessCode => 0,
       GeneralOS_ReturnSpace => 2,
       GeneralOS_ReturnSpace_Extended1 => 3
    );
@@ -35,7 +38,7 @@ type GeneralOS is record
    OtherError : Boolean;
    NullPTR : Boolean; --use this when the error is related to NUll pointer
    InsertOverflow : Boolean;--Use this when there is no space left, and you can't push/add thing to stack/queue
-   ArrayInsertUnable : Boolean;--Use this when you can't add thing to a static allocated memory part
+   ArrayInsertUnable : Boolean;--Use this when you can't add thing to a static allocated memory region
    ArrayIndexOverflow : Boolean;--Use this when the index to insert you were given, is too big or wrong in some other way
    AllocationFailed : Boolean;--Use this when, for example, there is no free RAM left to alllocate
    AllocationImpossible : Boolean;--Use this when, for example, allocation requirements are impossible (Like 1 TB of RAM)
@@ -61,17 +64,17 @@ end record;
 for GeneralOS use record
    ReturnValNameSpace   at 0 range 0..7;
 
-   OtherError        at 1 range 0..0;
-   NullPTR           at 1 range 1 .. 1;
-   InsertOverflow    at 1 range 2 .. 2;
-   ArrayInsertUnable at 1 range 3 .. 3; 
-   ArrayIndexOverflow at 1 range 4 .. 4;
-   AllocationFailed at 1 range 5 .. 5;
-   AllocationImpossible at 1 range 6 .. 6;
-   SpinlockWatchdogSet at 1 range 7 .. 7;
-      
-   Reserved16 at 2 range 0 .. 0;
-   Reserved17 at 2 range 1 .. 1;
+   OtherError           at 0 range 8..8;
+   NullPTR              at 0 range 9 .. 9;
+   InsertOverflow       at 0 range 10 .. 10;
+   ArrayInsertUnable    at 0 range 11 .. 11; 
+   ArrayIndexOverflow   at 0 range 12 .. 12;
+   AllocationFailed     at 0 range 13 .. 13;
+   AllocationImpossible at 0 range 14 .. 14;
+   WatchdogSet          at 0 range 15 .. 15;
+   TooBigNumber         at 0 range 16 .. 16;
+   TooSmallNumber       at 0 range 17 .. 17;
+
    Reserved18 at 2 range 2 .. 2;
    Reserved19 at 2 range 3 .. 3;
    Reserved20 at 2 range 4 .. 4;

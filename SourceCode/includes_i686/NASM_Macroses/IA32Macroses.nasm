@@ -2,6 +2,11 @@
 
 %define GDT_LIMIT_MAX 0xFF_FFFF
 
+struc GDT_Descriptor
+    .limit resb 2
+    .GDT_pointer resb 4
+endstruc
+
 struc Segment_descriptor
     .limit0_15 resb 2
     .base0_15  resb 2
