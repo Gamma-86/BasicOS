@@ -1,3 +1,5 @@
+#!/bin/sh
+
 export ROOT="$PWD"
 
 #export Version = normal
@@ -11,7 +13,8 @@ export PathTo_GrubDiskSystem="${ROOT}"/test_disk
 #Pathes for assemblers and compilers setting
 export PathTo_Multiboot_files="${ROOT}"/main/grub
 export PathToFull_Linker_Script="${ROOT}"/main/grub/link.ld
-export PathTo_BIN_OBJ_filesDump="${ROOT}"/BIN_OBJ_filesDump
+export PathTo_BIN_filesDump="${ROOT}"/BIN_filesDump
+export PathTo_OBJ_filesDump="${ROOT}"/OBJ_filesDump
 
 
 #General Include Pathes
@@ -33,13 +36,13 @@ export PathTo_GNAT_ADC="${ROOT}"/includes_i686/adaCompConfig/
 
 
 #Compilers options
-export ADA_default_flags=-I${PathTo_OS_include}/ -I${PathTo_ADA_INCLUDES}/ -I${PathTo_GNAT_ADC} -gnatp -ffreestanding -nostdlib -fno-exceptions -gnatec=$(PathTo_GNAT_ADC)
+export ADA_default_flags=-I${PathTo_OS_include}/ -I${PathTo_ADA_INCLUDES}/ -I${PathTo_GNAT_ADC} -gnatp -ffreestanding -nostdlib -fno-exceptions -m32 -gnatec=$(PathTo_GNAT_ADC) -gnatwa -gnatwe
 export NASM_default_flags=-i${PathTo_OS_include}/ -i$(PathTo_NASM_default_macroses)/ -i$(PathTo_IA32Macroses_NASM)/ -g
 export C_default_flags=-I${PathTo_OS_include}/ -Wall -g -m32 -ffreestanding -fno-stack-protector -fno-pic -fno-pie
 
 #Compilers themselves
-export CC=~/crossCOMPs/gccses/bin/i686-elfNoOS-gcc
-export C_compiler=${CC}
-export ADA_compiler=~/crossCOMPs/gccses/bin/i686-elfNoOS-gcc
-export ASSEMBLER=as
+export CC=i686-elf-gcc
+export C_COMPILER=${CC}
+export ADA_COMPILER=i686-elf-gnat
+export AS_ASSEMBLER=as
 export LINKER=ld

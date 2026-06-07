@@ -11,7 +11,7 @@ multiboot.o:
 		-f elf32 \
 		./PortDebugOutput/PortDebugOutput.nasm \
 		-o multiboot_port.o
-	$(C_compiler) \
+	$(C_COMPILER) \
 		$(C_default_flags) \
 		multiboot.c \
 		-I$(PathTo_Multiboot_files)\
@@ -23,5 +23,5 @@ multiboot.o:
 
 
 multiboot.elf: multiboot.o
-	$(LINKER) -m elf_i386 -T $(Linker_Script_Full_Path)  multiboot.o -o multiboot.elf
+	$(LINKER) -m elf_i386 -T $(PathToFull_Linker_Script)  multiboot.o -o multiboot.elf
 	rm multiboot.o
