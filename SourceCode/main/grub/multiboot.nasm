@@ -102,54 +102,7 @@ _start:
     call  Sort_multiboot_struct ;Sort things that multiboot given in EBX*
     emms
     fninit
-%IF 0
-    %assign NON_EXISTING_RAM (0x10_0000 * 1513)
-    PRINT_STR_WITH_INITIALPTRINT "ADDRESS IS"
-        push  NON_EXISTING_RAM
-        call  PrintInt32HEXIntial
-        add   esp, 4
-    xor   ebx, ebx
-    PRINT_STR_WITH_INITIALPTRINT "READING FROM NON RAM TO EBX,EBX=0"
-        mov   ebx,[NON_EXISTING_RAM]
-    PRINT_STR_WITH_INITIALPTRINT "NOW EBX IS : "
-        push  ebx
-        call PrintInt32HEXIntial
-        add   esp, 4
 
-    xor   ebx, ebx
-    PRINT_STR_WITH_INITIALPTRINT "WRITING 1 to NO RAM and reading immediatley"
-        mov   dword[NON_EXISTING_RAM], 1
-        mov   ebx, [NON_EXISTING_RAM]
-    PRINT_STR_WITH_INITIALPTRINT "READ FROM NON EXITING RAM TO EBX"
-    PRINT_STR_WITH_INITIALPTRINT "EBX was 0, now EBX IS"
-    push  ebx
-    call  PrintInt32HEXIntial
-    add   esp, 4
-    
-    PRINT_STR_WITH_INITIALPTRINT "TRYING READ/WRITE 1 ANOTHER ADDRESS EBX=9"
-    mov   ebx, 9
-    mov   byte[NON_EXISTING_RAM+100], 1
-    mov   ebx, [NON_EXISTING_RAM+100]
-    PRINT_STR_WITH_INITIALPTRINT "NOW EBX IS"
-        push  ebx
-        call  PrintInt32HEXIntial
-        add   esp, 4
-
-    PRINT_STR_WITH_INITIALPTRINT "Reading and printing from address 3 times"
-        mov   ebx,[NON_EXISTING_RAM+256]
-            push  ebx
-            call PrintInt32HEXIntial
-            add   esp, 4
-        mov   ebx, [NON_EXISTING_RAM+256]
-            push  ebx
-            call PrintInt32HEXIntial
-            add   esp, 4
-        mov   ebx, [NON_EXISTING_RAM+256]
-            push  ebx
-            call PrintInt32HEXIntial
-            add   esp, 4
-    PRINT_STR_WITH_INITIALPTRINT "THE END"
-%endif
     cli
     hlt
     jmp $
