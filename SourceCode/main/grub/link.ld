@@ -13,7 +13,7 @@ MEMORY
 
 SECTIONS
 {
-    . = 0x100000;
+    . = 0x110000;
     .multiboot : ALIGN(8)  
     {
         header_start = .;

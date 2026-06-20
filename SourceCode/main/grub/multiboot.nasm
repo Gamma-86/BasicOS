@@ -1,10 +1,11 @@
+bits 32
+CPU WILLAMETTE
+
 %include "NASM_default_macroses.nasm"
 %include "IA32Macroses.nasm"
 %include "multiboot_structures.nasm"
 %include "./PortDebugOutput/PortDebugOutput_NASMmacro.nasm"
-
-bits 32
-CPU WILLAMETTE
+%include "Pos_Indep_Code.nasm"
 
 struc HeaderTagGeneral
     .type resb 2
@@ -127,7 +128,18 @@ _start:
     hlt
     jmp $
 
+Initialize_SSE_FPU:
+    mov   eax, cr0
+        btr   eax, cr0_indexes.MP_FPU_monitored
+        btr   eax, cr0_indexes.EM_FPU_emulated
+        btr   eax, cr0_indexes.TS_Task_Was_Switched
+    mov   cr0, eax
 
+    mov   eax, cr4
+        bts   eax, cr4_indexes.OSFXSR_SaveSSE_When_fxsave
+        bts   eax, cr4_indexes.OSXMMEXCPT_Enble_SSE_XF_INT
+    mov   cr4, eax
+    ret
 
 section .text
 Get_next_eip:

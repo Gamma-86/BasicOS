@@ -116,6 +116,40 @@ struc cr0_indexes
     .PG_Pagind_Enabled resb 1
 endstruc
 
+struc cr4_indexes
+    .VME resb 0
+    .VME_V8086_INT_Hard_Support resb 1
+
+    .PVI resb 0
+    .PVI_Enable_V_interrupt_flag resb 1
+
+    .TSD resb 0
+    .TSD_Limit_RDTSC_ToLvl0 resb 1
+
+    .DE resb 0
+    .DE_Disable_DR4_DR5 resb 1
+
+    .PSE resb 0
+    .PSE_Enable_BigPages resb 1
+
+    .PAE resb 0
+    .PAE_Enable_36bit_Mode resb 1
+
+    .MCE resb 0
+    .MCE_Allow_Machine_Check_INT resb 1
+
+    .PGE resb 0
+    .PGE_Enable_Global_Pages resb 1
+
+    .PCE resb 0
+    .PCE_Allow_RDPMC_ToUser resb 1
+
+    .OSFXSR resb 0
+    .OSFXSR_SaveSSE_When_fxsave resb 1
+
+    .OSXMMEXCPT resb 0
+    .OSXMMEXCPT_Enble_SSE_XF_INT resb 1
+endstruc
 
 
 
