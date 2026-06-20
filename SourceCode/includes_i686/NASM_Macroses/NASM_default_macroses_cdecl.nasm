@@ -1,0 +1,203 @@
+%define S_Char int8_t
+%define U_Char uint8_t
+
+%define S_Short int16_t
+%define S_Short_Int int16_t
+%define U_Short uint16_t
+%define U_Short_Int uint16_t
+
+%define S_int   int32_t
+%define U_int   uint32_t
+
+%define S_Long  int32_t
+%define S_Long_Int int32_t
+%define U_Long  uint32_t
+%define U_Long_Int uint32_t
+
+%define S_LongLong int64_t
+%define S_LongLong_Int int64_t
+%define U_LongLong uint64_t
+%define U_LongLong_Int uint64_t
+
+%define size_t uint32_t
+		
+%define SizeOfInt 4
+%define BitnessOfInt 32
+
+
+
+
+
+%define FREE_REG1_INTSIZE FREE_REG1_32
+%define FREE_REG2_INTSIZE FREE_REG2_32
+%define FREE_REG3_INTSIZE FREE_REG3_32
+%define VOLATILE_REG1_INTSIZE VOLATILE_REG1_32
+
+
+
+
+
+;DEFINING FREE REGISTERS FOR CURRENT SIZE OF POINTER
+;AND SOME OTHER POINTER SIZE SPECIFIC REGISTERS(like esp, ebp)
+	%undef FREE_REG4_PTRSIZE
+		%undef FREE_REG4_64
+		%undef FREE_REG4_32
+		%undef FREE_REG4_16
+		%undef FREE_REG4_8LOW
+	%undef FREE_REG5_PTRSIZE
+		%undef FREE_REG5_64
+		%undef FREE_REG5_32
+		%undef FREE_REG5_16
+		%undef FREE_REG5_8LOW
+	%undef FREE_REG6_PTRSIZE
+		%undef FREE_REG6_64
+		%undef FREE_REG6_32
+		%undef FREE_REG6_16
+		%undef FREE_REG6_8LOW
+	%undef FREE_REG7_PTRSIZE
+		%undef FREE_REG7_64
+		%undef FREE_REG7_32
+		%undef FREE_REG7_16
+		%undef FREE_REG7_8LOW
+
+	%undef FREE_REG4_INTSIZE
+	%undef FREE_REG5_INTSIZE
+	%undef FREE_REG6_INTSIZE
+	%undef FREE_REG7_INTSIZE
+
+
+	%define FREE_REG1_PTRSIZE FREE_REG1_32
+	%define FREE_REG2_PTRSIZE FREE_REG2_32
+	%define FREE_REG3_PTRSIZE FREE_REG3_32
+	%define VOLATILE_REG1_PTRSIZE VOLATIVE_REG1_32
+
+	%define AX_PTRSIZE eax
+	%define BX_PTRSIZE ebx
+	%define CX_PTRSIZE ecx
+	%define DX_PTRSIZE edx
+	%define SI_PTRSIZE esi
+	%define DI_PTRSIZE edi
+	%define BP_PTRSIZE ebp
+	%define SP_PTRSIZE esp
+
+
+
+
+
+
+
+
+
+
+
+;DEFINING ARGUMENTS LOCATION FOR CURRENT POINTER SIZE
+	%define STACK_ARG1_SP [STACK_ARGX_ESP(1)]
+		%define STACK_ARG1_SP8 byte[STACK_ARGX_ESP(1)]
+		%define STACK_ARG1_SP16 word[STACK_ARGX_ESP(1)]
+		%define STACK_ARG1_SP32 dword[STACK_ARGX_ESP(1)]   
+	%define STACK_ARG2_SP [STACK_ARGX_ESP(2)]
+		%define STACK_ARG2_SP8 byte[STACK_ARGX_ESP(2)]
+		%define STACK_ARG2_SP16 word[STACK_ARGX_ESP(2)]
+		%define STACK_ARG2_SP32 dword[STACK_ARGX_ESP(2)]
+	%define STACK_ARG3_SP [STACK_ARGX_ESP(3)]
+		%define STACK_ARG3_SP8 byte[STACK_ARGX_ESP(3)]
+		%define STACK_ARG3_SP16 word[STACK_ARGX_ESP(3)]
+		%define STACK_ARG3_SP32 dword[STACK_ARGX_ESP(3)]
+	%DEFINE STACK_ARG4_SP [STACK_ARGX_ESP(4)]
+		%define STACK_ARG4_SP8 byte[STACK_ARGX_ESP(4)]
+		%define STACK_ARG4_SP16 word[STACK_ARGX_ESP(4)]
+		%define STACK_ARG4_SP32 dword[STACK_ARGX_ESP(4)]
+	%DEFINE STACK_ARG5_SP [STACK_ARGX_ESP(5)]
+		%define STACK_ARG5_SP8 byte[STACK_ARGX_ESP(5)]
+		%define STACK_ARG5_SP16 word[STACK_ARGX_ESP(5)]
+		%define STACK_ARG5_SP32 dword[STACK_ARGX_ESP(5)]
+	%DEFINE STACK_ARG6_SP [STACK_ARGX_ESP(6)]
+		%define STACK_ARG6_SP8 byte[STACK_ARGX_ESP(6)]
+		%define STACK_ARG6_SP16 word[STACK_ARGX_ESP(6)]
+		%define STACK_ARG6_SP32 dword[STACK_ARGX_ESP(6)]
+	%define STACK_ARG7_SP [STACK_ARGX_ESP(7)]
+		%define STACK_ARG7_SP8 byte[STACK_ARGX_ESP(7)]
+		%define STACK_ARG7_SP16 word[STACK_ARGX_ESP(7)]
+		%define STACK_ARG7_SP32 dword[STACK_ARGX_ESP(7)]
+
+
+	%DEFINE STACK_ARG1_BP [STACK_ARGX_EBP(1)]
+		%define STACK_ARG1_BP8 byte[STACK_ARGX_EBP(1)]
+		%define STACK_ARG1_BP16 word[STACK_ARGX_EBP(1)]
+		%define STACK_ARG1_BP32 dword[STACK_ARGX_EBP(1)]
+	%DEFINE STACK_ARG2_BP [STACK_ARGX_EBP(2)]
+		%define STACK_ARG2_BP8 byte[STACK_ARGX_EBP(2)]
+		%define STACK_ARG2_BP16 word[STACK_ARGX_EBP(2)]
+		%define STACK_ARG2_BP32 dword[STACK_ARGX_EBP(2)]
+	%DEFINE STACK_ARG3_BP [STACK_ARGX_EBP(3)]
+		%define STACK_ARG3_BP8 byte[STACK_ARGX_EBP(3)]
+		%define STACK_ARG3_BP16 word[STACK_ARGX_EBP(3)]
+		%define STACK_ARG3_BP32 dword[STACK_ARGX_EBP(3)]
+	%DEFINE STACK_ARG4_BP [STACK_ARGX_EBP(4)]
+		%define STACK_ARG4_BP8 byte[STACK_ARGX_EBP(4)]
+		%define STACK_ARG4_BP16 word[STACK_ARGX_EBP(4)]
+		%define STACK_ARG4_BP32 dword[STACK_ARGX_EBP(4)]
+	%DEFINE STACK_ARG5_BP [STACK_ARGX_EBP(5)]
+		%define STACK_ARG5_BP8 byte[STACK_ARGX_EBP(5)]
+		%define STACK_ARG5_BP16 word[STACK_ARGX_EBP(5)]
+		%define STACK_ARG5_BP32 dword[STACK_ARGX_EBP(5)]
+	%DEFINE STACK_ARG6_BP [STACK_ARGX_EBP(6)]
+		%define STACK_ARG6_BP8 byte[STACK_ARGX_EBP(6)]
+		%define STACK_ARG6_BP16 word[STACK_ARGX_EBP(6)]
+		%define STACK_ARG6_BP32 dword[STACK_ARGX_EBP(6)]
+	%define STACK_ARG7_BP [STACK_ARGX_EBP(7)]
+		%define STACK_ARG7_BP8 byte[STACK_ARGX_EBP(7)]
+		%define STACK_ARG7_BP16 word[STACK_ARGX_EBP(7)]
+		%define STACK_ARG7_BP32 dword[STACK_ARGX_EBP(7)]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;1-name 
+;2-index
+;3-optional argument amount
+%macro NASM_DEFAULT_MACROSES_INTERNAL_MACRO_DEFINE_INT_STACK_ARGUMENT_SP8 2-3
+	%define %[%1] byte[STACK_ARGX_ESP]
+%endmacro
+%macro NASM_DEFAULT_MACROSES_INTERNAL_MACRO_DEFINE_INT_STACK_ARGUMENT_SP16 2-3
+	%define %[%1] word[STACK_ARGX_ESP]
+%endmacro
+%macro NASM_DEFAULT_MACROSES_INTERNAL_MACRO_DEFINE_INT_STACK_ARGUMENT_SP32 2-3
+	%define %[%1] dword[STACK_ARGX_ESP]
+%endmacro
+%macro NASM_DEFAULT_MACROSES_INTERNAL_MACRO_DEFINE_INT_STACK_ARGUMENT_SP 2-3
+	%define %[%1] [STACK_ARGX_ESP]
+%endmacro
+
+;1-name 
+;2-index
+;3-optional argument amount
+%macro NASM_DEFAULT_MACROSES_INTERNAL_MACRO_DEFINE_INT_STACK_ARGUMENT_BP8 2-3
+	%define %[%1] byte[STACK_ARGX_EBP]
+%endmacro
+%macro NASM_DEFAULT_MACROSES_INTERNAL_MACRO_DEFINE_INT_STACK_ARGUMENT_BP16 2-3
+	%define %[%1] word[STACK_ARGX_EBP]
+%endmacro
+%macro NASM_DEFAULT_MACROSES_INTERNAL_MACRO_DEFINE_INT_STACK_ARGUMENT_BP32 2-3
+	%define %[%1] dword[STACK_ARGX_EBP]
+%endmacro
+%macro NASM_DEFAULT_MACROSES_INTERNAL_MACRO_DEFINE_INT_STACK_ARGUMENT_BP 2-3
+	%define %[%1] [STACK_ARGX_EBP]
+%endmacro
+
+
+
+	%define LODS_INT lodsd
+	%define STOS_INT stosd
+	%define CMPS_INT cmpsd
+	%define MOVS_INT movsd

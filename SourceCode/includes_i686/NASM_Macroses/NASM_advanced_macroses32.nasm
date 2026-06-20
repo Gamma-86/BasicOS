@@ -1,7 +1,7 @@
 %IFNDEF NASM_ADVANCED_MACROSES32_NASM
 %define NASM_ADVANCED_MACROSES32_NASM
 
-%include "NASM_default_macroses.nasm"
+;%include "NASM_default_macroses.nasm"
 
 struc VAR_TYPES_ENUM
     .U_Char  resb 0
