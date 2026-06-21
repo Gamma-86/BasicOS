@@ -322,3 +322,21 @@
 	%define STOS_INT stosd
 	%define CMPS_INT cmpsd
 	%define MOVS_INT movsd
+
+
+%define AX_INTSIZE eax
+%define BX_INTSIZE ebx
+%define CX_INTSIZE ecx
+%define DX_INTSIZE edx
+%define DI_INTSIZE edi
+%define SI_INTSIZE esi
+%define BP_INTSIZE ebp
+%define SP_INTSIZE esp
+%define R8_INTSIZE r8d
+%define R9_INTSIZE r9d
+%define R10_INTISZE r10d
+%define R11_INTSIZE r11d
+%define R12_INTSIZE r12d 
+%define R13_INTSIZE r13d
+%define R14_INTSIZE r14d
+%define R15_INTSIZE r15d

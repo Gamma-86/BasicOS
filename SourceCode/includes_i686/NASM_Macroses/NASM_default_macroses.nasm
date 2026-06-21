@@ -1351,6 +1351,30 @@ and   %1, 0xF
 	%define CMPS_INT cmpsq
 	%define MOVS_INT movsq
 %endif
+
+
+
+
+
+
+
+%define AX_INTSIZE
+%define BX_INTSIZE
+%define CX_INTSIZE
+%define DX_INTSIZE
+%define DI_INTSIZE
+%define SI_INTSIZE
+%define BP_INTSIZE
+%define SP_INTSIZE
+%define R8_INTSIZE
+%define R9_INTSIZE
+%define R10_INTISZE
+%define R11_INTSIZE
+%define R12_INTSIZE
+%define R13_INTSIZE
+%define R14_INTSIZE
+%define R15_INTSIZE
+
 ;#############################################################################
 ;#############################################################################
 ;#############################################################################
