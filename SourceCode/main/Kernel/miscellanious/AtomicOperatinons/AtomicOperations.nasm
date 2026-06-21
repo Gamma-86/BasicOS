@@ -11,6 +11,6 @@ Mutex_Lock_Watchdog:;unsigned char Mutex_Lock(unsigned char LockingBool, unsigne
 
     ret
 
-Mutex_Unock:;void Mutex_Unlock(unsigned char LockingBool)
+Mutex_Ulnock:;void Mutex_Unlock(unsigned char LockingBool)
 
     ret
