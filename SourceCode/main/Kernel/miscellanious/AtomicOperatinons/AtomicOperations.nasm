@@ -47,7 +47,7 @@ Mutex_Lock_Watchdog:;unsigned char Mutex_Lock(unsigned char* LockingBool, unsign
     mov   eax, 1
     ret
 
-Mutex_Unlock:;void Mutex_Unlock(unsigned char* LockingBool)
+Mutex_Unlock: ;void Mutex_Unlock(unsigned char* LockingBool)
     mov   AX_PTRSIZE, STACK_ARG1_SP
     mov   byte[AX_PTRSIZE], 0
     ret
