@@ -26,7 +26,7 @@ static struct Arena_metadata Arena1_data ={
 
 };
 
-int32_t Arena1_initial_malloc(void** PTR, unsigned int size){
+int32_t Arena1_initial_malloc(void** PTR, uint32_t size){
     /*Plan :
     1- lock mutex of Arena1
     2- check for differnt kind of error and set bits correspondibly
@@ -63,7 +63,7 @@ int32_t Arena1_initial_malloc(void** PTR, unsigned int size){
         returned_bitfield = returned_bitfield | LOW8_GeneralOS;
         returned_bitfield = returned_bitfield | (1<<GeneralOS_AllocationImpossible);
     };
-    if(size > Arena1_data.Bytes_left){
+    if(size > (uint32_t)Arena1_data.Bytes_left){
         returned_bitfield = returned_bitfield | LOW8_GeneralOS;
         returned_bitfield = returned_bitfield | (1<<GeneralOS_AllocationFailed);
     };
@@ -86,7 +86,7 @@ int32_t Arena1_initial_malloc(void** PTR, unsigned int size){
     return returned_bitfield;
 };
 
-int32_t Arena1_initial_calloc(void** PTR, unsigned int size){
+int32_t Arena1_initial_calloc(void** PTR, uint32_t size){
     int32_t returned_bitfield = 0;
     int32_t malloc_bitfield = 0;
     void* returned_ptr;
@@ -96,7 +96,7 @@ int32_t Arena1_initial_calloc(void** PTR, unsigned int size){
         return malloc_bitfield;
     }
 
-    returned_ptr = memset(returned_ptr, 0, size);
+    returned_ptr = memset(returned_ptr, 0, (size_t)size);
     *PTR = returned_ptr;
     return returned_bitfield;
 };
