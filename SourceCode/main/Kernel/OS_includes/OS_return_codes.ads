@@ -17,7 +17,8 @@
 
 --IF THERE IS NO ERROR, RETURN ABSOLUTE 0
 
-
+with Ada.Unchecked_Conversion;
+with Interfaces;
 package ReturnBitfields is
 
    type LOW8_ReturnSpace is 
@@ -93,6 +94,17 @@ for Return_Bitfield32_raw use record
    FulfilledWithError at 0 range 31 .. 31;
 end record;
 for Return_Bitfield32_raw'Size use 32;
+function Returnfield32raw_To_int32 is new Ada.Unchecked_Conversion
+   (
+      Source => Return_Bitfield32_raw,
+      Target => Interfaces.Integer_32
+   );
+function int32_To_Returnfield32raw is new Ada.Unchecked_Conversion
+   (
+      Source => Interfaces.Integer_32,
+      Target => Return_Bitfield32_raw
+   );
+
 
 type GeneralOS is record
    ReturnValNameSpace : LOW8_ReturnSpace;
@@ -153,5 +165,13 @@ for GeneralOS use record
    FulfilledWithError at 0 range 31 .. 31;
 end record;
 for GeneralOS'Size use 32;
+function GeneralOS_To_int32 is new Ada.Unchecked_Conversion
+   (Source=> GeneralOS, Target => Interfaces.Integer_32);
+function int32_To_GeneralOS is new Ada.Unchecked_Conversion
+   (Source => Interfaces.Integer_32, Target => GeneralOS);
+function GeneralOS_To_Returnfield32raw is new Ada.Unchecked_Conversion
+   (Source => GeneralOS, Target => Return_Bitfield32_raw);
+function Returnfield32raw_To_GeneralOS is new Ada.Unchecked_Conversion
+   (Source => Return_Bitfield32_raw, Target => GeneralOS);
 
 end OS_return_codes;
