@@ -18,8 +18,8 @@ export PathTo_OBJ_filesDump="${ROOT}"/OBJ_filesDump
 
 
 #General Include Pathes
-export PathTo_OS_return_codes="${ROOT}"/main/OS_includes
 export PathTo_OS_include="${ROOT}"/main/Kernel/OS_includes
+export PathTo_OS_return_codes="${PathTo_OS_includes}"
 
 #Pathes to different modules and other stuff
 export PathTo_MemoryManagers="${PathTo_Kernel}"/KernelMemoryManagers

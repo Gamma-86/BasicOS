@@ -18,7 +18,7 @@ int Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
     uint32_t MB2_type = MB2_structure->Type;
     if( (uintptr_t)MB2_structure & 7 ){
         MB2ParseErrorFlag_WrongAlignment = 1;
-        Print_str_lpt("Te alignment of given pointer is wrong");
+        Print_str_lpt("The alignment of given pointer is wrong");
     }
 
     switch(MB2_type){
