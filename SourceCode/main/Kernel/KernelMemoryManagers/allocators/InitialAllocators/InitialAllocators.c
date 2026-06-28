@@ -23,8 +23,12 @@ static struct Arena_metadata Arena1_data ={
     .Is_free = 1,
     .Locking_bool = 0,
     .Stack_pointer = 0
-
 };
+
+
+
+
+
 
 int32_t Arena1_initial_malloc(void** PTR, uint32_t size){
     /*Plan :
@@ -102,6 +106,16 @@ int32_t Arena1_initial_calloc(void** PTR, uint32_t size){
 };
 
 void Arena1_initial_free(void* PTR){
+    /*Plan:
+        1- Lock the RAM mutex with watchdog
+        2- if watchdog error, No last allocation, 
+        if somehow Stack pointer is less than Last allocation size
+           2.1 - unlock mutex and return without freeing
+        
+        3- if Stack pointer == Allocated size
+            3.1- reset arena (Set BytesLeft, Stack Pointer to initial VALS)
+            3.2- else Subtract size from stack pointer, add size to bytes left
+        4- reset Last allocated PTR, Size*/
     unsigned char watchdog_error = 0;
     unsigned char Stack_Free_Error;
     enum{WatchdogTick = 0xFFFFFF};
@@ -115,7 +129,7 @@ void Arena1_initial_free(void* PTR){
         Mutex_Unlock(&Arena1_data.Locking_bool);
         return;
     }
-    
+
     if (Arena1_data.Stack_pointer == Arena1_data.Last_Allocated_Size){
         Arena1_data.Bytes_left = ARENA1_SIZE;
         Arena1_data.Is_free = 1;
@@ -148,3 +162,12 @@ void Arena1_reset(){
     Mutex_Unlock(&Arena1_data.Locking_bool);
     return;
 }
+
+
+
+
+
+
+
+
+
