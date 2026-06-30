@@ -30,7 +30,22 @@ project BasicOS is
    NASM_default_flags:= external("NASM_default_flags","-No_NASM_Flags");
    C_default_flags := external("C_default_flags", "-No_C_Flags");
 
-   for Source_Dirs use ("SourceCode/main/grub", "SourceCode/main/Kernel");
+
+--miscellanious pathes
+   PathTo_miscellanious := external("PathTo_miscellanious", "SourceCode/main/Kernel/miscellanious");
+   PathTo_AtomicOperations := external("PathTo_AtomicOperations", Pathto_Miscellanious & "/AtomicOperations");
+   PathTo_VGA_80_25 := external("PathTo_VGA_80_25", Pathto_Miscellanious & "/VGA_80_25");
+   PathTo_LowLevel_Functions := external("PathTo_LowLevel_Functions", Pathto_Miscellanious & "/LowLevel_Functions");
+   PathTo_Bitwise_Algebra := external("PathTo_Bitwise_Algebra", Pathto_Miscellanious & "/bitwise_and_al_bebra");
+
+   for Source_Dirs use 
+   (
+      "SourceCode/main/grub",
+      "SourceCode/main/Kernel",
+      Pathto_Vga_80_25,
+      Pathto_Atomicoperations
+   );
+   
    for Object_Dir use "SourceCode/OBJ_filesDump";
    for Exec_Dir use "SourceCode/BIN_filesDump";
 

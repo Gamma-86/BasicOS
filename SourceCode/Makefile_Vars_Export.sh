@@ -21,6 +21,13 @@ export PathTo_OBJ_filesDump="${ROOT}"/OBJ_filesDump
 export PathTo_OS_include="${ROOT}"/main/Kernel/OS_includes
 export PathTo_OS_return_codes="${PathTo_OS_includes}"
 
+#miscellanious pathes
+export PathTo_miscellanious = "${ROOT}"/main/Kernel/miscellanious
+export PathTo_AtomicOperations = "${PathTo_miscellanious}"/AtomicOperations
+export PathTo_VGA_80_25 = "${PathTo_miscellanious}"/VGA_80_25
+export PathTo_LowLevel_Functions = "${PathTo_miscellanious}"/LowLevel_Functions
+export PathTo_Bitwise_Algebra = "${PathTo_miscellanious}"/bitwise_and_al_bebra
+
 #Pathes to different modules and other stuff
 export PathTo_MemoryManagers="${PathTo_Kernel}"/KernelMemoryManagers
 export PathTo_IntitalRAMAllocators="${PathTo_MemoryManagers}"/allocators/IntialAllocators
