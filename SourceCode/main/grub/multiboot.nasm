@@ -233,27 +233,6 @@ PrintInt32HEXIntial:;void (int32)
     leave
     ret
     %pop
-extern Multiboot2_info_main_parser
-struc RAMMapInfo_DLinkedList_entry
-    .next resb 4
-    .prev resb 4
-    .Address4Low resb 4
-    .Address4High resb 4
-    .Length4Low resb 4
-    .Length4High resb 4
-    .LastAddress4Low resb 4
-    .LastAddress4High resb 4
-    .Type resb 4
-endstruc 
-%macro ALIGNREG_ROOF8 1
-    add   %1, 7 ;100% not aligned, and is in the next align block
-    and   %1, ~(0x7) ;ALign to floor
-%endmacro
-section .data
-    MB2Error_Not_Enough_Stack_for_RamMap db 0
-    MB2Error_MaxIteration_Passed db 0
-    RAMMap_Description_LinkedList_FirstPTR dd 0
-section .text
 Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different arrays
     %push Sorting
 
@@ -439,5 +418,101 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
 %undef CurrentTagPointerReg
 %undef multi_struct
 %undef multi_struct_fullSize
-
+%undef EBX_save
+%undef ESI_save
+%undef EDI_save
 %pop
+
+
+
+
+
+
+
+
+extern Multiboot2_info_main_parser
+struc RAMMapInfo_DLinkedList_entry
+    .next resb 4
+    .prev resb 4
+    .Address4Low resb 4
+    .Address4High resb 4
+    .Length4Low resb 4
+    .Length4High resb 4
+    .Type resb 4
+endstruc 
+
+%macro ALIGNREG_ROOF8 1
+    add   %1, 7 ;100% not aligned, and is in the next align block
+    and   %1, ~(0x7) ;ALign to floor
+%endmacro
+%macro MB2_SORT_STACK_MALLOC 1
+    mov   esp, %1
+    sub   esp, eax
+    and   esp, ~0xF
+    mov   eax, esp
+%endmacro
+
+section .data
+    Local_Sort_Multiboot_struct2_MB2structPTR dd 0
+    Local_Sort_Multiboot_struct2_ReturnAddress dd 0
+
+
+global MB2Info_absolute_start_PTR
+global MB2Info_absolute_total_size
+global MB2Error_Not_Enough_Stack_for_RamMap
+global RAMMap_Description_LinkedList_FirstPTR
+    MB2Info_absolute_start_PTR dd 0
+    MB2Info_absolute_total_size dd 0
+    MB2Error_Not_Enough_Stack_for_RamMap db 0
+    RAMMap_Description_LinkedList_FirstPTR dd 0
+section .text
+
+Initial_Sort_multiboot_struct2:;void (ebx=*multiboot structure) Sort them to different arrays
+    %define EBX_SAVE mm7
+    %define ESI_SAVE mm6
+    %define EDI_SAVE mm5
+    %define MB2struct_pointer_register ebx
+    movd  EBX_SAVE, ebx
+    movd  EDI_SAVE, edi
+    movd  ESI_SAVE, esi
+    ;first, initialize local variables and set global ones
+    ;These are: 
+    ;  MB2Info_PTR - not now
+    ;  MB2Info_Size - now
+    ;  MB2Error_Not enough stack - now
+    mov   [Local_Sort_Multiboot_struct2_MB2structPTR], MB2struct_pointer_register
+    mov   eax, [MB2struct_pointer_register + MB2Info_MainHead.Total_size]
+        mov   [MB2Info_absolute_total_size], eax
+
+    mov   eax, [esp]
+        mov   [Local_Sort_Multiboot_struct2_ReturnAddress], eax
+
+    ;secondly, allocate stack; copy All mb2 tags and head
+    ;set MB2Info absolute pointer
+    MB2_SORT_STACK_MALLOC dword[MB2Info_absolute_total_size]
+        mov   [MB2Info_absolute_start_PTR], eax
+    ;copy MB2 from bootloader to allocated stack
+    mov   edi, eax
+    mov   esi, MB2struct_pointer_register
+    mov   ecx, MB2Info_absolute_total_size
+        shr   ecx, 2
+    cld
+    rep movsd
+    
+    mov   ecx, MB2Info_absolute_total_size
+        and   ecx, 3
+    rep   movsb
+
+    sub   esp, 0xF
+        and   esp, ~0xF
+    mov   eax, Local_Sort_Multiboot_struct2_ReturnAddress
+    mov   [esp], eax
+
+    movd  esi, ESI_SAVE
+    movd  edi, EDI_SAVE
+    movd  ebx, EBX_SAVE
+    ret
+    %undef EBX_SAVE
+    %undef ESI_SAVE
+    %undef EDI_SAVE
+    %undef MB2struct_pointer_register
