@@ -6,13 +6,46 @@ CPU WILLAMETTE
 %include "multiboot_structures.nasm"
 %include "./PortDebugOutput/PortDebugOutput_NASMmacro.nasm"
 %include "Pos_Indep_Code.nasm"
-
+%include "./panic/multiboot_panic.nasm"
 struc HeaderTagGeneral
     .type resb 2
     .flags resb 2
     .size resb 4
 endstruc
 
+
+%IF 0
+This is the FIRST thing that get executed ever in this OS
+Our goal is to parse MB2(multiboot 2 specification) info and usually get it
+to the determined location
+    For that reason, there are a lot of functions, but we also have some very
+low level debug printint functions because we might not have text console set
+for example LPT port character sending and maybe RS232 thing in the future
+    Also there is structure that give multiboot loader requests of info and
+gives it information that we should be loaded with MB2 specificatin
+    By default it sets 80x25 text mode
+
+DO NOT USE STACK ALLOCATIONS USE LIKE C STATIC LOCAL VARIABLES
+MMX IS USED BY A LOT OF FUNCTIONS, SO DO NOT USE X87
+
+1 - CPU declaration, includes
+20 - All The info we give bootloader
+30 -  Macros for Initial 80x25 console print
+40 - Stack reserved bytes
+50 - The _start, first ever code to get executed
+60 - Initialize_SSE_FPU
+61 - 
+70 - PrintStringInitial (to 80x25 text console)
+71 - PrintInt32HEXIntial (to 80x25 console)
+80 - Sort_multiboot_struct -- OLD FUNCTION DO NOT USE
+90 - Initial_Sort_multiboot_struct2 and all its data
+%endif
+
+;#############################################################################
+;20
+;20
+;20
+;#############################################################################
 %define Tagtype_PageAlign 7
 %define Tagtype_VideoMode 5
     %define VMODEwidth 1024
@@ -52,8 +85,11 @@ header_end:
 
 
 
-
-
+;#############################################################################
+;30
+;30
+;30
+;#############################################################################
 %macro PRINT_STR_WITH_INITIALPTRINT 1
 %push Intial_STR_Print
 section .data
@@ -66,6 +102,11 @@ section .text
 %pop 
 %endmacro
 
+;#############################################################################
+;40
+;40
+;40
+;#############################################################################
 section .bss
     %define INITIAL_STACK_SIZE 65536+4096
     stack_end:
@@ -74,11 +115,15 @@ section .bss
 section .data
     Initial_stack_size_VAR dd INITIAL_STACK_SIZE
 
+;#############################################################################
+;50
+;50
+;50
+;#############################################################################
 
 MultibootInfoPTR dd 0
 MB2_WholeTagStruct_TotalSize dd 0
 section .text
-
 extern   kernel_main ;(unsigned int EAX_magic, void* EBX_structure)
 global _start
 _start:
@@ -109,24 +154,14 @@ _start:
     jmp $
 
 .not_multiboot:
-    mov   eax, 'E' | (0xF<<8) | ('1'<<16) | (0xF<<24)
-    mov   [0xb8000], eax
-
-    CALL_PRINT_STR_LPT "The image was loaded with not multiboot standart"
-
-    cli
-    hlt
-    jmp $
+    I_AM_MULTIBOOT_IDK_WAHTTODO_PANIC MB2panic_EnumCodes.Unsupported_Loader
 .not_aligned:
-    mov   eax, 'E' | (0xF<<8) | ('2'<<16) | (0xF<<24)
-    mov   [0xb8000], eax
-
-    CALL_PRINT_STR_LPT "The address to multiboot stryctyre is not aligned"
-
-
-    cli
-    hlt
-    jmp $
+    I_AM_MULTIBOOT_IDK_WAHTTODO_PANIC MB2panic_EnumCodes.Multiboot_UnalignedPTR
+;#############################################################################
+;60
+;60
+;60
+;#############################################################################
 
 Initialize_SSE_FPU:
     mov   eax, cr0
@@ -140,15 +175,24 @@ Initialize_SSE_FPU:
         bts   eax, cr4_indexes.OSXMMEXCPT_Enble_SSE_XF_INT
     mov   cr4, eax
     ret
+;#############################################################################
+;61
+;61
+;61
+;#############################################################################
 
-section .text
-Get_next_eip:
-    mov   eax, [esp]
-    ret
 
+
+;#############################################################################
+;70
+;70
+;70
+;#############################################################################
 section .data
     Curnt_Y_cord db 0
 section .text
+
+global PrintStringInitial
 PrintStringInitial:; void (string ptr)
     MACRO_ENTER_NATIVE 0, 0
     push  esi
@@ -176,6 +220,12 @@ PrintStringInitial:; void (string ptr)
     pop   esi
     leave
     ret
+
+;#############################################################################
+;71
+;71
+;71
+;#############################################################################
 section .data
     HEX_CharactersTable db '0123456789ABCDEF'
     Int32_Nibble_Bitmasks
@@ -187,7 +237,6 @@ section .data
     dq 0xF0_0000
     dq 0xF00_0000
     dq 0xF000_0000
-
 section .text
 PrintInt32HEXIntial:;void (int32)
     %push context
@@ -233,6 +282,21 @@ PrintInt32HEXIntial:;void (int32)
     leave
     ret
     %pop
+;#############################################################################
+;80
+;80
+;80
+;#############################################################################
+struc RAMMapInfo_DLinkedList_entry
+    .next resb 4
+    .prev resb 4
+    .Address4Low resb 4
+    .Address4High resb 4
+    .Length4Low resb 4
+    .Length4High resb 4
+    .Type resb 4
+endstruc
+
 Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different arrays
     %push Sorting
 
@@ -429,22 +493,15 @@ Sort_multiboot_struct: ;void (ebx=*multiboot structure) Sort them to different a
 
 
 
+;#############################################################################
+;90
+;90
+;90
+;#############################################################################
 
-extern Multiboot2_info_main_parser
-struc RAMMapInfo_DLinkedList_entry
-    .next resb 4
-    .prev resb 4
-    .Address4Low resb 4
-    .Address4High resb 4
-    .Length4Low resb 4
-    .Length4High resb 4
-    .Type resb 4
-endstruc 
+extern Multiboot2_info_main_sorter
 
-%macro ALIGNREG_ROOF8 1
-    add   %1, 7 ;100% not aligned, and is in the next align block
-    and   %1, ~(0x7) ;ALign to floor
-%endmacro
+
 %macro MB2_SORT_STACK_MALLOC 1
     mov   esp, %1
     sub   esp, eax
@@ -459,39 +516,92 @@ section .data
 
 global MB2Info_absolute_start_PTR
 global MB2Info_absolute_total_size
-global MB2Error_Not_Enough_Stack_for_RamMap
-global RAMMap_Description_LinkedList_FirstPTR
+global MB2Error_Not_Enough_Stack
+global MB2Error_MaxIteration_Passed
+global MB2Info_absolute_LastByte_PTR
     MB2Info_absolute_start_PTR dd 0
     MB2Info_absolute_total_size dd 0
-    MB2Error_Not_Enough_Stack_for_RamMap db 0
-    RAMMap_Description_LinkedList_FirstPTR dd 0
-section .text
+    
+    MB2Error_Not_Enough_Stack db 0
+    MB2Error_MaxIteration_Passed db 0
 
+    
+    MB2Info_absolute_LastByte_PTR dd 0
+
+section .text
+%macro Initial_Sort_multiboot_struct2_Get_MB2RAMEntries_Amount__RAMmapTagReg 1
+;Goal - find amount of MB2 ram entries %1 - pointer reg to RAMmap Tag
+;Of cource return in eax, can use eax,edx,ecx ; preserve ebx,edi,esi,ebp
+    push  %1
+    pop   ecx
+    mov   eax, ecx
+    mov   edx, ecx
+;plan - get difference between RAM entries start end tag end
+;       then divide
+;ecx - start, eax - end, then ecx-divisor
+    add   eax, [eax + MB2Info_RAMMap.Size]
+    add   ecx, MB2Info_RAMmap.Entries_start
+    sub   eax, ecx
+
+    mov   ecx, [edx + MB2Info_RAMMap.One_Entry_size]
+        xor   edx, edx
+        div   ecx
+%endmacro
+%macro Initial_Sort_multiboot_struct2_Get_UEFIRAMEntries_Amount__RAMmapTagReg 1
+
+%endmacro
 Initial_Sort_multiboot_struct2:;void (ebx=*multiboot structure) Sort them to different arrays
     %define EBX_SAVE mm7
     %define ESI_SAVE mm6
     %define EDI_SAVE mm5
+    %define EDX_SAVE mm4
+    %define ECX_SAVE mm3
+    %define EAX_SAVE mm2
+
     %define MB2struct_pointer_register ebx
     movd  EBX_SAVE, ebx
     movd  EDI_SAVE, edi
     movd  ESI_SAVE, esi
     ;first, initialize local variables and set global ones
     ;These are: 
-    ;  MB2Info_PTR - not now
     ;  MB2Info_Size - now
     ;  MB2Error_Not enough stack - now
+    ;  MB2 absolute end PTR - now
     mov   [Local_Sort_Multiboot_struct2_MB2structPTR], MB2struct_pointer_register
+    
+    ;MB2Info_size, Error not enough stack
     mov   eax, [MB2struct_pointer_register + MB2Info_MainHead.Total_size]
         mov   [MB2Info_absolute_total_size], eax
+    cmp   eax, INITIAL_STACK_SIZE
+        setae al
+        mov   [MB2Error_Not_Enough_Stack], al
 
     mov   eax, [esp]
         mov   [Local_Sort_Multiboot_struct2_ReturnAddress], eax
+    ;MB2 absolute end PTR
+    mov   eax, MB2struct_pointer_register
+        add   eax, [MB2struct_pointer_register + MB2Info_MainHead.Total_size]
+        mov   [MB2Info_absolute_LastByte_PTR], eax
 
     ;secondly, allocate stack; copy All mb2 tags and head
     ;set MB2Info absolute pointer
+    ;1 - Allocate space on stack(the size give in MB2 boot info)
+    ;   1.1 - set this memory as global MB2BootInfo pointer
+    ;2 - copy MB2 boot info to stack
+    ;3 MAJOR - find the MB2 Boot info or UEFI RAM map
+    ;   3.1 find how many descriptors are there, get the size of this structure
+    ;   3.2 Allocate the Size of Amount of descriptors * Size of OS RAM descriptors space on stack
+    ;             Add another 512 bytes just in case
+    ;   Overall - Allocate size on stack, return: Entries amount 
+    ;4 - move stack pointer and return address
+    ;5 - call main MB2 boot info sorter( it needs FirstTag pointer, Space for OS RAM descriptors, MB2 RAMmap entries amount)
+    ;return
+
+    ;1
     MB2_SORT_STACK_MALLOC dword[MB2Info_absolute_total_size]
+    ;1.1
         mov   [MB2Info_absolute_start_PTR], eax
-    ;copy MB2 from bootloader to allocated stack
+    ;2
     mov   edi, eax
     mov   esi, MB2struct_pointer_register
     mov   ecx, MB2Info_absolute_total_size
@@ -503,16 +613,69 @@ Initial_Sort_multiboot_struct2:;void (ebx=*multiboot structure) Sort them to dif
         and   ecx, 3
     rep   movsb
 
+    ;3
+    mov   edx, MB2struct_pointer_register
+        add   edx, MB2Info_MainHead_size
+    xor   ecx, ecx
+        not   cl
+.loop_find_MB2_RAMMap_start:
+    cmp   dword[edx + MB2Info_TagHead.Type], MB2Info_RAMmap_type
+        sete  al
+    cmp   dword[edx + MB2Info_TagHead.Type], MB2Info_UEFI_RAM_MAP_type
+        sete  ah
+        or    al, ah
+        jnz   .loop_find_MB2_RAMMap_end
+
+    add   edx, [edx + MB2Info_TagHead.Size]
+    ALIGN8_REG_ROOF edx
+
+    loop  .loop_find_MB2_RAMMap_start    
+.loop_find_MB2_RAMMap_end:
+    test   ecx, ecx
+        setz  cl
+    ;3.1
+    movd  EDX_SAVE, edx
+    movd  ECX_SAVE, ecx
+        Initial_Sort_multiboot_struct2_Get_MB2RAMEntries_Amount__RAMmapTagReg edx
+    movd  ECX_SAVE, ecx
+    movd  EDX_SAVE, edx
+
+
+    mov   MB2struct_pointer_register, MB2Info_absolute_start_PTR
+    ;4
     sub   esp, 0xF
-        and   esp, ~0xF
+        and   esp, 0xF        
     mov   eax, Local_Sort_Multiboot_struct2_ReturnAddress
     mov   [esp], eax
+
+
+
+    ;5 void Multiboot2_info_main_sorter(struct MB2Info_TagHead* Boot Info Tags PTR)
+    mov   eax, MB2struct_pointer_register
+        add   eax, MB2Info_MainHead_size
+        push  eax
+    call Multiboot2_info_main_sorter
+        add   esp, 4
 
     movd  esi, ESI_SAVE
     movd  edi, EDI_SAVE
     movd  ebx, EBX_SAVE
     ret
+    %undef EDX_SAVE
+    %undef ECX_SAVE
+    %undef EAX_SAVE
     %undef EBX_SAVE
     %undef ESI_SAVE
     %undef EDI_SAVE
     %undef MB2struct_pointer_register
+
+
+
+
+
+
+
+
+
+
+
