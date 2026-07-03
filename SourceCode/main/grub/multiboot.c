@@ -3,7 +3,7 @@
 #include "OS_return_codes.h"
 #include "multiboot_structures.h"
 #include "./PortDebugOutput/PortDebugOutput.h"
-
+#include "./panic/multiboot2_panic.h"
 
 
 
