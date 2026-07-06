@@ -10,5 +10,5 @@ enum{
 
 
 void multiboot2_LoadPanic(int PanicCode);
-
+void multiboot2_LoadPanic_customSTR(char* string_to_write);
 #endif

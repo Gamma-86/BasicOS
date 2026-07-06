@@ -174,6 +174,12 @@ multiboot2_LoadPanic: ;void (uint32_t panic_code)
     loop  .end
     int 3
 
+global multiboot2_LoadPanic_customSTR
+multiboot2_LoadPanic_customSTR: ;void(char*)
+    jmp   multiboot2_LoadPanic.not_unknown_code
+
+
+
 NULL_IDTR:
     dw 0
     dd 0

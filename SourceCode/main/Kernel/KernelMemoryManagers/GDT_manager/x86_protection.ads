@@ -147,43 +147,6 @@ package x86_protection is
 
 
 
-   type Segment_Index_type is new Integer range 0 .. 8191
-      with Size => 13;
-   for Segment_Index_type'Size use 13;
-
-   type Segment_Selector is record
-      Requested_Privelege : Privelege_LVL_type;
-      IsIn_LDT : Boolean;
-      Segment_Index : Segment_Index_type;
-   end record
-      with Size => 16;
-   for Segment_Selector use record
-      Requested_Privelege at 0 range 0 .. 1;
-      IsIn_LDT at 0 range 2 .. 2;
-      Segment_Index at 0 range 3 .. 15;
-   end record;
-   for  Segment_Selector'Size use 16;
-   type Segment_SelectorPTR is access all Segment_Selector;
-
-
-
-
-   type Segments_Table is array(Segment_Index_type) of SegmentRaw;
-   type Segments_TablePTR is access all Segments_Table;
-
-
-   type GDT_descriptor is record
-      limit : Interfaces.Unsigned_16;
-      Address: Segments_TablePTR;
-   end record
-      with Size => 48;
-   for GDT_descriptor use record
-      limit at 0 range 0 .. 15;
-      Address at 0 range 16 .. 47;
-   end record;
-   for GDT_descriptor'Size use 48;
-   type GDT_descriptorPTR is access all GDT_descriptor;
-
 
 
 

@@ -32,6 +32,7 @@ static inline void* Add_Xbytes_ToPTR(void* PTR, uintptr_t X){
 20
 ##############################################################################
 */
+
 void PrintStringInitial(char* string);
 void PrintInt32HEXIntial(uint32_t);
 
@@ -76,7 +77,7 @@ enum RAMMap_MemoryType{
     MotherBoard_Code = 16,
     EEPROM_RAM = 17,
 
-    Normal_RAM_END = 18
+    Real_RAM_END = 18
 };
 struct RAMMap_DescriptorEntry
 {
@@ -90,7 +91,7 @@ struct RAMMap_DescriptorEntry* RAMMap_DescriptorsArray;
 
 void Multiboot2_info_main_sorter(\
     struct MB2Info_TagHead* MB2_BootInfoTags_Pointer,\
-    struct RAMMap_DescriptorEntry* DescriptorsArray,\
+    struct RAMMap_DescriptorEntry* RAMMap_DescriptorsArray,\
     uint32_t MB2BootInfo_RAMmapEntries_Amount\
 )
 {
@@ -102,12 +103,12 @@ void Multiboot2_info_main_sorter(\
         if(Current_MB2Tag_PTR->Type == MB2Info_RAMmap_type){
             Multiboot2_info_RAMmap_translator(\
             (struct MB2Info_RAMMap*)Current_MB2Tag_PTR,\
-            DescriptorsArray);
+            RAMMap_DescriptorsArray,\
+            MB2BootInfo_RAMmapEntries_Amount);
         }
 
         Current_MB2Tag_size = Multiboot2_info_main_parser(MB2_BootInfoTags_Pointer);
         Current_MB2Tag_PTR = Add_Xbytes_ToPTR((void*)Current_MB2Tag_PTR, Current_MB2Tag_size);
-
     }
     return;
 }
@@ -121,9 +122,34 @@ void Multiboot2_info_main_sorter(\
 
 void Multiboot2_info_RAMmap_translator(\
     struct MB2Info_RAMMap* MB2_RAMMap_Tag_PTR,\
-    struct RAMMap_DescriptorEntry* OS_RAMmap_array\
+    struct RAMMap_DescriptorEntry* OS_RAMmap_array,\
+    uint32_t RAMMap_entries_amount\
 ){
+    /*Goal: translate the ram map of MB2 to OS rammap
+    andwrite it to the pre-allocated array OS_RAMmap_array
+    most fields are compatible with MB2, fo example types
+    How to do it:
+    0.1 - check if RAMMap_entries_amount is the same as we can calculate
+    1-get the MB2 entry from array(given to the function)
+    2-copy to the MB2 entry to the temporary translation entry
+    3-push translated entry to the OS RAm entries array
+    4-do it RAMMap_entries_amount times*/
+
     struct MB2_RAMMap_entry* MB2_RAMMap_Entries_Array = &(MB2_RAMMap_Tag_PTR->Entries_start);
+    struct RAMMap_DescriptorEntry TranslatedEntry;
+    uint32_t CurrentEntry_Translation_PTR = 0;
+    unsigned char Amounts_Are_Not_Equal;
+    //0.1
+    Amounts_Are_Not_Equal = ( (MB2_RAMMap_Tag_PTR->Size-sizeof(struct MB2Info_RAMMap)) / MB2_RAMMap_Tag_PTR->Entry_size ) \
+    != \
+    MB2_RAMMap_Entries_Array;
+    if(Amounts_Are_Not_Equal){
+        multiboot2_LoadPanic_customSTR("Multiboot2_info_RAMmap_translator, The given Entries amount is not the equal to the calculated one");
+    }
+//4
+    for(uint32_t i=RAMMap_entries_amount; 0 != i; i--){
+//3
+    }
 
     return;
 }
