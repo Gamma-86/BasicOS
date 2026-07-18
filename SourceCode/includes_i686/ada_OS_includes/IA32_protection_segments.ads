@@ -21,6 +21,13 @@ package IA32_protection_segments is
       with Size => 4;
       for Limit_High_Type'Size use 4;
 
+   type GDT_Descriptor_Raw is record
+      Word1 : Interfaces.Unsigned_16;
+      Word2 : Interfaces.Unsigned_16;
+   end record;
+
+
+
 
 
 
