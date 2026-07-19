@@ -2,9 +2,32 @@ with Interfaces;
 with Interfaces.C;
 
 package IA32_protection_segments is
+   type Nibble_t is mod 2**4
+      with Size => 4;
+      for Nibble_t'Size use 4;
    type Privelege_LVL_type is mod 2 ** 2
       with Size => 2;
       for Privelege_LVL_type'Size use 2;
+
+   type GDT_Descriptor_Raw is record
+      Word1 : Interfaces.Unsigned_16;
+      Word2 : Interfaces.Unsigned_16;
+      Byte5 : Interfaces.Unsigned_8;
+      Descriptor_Type  : Nibble_t;
+      IsNot_System : Boolean;
+      Privelege : Privelege_LVL_type;
+      Is_Present : Boolean;
+      Dword4 : Interfaces.Unsigned_32;
+   end record;
+   for GDT_Descriptor_Raw use record
+      Word1 at 0 range 0 .. 15;
+      Word2 at 0 range 16 .. 31;
+      Byte5 at 4 range 0 .. 7;
+      Descriptor_Type at 4 range 8 .. 11;
+      IsNot_System at 4 range 12 .. 12;
+   end record;
+
+
 
    type Base_Low_Type is mod 2 ** 24
       with Size => 24;
@@ -21,14 +44,9 @@ package IA32_protection_segments is
       with Size => 4;
       for Limit_High_Type'Size use 4;
 
-   type GDT_Descriptor_Raw is record
-      Word1 : Interfaces.Unsigned_16;
-      Word2 : Interfaces.Unsigned_16;
+   type GDT_Descriptor_Code is record
+
    end record;
-
-
-
-
 
 
    type Segment_Index_type is new Integer range 0 .. 8191
