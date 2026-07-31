@@ -27,15 +27,18 @@
 
 --60 Type Access Byte (from Typical segment descriptor)
 
---70 Record Type GDT_Descriptor_RAW, the most generic Descriptor reasonable
+--70 Record Type GDT_Descriptor_Raw, the most generic Descriptor reasonable
+--70.9 Pointer to the GDT_Descriptor_RAW
 --70.10 Unchecked conversion function between unsigned64 and GDT_Descriptor Raw
 
 --80 Record Type for GDT descriptor fourth word of NonSystem(Data Or COde) descriptor
 
 --90 Record Type Segment descriptor for code
+--90.9 Pointer to the Code segment descriptor
 --90.10 Unsigned64<->DescriptorCOde<->DescriptorRAW  Unchecked conversion
 
---100 Record Type Segment descriptor for DATA
+--100 Record Type - Segment descriptor for DATA
+--100.9 Pointer to the DATA descriptor
 --100.10 DescriptorRaw<->DescriptorData<->Unsigned64 Unchecked conversions
 
 --110 Integer Type segment Index, which is index in GDT with range 
@@ -45,14 +48,12 @@
 --120.10 Unchecked conversions between segment selector and Unsigned16
 
 --130 Record Type - Call Gate 32, one of possible system calls ways
+--130.9 Type - Pointer to the CALL GATE 32
 --130.10 DescriptorRAW<->Call Gate 32<->Unsigned 64 unchecked conversions
 
---140 Record Type - LDT Descriptor, GDT but local
---140.10 DescriptorRAW<->LDT descriptor<->Unsigned 64 unchecked conversions
 
---150 Record Type - TSS 32 Descriptor, a local thread storage for hardware
---    Multitasking
---150.10 DescriptorRAW<->TSS32<->Unsigned 64 unchecked conversions
+--150 GDT_t, GDT_t_PTR : the man himself
+--150.10 GDT_Descriptor and GDT_Descriptor pointer
 
 
 --#######################################################
@@ -182,6 +183,11 @@ function Separate_SegmentLimit (Limit : Interfaces.Unsigned_32) return Limit_Sep
 --#######################################################
 function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return Interfaces.Unsigned_32;
 
+
+
+
+
+
 --#######################################################
 --#######################################################
 --
@@ -189,6 +195,8 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
 --
 --#######################################################
 --#######################################################
+
+
 
    type SystemTypes_t is 
    (
@@ -242,14 +250,14 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
 --    50.10
 --#######################################################
 
-   type GDTSystemTypes_t is
+   type GDTSysTypes_t is
    (
       Invalid0,
       TSS16_Available,
       LDT,
       TSS16_Busy,
       CallGate16,
---      Task_Gate,
+      Task_Gate,
 --      Interrupt16,
 --      Trap16,
       Reserved8,
@@ -268,7 +276,7 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
       LDT  = 2#0010#,
       TSS16_Busy      = 2#0011#,
       CallGate16     = 2#0100#,
---      Task_Gate       = 2#0101#,
+      Task_Gate       = 2#0101#,
 --      Interrupt16     = 2#0110#,
 --      Trap16          = 2#0111#,
       Reserved8       = 2#1000#,
@@ -280,17 +288,17 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
 --      Interrupt32     = 2#1110#,
 --      Trap32          = 2#1111#
    );
-   for GDTSystemTypes_t'Size use 4;
-
+   for GDTSysTypes_t'Size use 4;
 --#######################################################
 --    50.20
 --#######################################################
 
-   subtype GDTSystemTypes_LDT_SubT is GDTSystemTypes_t range LDT .. LDT;
-   subtype GDTSystemTypes_CallGate16_SubT is GDTSystemTypes_t range CallGate16 .. CallGate16;
-   subtype GDTSystemTypes_CallGate32_SubT is GDTSystemTypes_t range CallGate32 .. CallGate32;
-   subtype GDTSystemTypes_TSS16_SubT is GDTSystemTypes_t range TSS16_Available .. TSS16_Busy;
-   subtype GDTSystemTypes_TSS32_SubT is GDTSystemTypes_t range TSS32_Available .. TSS32_Busy;
+   subtype GDTSysTypes_LDT_SubT is GDTSysTypes_t range LDT .. LDT;
+   subtype GDTSysTypes_CallGate16_SubT is GDTSysTypes_t range CallGate16 .. CallGate16;
+   subtype GDTSysTypes_CallGate32_SubT is GDTSysTypes_t range CallGate32 .. CallGate32;
+   subtype GDTSysTypes_TSS16_SubT is GDTSysTypes_t range TSS16_Available .. TSS16_Busy;
+   subtype GDTSysTypes_TSS32_SubT is GDTSysTypes_t range TSS32_Available .. TSS32_Busy;
+   subtype GDTSysTypes_TaskGate_SubT is GDTSysTypes_t range Task_Gate .. Task_Gate;
 --   subtype SystemTypes_IDT16Types_SubT is SystemTypes_t range Task_Gate .. Trap16;
 --   subtype SystemTypes_IDT32Types_SubT is SystemTypes_t range Interrupt32 .. Trap32;
 --   subtype SystemTypes_IDTTypes_SubT is SystemTypes_t range Task_Gate .. Trap32;
@@ -333,7 +341,6 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
 --#######################################################
 
 
-
    type GDT_Descriptor_Raw is record
       Word1 : Interfaces.Unsigned_16;
       Word2 : Interfaces.Unsigned_16;
@@ -350,6 +357,10 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
       Word4 at 4 range 16 .. 31;
    end record;
    for GDT_Descriptor_Raw'Size use 64;
+--#######################################################
+--    70.9
+--#######################################################
+   type GDT_Descriptor_Raw_PTR is access all GDT_Descriptor_Raw;
 
 --#######################################################
 --    70.10
@@ -441,7 +452,10 @@ function uint64_TO_DescriptorRAW is new Ada.Unchecked_Conversion
       Word4 at 4 range 16 .. 31;
    end record;
    for GDT_Descriptor_Code'Size use 64;
-
+--#######################################################
+--    90.9
+--#######################################################
+   type GDT_Descriptor_Code_PTR is access all GDT_Descriptor_Code;
 --#######################################################
 --    90.10
 --#######################################################
@@ -511,7 +525,10 @@ function uint64_TO_DescriptorCode is new ADA.Unchecked_Conversion
       Word4 at 4 range 16 .. 31;
    end record;
    for GDT_Descriptor_Data'Size use 64;
-
+--#######################################################
+--    100.9
+--#######################################################
+   type GDT_Descriptor_Data_PTR is access all GDT_Descriptor_Data;
 --#######################################################
 --    100.10
 --#######################################################
@@ -547,9 +564,9 @@ function uint64_TO_DescriptorData is new ADA.Unchecked_Conversion
 --#######################################################
 --#######################################################
 
-   type Segment_Index_type is new Integer range 0 .. 8191
+   type Segment_Index_t is new Integer range 0 .. 8191
       with Size => 13;
-   for Segment_Index_type'Size use 13;
+   for Segment_Index_t'Size use 13;
 
 
 
@@ -564,7 +581,7 @@ function uint64_TO_DescriptorData is new ADA.Unchecked_Conversion
    type Segment_Selector is record
       Requested_Privelege : Privelege_LVL_t;
       IsIn_LDT : Boolean;
-      Segment_Index : Segment_Index_type;
+      Segment_Index : Segment_Index_t;
    end record
       with Size => 16;
    for Segment_Selector use record
@@ -625,9 +642,12 @@ function uint16_TO_Selector is new ADA.Unchecked_Conversion
       Offset_High at 4 range 16 .. 31;
    end record;
    for Call_Gate32_r'Size use 64;
-
 --#######################################################
--- 130.10
+--    130.9
+--#######################################################
+   type Call_Gate32_r_PTR is access all Call_Gate32_r;
+--#######################################################
+--    130.10
 --#######################################################
 
 function CallGate32_TO_DescriptorRaw is new ADA.Unchecked_Conversion
@@ -653,76 +673,12 @@ function uint64_TO_CallGate32 is new ADA.Unchecked_Conversion
 
 
 
---#######################################################
---#######################################################
---
---    140
---
---#######################################################
---#######################################################
 
-   type LDT_Descriptor is record
-      Limit_Low : Limit_Low_t;
-      Base_Low  : Base_Low_t;
-      
-      LDT_Type  : GDTSystemTypes_LDT_SubT;
-      IsNot_System : Always_0Bool_t;
-      Privelege_LVL : Privelege_LVL_t;
-      Is_Present : Boolean;
-      
-      Limit_High : Limit_High_t;
 
-      Available_Bit : Boolean;
-      Is_64 : Boolean;
-      ZeroBit: Always_0Bool_t;
-      Is_Granular : Boolean;
-      Base_High : Base_High_t;
-   end record
-   with Size => 64;
-   for LDT_Descriptor use record
-      Limit_Low at 0 range 0 .. 15;
-      Base_Low at 0 range 16 .. 39;
 
-      LDT_Type at 4 range 8 .. 11;
-      IsNot_System at 4 range 12 .. 12;
-      Privelege_LVL at 4 range 13 .. 14;
-      Is_Present at 4 range 15 .. 15;
 
-      Limit_High at 4 range 16 .. 19;
 
-      Available_Bit at 4 range 20 .. 20;
-      Is_64 at 4 range 21 .. 21;
-      ZeroBit at 4 range 22 .. 22;
-      Is_Granular at 4 range 23 .. 23;
 
-      Base_High at 4 range 24 .. 31;
-   end record;
-   for LDT_Descriptor'Suze use 64;
-
---#######################################################
---    140.10
---#######################################################
-
-function LDT_TO_DescriptorRaw is new ADA.Unchecked_Conversion
-   (
-      Source => LDT_Descriptor,
-      Target => GDT_Descriptor_Raw
-   );
-function DescriptorRaw_TO_LDT is new ADA.Unchecked_Conversion
-   (
-      Source => GDT_Descriptor_Raw,
-      Target => LDT_Descriptor
-   );
-function LDT_TO_uint64 is new ADA.Unchecked_Conversion
-   (
-      Source => LDT_Descriptor,
-      Target => Interfaces.Unsigned_64
-   );
-function uint64_TO_LDT is new ADA.Unchecked_Conversion
-   (
-      Source => Interfaces.Unsigned_64,
-      Target => LDT_Descriptor
-   );
 
 
 
@@ -734,79 +690,23 @@ function uint64_TO_LDT is new ADA.Unchecked_Conversion
 --#######################################################
 --#######################################################
 
-   type TSS32_Descriptor is record
-      Limit_Low : Limit_Low_t;
-      Base_Low  : Base_Low_t;
-
-      Is1_Bit1  : Always_1Bool_t;
-      Is_Busy   : Boolean;
-      Is0_Bit1  : Always_0Bool_t;
-      Is1_Bit2  : Always_1Bool_t;
-      IsNot_System : Always_0Bool_t;
-      Privelege_LVL : Privelege_LVL_t;
-      Is_Present : Boolean;
-
-      Limit_High : Limit_High_t;
-      Available_Bit : Boolean;
-
-      Is_64 : Always_0Bool_t;
-      Is0_Bit2 : Always_0Bool_t;
-      Is_Granular : Boolean;
-      Base_High : Base_High_t;
-   end record
-   with Size => 64;
-   for TSS32_Descriptor use record
-      Limit_Low at 0 range 0 .. 15;
-      Base_Low at 0 range 16 .. 39;
-
-      Is1_Bit1 at 4 range 8 .. 8;
-      Is_Busy at 4 range 9 .. 9;
-      Is0_Bit1 at 4 range 10 .. 10;
-      Is1_Bit2 at 4 range 11 .. 11;
-      IsNot_System at 4 range 12 .. 12;
-      Privelege_LVL at 4 range 13 .. 14;
-      Is_Present at 4 range 15 .. 15;
-
-      Limit_High at 4 range 16 .. 19;
-      Available_Bit at 4 range 20 .. 20;
-
-      Is_64 at 4 range 21 .. 21;
-      Is0_Bit2 at 4 range 22 .. 22;
-      Is_Granular at 4 range 23 .. 23;
-      Base_High at 4 range 24 .. 31;
-   end record;
-   For TSS32_Descriptor'Size use 64;
+type GDT_t is array (Segment_Index_t) of GDT_Descriptor_Raw;
+type GDT_t_PTR is access all GDT_t;
 --#######################################################
 --    150.10
 --#######################################################
+type GDT_Descriptor_r is record
+   Limit : Interfaces.Unsigned_16;
+   GDT_Pointer : GDT_t_PTR;
+end record
+   with Size => 48;
+for GDT_Descriptor_r use record
+   Limit at 0 range 0 .. 15;
+   GDT_Pointer at 0 range 16 .. 47;
+end record;
+for GDT_Descriptor_r'Size use 48;
 
-function TSS32_TO_DescriptorRaw is new ADA.Unchecked_Conversion
-   (
-      Source => TSS32_Descriptor,
-      Target => GDT_Descriptor_Raw
-   );
-function DescriptorRaw_TO_TSS32 is new ADA.Unchecked_Conversion
-   (
-      Source => GDT_Descriptor_Raw,
-      Target => TSS32_Descriptor
-   );
-function TSS32_TO_uint64 is new ADA.Unchecked_Conversion
-   (
-      Source => TSS32_Descriptor,
-      Target => Interfaces.Unsigned_64
-   );
-function uint64_TO_TSS32 is new ADA.Unchecked_Conversion
-   (
-      Source => Interfaces.Unsigned_64,
-      Target => TSS32_Descriptor
-   );
-
-
-
-
-
-
-
+type GDT_Descriptor_r_PTR is access all GDT_Descriptor_r; 
 
 
 
