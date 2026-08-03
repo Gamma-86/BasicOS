@@ -27,7 +27,7 @@
 
 --60 Type Access Byte (from Typical segment descriptor)
 
---70 Record Type GDT_Descriptor_Raw, the most generic Descriptor reasonable
+--70 Record Type Segment_Descriptor_Raw, the most generic Descriptor reasonable
 --70.9 Pointer to the GDT_Descriptor_RAW
 --70.10 Unchecked conversion function between unsigned64 and GDT_Descriptor Raw
 
@@ -217,7 +217,6 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
       Interrupt32,
       Trap32
    ) with Size => 4;
-
    for SystemTypes_t use
    (
       Invalid0 = 0,
@@ -341,7 +340,7 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
 --#######################################################
 
 
-   type GDT_Descriptor_Raw is record
+   type Segment_Descriptor_Raw is record
       Word1 : Interfaces.Unsigned_16;
       Word2 : Interfaces.Unsigned_16;
       Byte5 : Interfaces.Unsigned_8;
@@ -349,18 +348,18 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
       Word4 : Interfaces.Unsigned_32;
    end record
    with Size => 64;
-   for GDT_Descriptor_Raw use record
+   for Segment_Descriptor_Raw use record
       Word1 at 0 range 0 .. 15;
       Word2 at 0 range 16 .. 31;
       Byte5 at 4 range 0 .. 7;
       Access_Byte at 4 range 8 .. 15;
       Word4 at 4 range 16 .. 31;
    end record;
-   for GDT_Descriptor_Raw'Size use 64;
+   for Segment_Descriptor_Raw'Size use 64;
 --#######################################################
 --    70.9
 --#######################################################
-   type GDT_Descriptor_Raw_PTR is access all GDT_Descriptor_Raw;
+   type GDT_Descriptor_Raw_PTR is access all Segment_Descriptor_Raw;
 
 --#######################################################
 --    70.10
@@ -369,13 +368,13 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
 
 function DescriptorRaw_TO_uint64 is new Ada.Unchecked_Conversion
    (
-      Source => GDT_Descriptor_Raw,
+      Source => Segment_Descriptor_Raw,
       Target => Interfaces.Unsigned_64
    );
 function uint64_TO_DescriptorRAW is new Ada.Unchecked_Conversion
    (
       Source => Interfaces.Unsigned_64,
-      Target => GDT_Descriptor_Raw
+      Target => Segment_Descriptor_Raw
    );
 
 
@@ -464,11 +463,11 @@ function uint64_TO_DescriptorRAW is new Ada.Unchecked_Conversion
 function DescriptorCode_TO_DescriptorRaw is new ADA.Unchecked_Conversion
    (
       Source => GDT_Descriptor_Code,
-      Target => GDT_Descriptor_Raw
+      Target => Segment_Descriptor_Raw
    );
 function DescriptorRaw_TO_DescriptorCode is new ADA.Unchecked_Conversion
    (
-      Source => GDT_Descriptor_Raw,
+      Source => Segment_Descriptor_Raw,
       Target => GDT_Descriptor_Code
    );
 function DescriptorCode_TO_uint64 is new ADA.Unchecked_Conversion
@@ -536,11 +535,11 @@ function uint64_TO_DescriptorCode is new ADA.Unchecked_Conversion
 function DescriptorData_TO_DescriptorRaw is new ADA.Unchecked_Conversion
    (
       Source => GDT_Descriptor_Data,
-      Target => GDT_Descriptor_Raw
+      Target => Segment_Descriptor_Raw
    );
 function DescriptorRaw_TO_DescriptorData is new ADA.Unchecked_Conversion
    (
-      Source => GDT_Descriptor_Raw,
+      Source => Segment_Descriptor_Raw,
       Target => GDT_Descriptor_Data
    );
 function DescriptorData_TO_uint64 is new ADA.Unchecked_Conversion
@@ -653,11 +652,11 @@ function uint16_TO_Selector is new ADA.Unchecked_Conversion
 function CallGate32_TO_DescriptorRaw is new ADA.Unchecked_Conversion
    (
       Source => Call_Gate32_r,
-      Target => GDT_Descriptor_Raw
+      Target => Segment_Descriptor_Raw
    );
 function DescriptorRaw_TO_CallGate32 is new ADA.Unchecked_Conversion
    (
-      Source => GDT_Descriptor_Raw,
+      Source => Segment_Descriptor_Raw,
       Target => Call_Gate32_r
    );
 function CallGate32_TO_uint64 is new ADA.Unchecked_Conversion
@@ -690,7 +689,7 @@ function uint64_TO_CallGate32 is new ADA.Unchecked_Conversion
 --#######################################################
 --#######################################################
 
-type GDT_t is array (Segment_Index_t) of GDT_Descriptor_Raw;
+type GDT_t is array (Segment_Index_t) of Segment_Descriptor_Raw;
 type GDT_t_PTR is access all GDT_t;
 --#######################################################
 --    150.10

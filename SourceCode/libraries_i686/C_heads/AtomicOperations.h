@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 
-void Mutex_Lock(unsigned char* LockingBool);
-unsigned char Mutex_Lock_Watchdog(unsigned char* LockingBool, unsigned int WatchdogTime);
-void Mutex_Unlock(unsigned char* LockingBool);
+void Bool_Lock(unsigned char* LockingBool);
+unsigned char Bool_Lock_Watchdog(unsigned char* LockingBool, unsigned int WatchdogTime);
+void Bool_Unlock(unsigned char* LockingBool);
 
-//Mutex_Unlock
+
 
 void Locked_increment8(char* Incremented);
 void Locked_increment16(unsigned short* Incremented);

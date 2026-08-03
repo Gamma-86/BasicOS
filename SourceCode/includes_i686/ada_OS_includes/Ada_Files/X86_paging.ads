@@ -42,7 +42,7 @@ subtype PagingTables_GeneralRange is Integer range 0 .. 1023;
 
 
 
-type General_PageEntry_LowFlags is record
+type PagingEntry_General_Flags is record
    Is_Present        : Boolean;
    Is_Writable       : Boolean;
    Is_SuperVisor_LVL : Boolean;
@@ -50,7 +50,7 @@ type General_PageEntry_LowFlags is record
    Cache_Disabled    : Boolean;
    Was_Accessed      : Boolean;
 end record with Size => 6;
-for General_PageEntry_LowFlags use record
+for PagingEntry_General_Flags use record
    Is_Present at 0 range 0 .. 0;
    Is_Writable at 0 range 1 .. 1;
    Is_SuperVisor_LVL at 0 range 2 .. 2;
@@ -58,7 +58,7 @@ for General_PageEntry_LowFlags use record
    Cache_Disabled at 0 range 4 .. 4;
    Was_Accessed at 0 range 5 .. 5;
 end record;
-for General_PageEntry_LowFlags'Size use 6;
+for PagingEntry_General_Flags'Size use 6;
 
 
 
@@ -88,7 +88,7 @@ for PageEntry_Available_Field_e'Size use 3;
 
 
 type Page_Table_Entry is record
-   Low_Flags : General_PageEntry_LowFlags;
+   Low_Flags : PagingEntry_General_Flags;
    Dirty_Was_Written : Boolean;
    Reserved7         : Always_0Bool_t;
    Is_Global         : Boolean;
@@ -155,7 +155,7 @@ for DirEntry_Available_Field_e'Size use 3;
 
 
 type Page_Directory_Entry is record
-   Low_Flags : General_PageEntry_LowFlags;
+   Low_Flags : PagingEntry_General_Flags;
    Reserved6 : Always_0Bool_t;
    Is_Big_Page : Boolean;
    Is_Global   : Boolean;

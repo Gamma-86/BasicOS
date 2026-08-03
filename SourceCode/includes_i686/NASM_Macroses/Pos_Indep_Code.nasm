@@ -1,3 +1,7 @@
+; USE GET_LABEL_FLAT_ADDRESS_POS_INDEP
+
+
+
 %if (__?BITS?__) = 64
 
     %macro GET_LABEL_FLAT_ADDRESS_POS_INDEP 1
@@ -9,6 +13,7 @@
     LocalASM_FUN_Get_Next_EIP:
         mov   eax, [esp]
         ret
+
     %macro GET_LABEL_FLAT_ADDRESS_POS_INDEP 1
         call   LocalASM_FUN_Get_Next_EIP
     .next_eip:

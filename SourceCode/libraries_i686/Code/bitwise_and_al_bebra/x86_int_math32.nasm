@@ -1,5 +1,5 @@
 bits 32
-CPU WILLAMETTE
+CPU Katmai
 %include "NASM_default_macroses.nasm"
 
 global Usub8

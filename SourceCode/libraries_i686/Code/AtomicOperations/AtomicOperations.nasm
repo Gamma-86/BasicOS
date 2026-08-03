@@ -7,13 +7,12 @@ global Mutex_Lock
 global Mutex_Lock_Watchdog
 global Mutex_Unlock
 
-Mutex_Lock:;void Mutex_Lock(unsigned char* LockingBool)
+Bool_Lock:;void Bool_Lock(unsigned char* LockingBool)
     mov   AX_PTRSIZE, STACK_ARG1_SP
 
 .lp1:
-    xor   edx, edx
-        not   edx
-    xchg   dl, [AX_PTRSIZE]
+    mov   edx, TRUE
+    xchg  dl, [AX_PTRSIZE]
     
     test   dl, dl
         jz    .lp1_end
@@ -23,15 +22,14 @@ Mutex_Lock:;void Mutex_Lock(unsigned char* LockingBool)
 
     ret
 
-Mutex_Lock_Watchdog:;unsigned char Mutex_Lock(unsigned char* LockingBool, unsigned int WatchdogTime)
+Bool_Lock_Watchdog:;unsigned char Bool_Lock(unsigned char* LockingBool, unsigned int WatchdogTime)
     mov   AX_PTRSIZE, STACK_ARG1_SP
     mov   CX_INTSIZE, STACK_ARG2_SP
 
     test  CX_INTSIZE, CX_INTSIZE
         jz    .lp1_watchdog_end
 .lp1:
-    xor   edx, edx
-        not   edx
+    mov   edx, TRUE
     xchg  [AX_PTRSIZE], dl
 
     test  dl, dl
@@ -47,7 +45,7 @@ Mutex_Lock_Watchdog:;unsigned char Mutex_Lock(unsigned char* LockingBool, unsign
     mov   eax, 1
     ret
 
-Mutex_Unlock: ;void Mutex_Unlock(unsigned char* LockingBool)
+Bool_Unlock: ;void Bool_Unlock(unsigned char* LockingBool)
     mov   AX_PTRSIZE, STACK_ARG1_SP
     mov   byte[AX_PTRSIZE], 0
     ret
