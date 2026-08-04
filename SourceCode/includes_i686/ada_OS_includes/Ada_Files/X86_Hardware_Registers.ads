@@ -74,7 +74,7 @@ for EFlags_register_r'Size use 32;
 --############################################################################
 --############################################################################
 
-type Control_Register1_r is record
+type Control_Register0_r is record
    Protection_Enable : Boolean;
    Monito_FPU        : Boolean;
    Emulation_FPU     : Boolean;
@@ -91,7 +91,7 @@ type Control_Register1_r is record
    Paging_Enable     : Boolean; 
 end record 
 with Size => 32;
-for Control_Register1_r use record
+for Control_Register0_r use record
    Protection_Enable at 0 range 0 .. 0;
    Monito_FPU at 0 range 1 .. 1;
    Emulation_FPU at 0 range 2 .. 2;
@@ -107,7 +107,7 @@ for Control_Register1_r use record
    Cache_Disbled at 0 range 30 .. 30;
    Paging_Enable at 0 range 31 .. 31;
 end record;
-for Control_Register1_r'Size use 32;
+for Control_Register0_r'Size use 32;
 
 
 type Control_Register2 is new System.Address;

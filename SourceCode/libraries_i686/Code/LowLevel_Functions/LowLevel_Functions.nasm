@@ -1,7 +1,7 @@
 %include "NASM_default_macroses.nasm"
 
 bits 32
-CPU WILLAMETTE
+CPU 386
 
 section .text
 
@@ -101,9 +101,92 @@ Write_ModelSpecific_Register:;void (int WhereWrite, Long Long WhatWrite)
     %pop
 RDMSR_:
 Read_ModelSpecific_Register:;long long (int WhereRead)
-    %push Context
     %define WhereRead STACK_ARG1_SP
     mov   ecx, WhereWrite
         RDMSR
     ret
-    %pop
+    %undef WhereRead
+
+
+
+
+global get_CR0
+global get_CR2
+global get_CR3
+global get_CR4
+
+global globASM_FUN_get_CR0
+global globASM_FUN_get_CR2
+global globASM_FUN_get_CR3
+global globASM_FUN_get_CR4
+
+get_CR0:;uint32_t get_CR0();
+globASM_FUN_get_CR0:;uint32_t globASM_FUN_get_CR0();
+    mov   eax, cr0
+    mov   rax, rdx
+    ret
+
+get_CR2:;uint32_t get_CR2();
+globASM_FUN_get_CR2:;uint32_t globASM_FUN_get_CR2();
+    mov   eax, cr2
+    ret
+
+get_CR3:;uint32_t get_CR3();
+globASM_FUN_get_CR3:;uint32_t globASM_FUN_get_CR3();
+    mov   eax, cr3
+    ret
+
+get_CR4:;uint32_t get_CR4();
+globASM_FUN_get_CR4:;uint32_t globASM_FUN_get_CR4();
+    mov   eax, cr4
+    ret
+
+
+
+
+
+
+write_CR0:;void write_CR0(uint32_t Control_Register);
+globASM_FUN_write_CR0:;void globASM_FUN_write_CR0(uint32_t Control_Register);
+    mov   eax, STACK_ARG1_SP
+    mov   cr0, eax
+
+    ret
+write_CR2:;void write_CR2(uint32_t Control_Register);
+globASM_FUN_write_CR2:;void globASM_FUN_write_CR2(uint32_t Control_Register);
+    mov   eax, STACK_ARG1_SP
+    mov   cr2, eax
+
+    ret
+
+write_CR3:;void write_CR3(uint32_t Control_Register);
+globASM_FUN_write_CR3:;void globASM_FUN_write_CR3(uint32_t Control_Register);
+    mov   eax, STACK_ARG1_SP
+    mov   cr3, eax
+
+    ret
+
+write_CR4:;void write_CR4(uint32_t Control_Register);
+globASM_FUN_write_CR4:;void globASM_FUN_write_CR4(uint32_t Control_Register);
+    mov   eax, STACK_ARG1_SP
+    mov   cr4, eax
+
+    ret
+
+
+
+X86_Check_CPUID:
+    pushfd                               ;Save EFLAGS
+    pushfd                               ;Store EFLAGS
+    xor dword [esp],0x00200000           ;Invert the ID bit in stored EFLAGS
+    popfd                                ;Load stored EFLAGS (with ID bit inverted)
+    pushfd                               ;Store EFLAGS again (ID bit may or may not be inverted)
+    pop eax                              ;eax = modified EFLAGS (ID bit may or may not be inverted)
+    xor eax,[esp]                        ;eax = whichever bits were changed
+    popfd                                ;Restore original EFLAGS
+    and eax,0x00200000                   ;eax = zero if ID bit can't be changed, else non-zero
+    ret
+
+globASM_FUN_CPUID:;
+
+    ret

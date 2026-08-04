@@ -1,3 +1,4 @@
+with IA32_Hardware_Registers;
 with Interfaces;
 with Interfaces.C;use Interfaces.C;
 
@@ -108,5 +109,37 @@ function Read_ModelSpecific_Register(WhereRead : Unsigned_32) return Unsigned_64
    with Import => True,
    Convention => C,
    External_Name => "Read_ModelSpecific_Register";
+
+
+
+
+
+function get_CR0 return IA32_Hardware_Registers.Control_Register0_r;
+function get_CR2 return IA32_Hardware_Registers.Control_Register2;
+function get_CR3 return IA32_Hardware_Registers.Control_Register3_r;
+function get_CR4 return IA32_Hardware_Registers.Control_Register4_r;
+
+
+
+procedure write_CR0(WhatWrite : IA32_Hardware_Registers.Control_Register0_r)
+   with Import => True,
+   Convention => C,
+   External_Name => "write_CR0";
+procedure write_CR2(WhatWrite : IA32_Hardware_Registers.Control_Register2)
+   with Import => True,
+   Convention => C,
+   External_Name => "write_CR2";
+procedure write_CR3(WhatWrite : IA32_Hardware_Registers.Control_Register3_r)
+   with Import => True,
+   Convention => C,
+   External_Name => "write_CR3";
+procedure write_CR4(WhatWrite : IA32_Hardware_Registers.Control_Register4_r)
+   with Import => True,
+   Convention => C,
+   External_Name => "write_CR4";
+
+
+
+
 
 end LOWLEVEL_FUNCTIONS;

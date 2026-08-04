@@ -1,5 +1,7 @@
 #ifndef LOWLEVEL_FUNCTIONS_H_SENTRY
 #define LOWLEVEL_FUNCTIONS_H_SENTRY
+#include <stdint.h>
+
 
 void globASM_FUN_outb(unsigned short int PortAddress, unsigned char TheByte);
 void outb(unsigned short int PortAddress, unsigned char TheByte);
@@ -30,5 +32,35 @@ void Write_ModelSpecific_Register \
 
 unsigned long long RDMSR_(unsigned int WhereRead);
 unsigned long long Read_ModelSpecific_Register(unsigned int WhereRead);
+
+
+
+
+uint32_t get_CR0();
+uint32_t globASM_FUN_get_CR0();
+
+uint32_t get_CR2();
+uint32_t globASM_FUN_get_CR2();
+
+uint32_t get_CR3();
+uint32_t globASM_FUN_get_CR3();
+
+uint32_t get_CR4();
+uint32_t globASM_FUN_get_CR4();
+
+
+
+void write_CR0(uint32_t Control_Register);
+void globASM_FUN_write_CR0(uint32_t Control_Register);
+
+void write_CR2(uint32_t Control_Register);
+void globASM_FUN_write_CR2(uint32_t Control_Register);
+
+void write_CR3(uint32_t Control_Register);
+void globASM_FUN_write_CR3(uint32_t Control_Register);
+
+void write_CR4(uint32_t Control_Register);
+void globASM_FUN_write_CR4(uint32_t Control_Register)
+
 
 #endif
