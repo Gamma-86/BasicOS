@@ -238,4 +238,6 @@ type TSS32_r is record
    IO_Map_Base  : Interfaces.Unsigned_16;
 end record;
 
+type TSS32_r_PTR is access all TSS32_r;
+
 end X86_segments.TSS;
