@@ -359,7 +359,7 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
 --#######################################################
 --    70.9
 --#######################################################
-   type GDT_Descriptor_Raw_PTR is access all Segment_Descriptor_Raw;
+   type Segment_Descriptor_Raw_PTR is access all Segment_Descriptor_Raw;
 
 --#######################################################
 --    70.10

@@ -21,7 +21,7 @@ type Interrupt_Redirect_e is (
 ) with Size => 1;
 for Interrupt_Redirect_e use(
    To_IVT => 0,
-   To_IDT => 0
+   To_IDT => 1
 );
 for Interrupt_Redirect_e'Size use 1;
 
@@ -35,7 +35,7 @@ type Port_Permission is (
 ) with Size => 1;
 for Port_Permission use (
    Allowed => 0,
-   Denied  => 0
+   Denied  => 1
 );
 for Port_Permission'Size use 1;
 
@@ -88,10 +88,10 @@ type TaskGate_Descriptor_r_PTR is access all TaskGate_Descriptor_r;
 
 function TaskGate_To_DescriptorRaw is new Ada.Unchecked_Conversion(
    Source => TaskGate_Descriptor_r,
-   Target => GDT_Descriptor_Raw
+   Target => Segment_Descriptor_Raw
 );
 function DescriptorRaw_To_TaskGate is new Ada.Unchecked_Conversion(
-   Source => GDT_Descriptor_Raw,
+   Source => Segment_Descriptor_Raw,
    Target => TaskGate_Descriptor_r
 );
 function TaskGate_To_uint64 is new Ada.Unchecked_Conversion(
@@ -163,23 +163,23 @@ function uint64_To_TaskGate is new Ada.Unchecked_Conversion(
 
 function TSS32_TO_DescriptorRaw is new ADA.Unchecked_Conversion
    (
-      Source => TSS32_Descriptor,
-      Target => GDT_Descriptor_Raw
+      Source => TSS32_Descriptor_r,
+      Target => Segment_Descriptor_Raw
    );
 function DescriptorRaw_TO_TSS32 is new ADA.Unchecked_Conversion
    (
-      Source => GDT_Descriptor_Raw,
-      Target => TSS32_Descriptor
+      Source => Segment_Descriptor_Raw,
+      Target => TSS32_Descriptor_r
    );
 function TSS32_TO_uint64 is new ADA.Unchecked_Conversion
    (
-      Source => TSS32_Descriptor,
+      Source => TSS32_Descriptor_r,
       Target => Interfaces.Unsigned_64
    );
 function uint64_TO_TSS32 is new ADA.Unchecked_Conversion
    (
       Source => Interfaces.Unsigned_64,
-      Target => TSS32_Descriptor
+      Target => TSS32_Descriptor_r
    );
 
    

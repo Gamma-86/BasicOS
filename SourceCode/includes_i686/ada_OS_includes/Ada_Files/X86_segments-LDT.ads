@@ -63,34 +63,34 @@ package X86_segments.LDT is
 
       Base_High at 4 range 24 .. 31;
    end record;
-   for LDT_Descriptor'Suze use 64;
+   for LDT_Descriptor_r'Suze use 64;
 --#######################################################
 --    20.9
 --#######################################################
-   type LDT_Descriptor_PTR is access all LDT_Descriptor;
+   type LDT_Descriptor_PTR is access all LDT_Descriptor_r;
 --#######################################################
 --    20.10
 --#######################################################
 
 function LDT_TO_DescriptorRaw is new ADA.Unchecked_Conversion
    (
-      Source => LDT_Descriptor,
-      Target => GDT_Descriptor_Raw
+      Source => LDT_Descriptor_r,
+      Target => Segment_Descriptor_Raw
    );
 function DescriptorRaw_TO_LDT is new ADA.Unchecked_Conversion
    (
-      Source => GDT_Descriptor_Raw,
-      Target => LDT_Descriptor
+      Source => Segment_Descriptor_Raw,
+      Target => LDT_Descriptor_r
    );
 function LDT_TO_uint64 is new ADA.Unchecked_Conversion
    (
-      Source => LDT_Descriptor,
+      Source => LDT_Descriptor_r,
       Target => Interfaces.Unsigned_64
    );
 function uint64_TO_LDT is new ADA.Unchecked_Conversion
    (
       Source => Interfaces.Unsigned_64,
-      Target => LDT_Descriptor
+      Target => LDT_Descriptor_r
    );
 
 
