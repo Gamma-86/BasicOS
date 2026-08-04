@@ -1,8 +1,60 @@
 project BasicOS is
-   for Languages use ("Ada", "C", "NASM_ASM", "AS_ASM");
+   for Languages use ("Ada", "C", "NASM_ASM", "AS_ASM", "FASM_ASM");
 
    type Build_Mode is ("normal", "debug", "PreClassic", "Classic" ,"InDev" ,"InfDev", "Alpha", "Beta");
    Version : Build_Mode := external("Version", "PreClassic");
+
+   package Naming is
+      for Body_Suffix("NASM_ASM") use ".nasm";
+      for Body_Suffix("FASM_ASM") use ".fasm";
+   end Naming;
+
+   package Compiler is
+      for Driver("C") use external("C_COMPILER", "i686-elf-gcc");
+      for Driver("NASM_ASM") use "nasm";
+      for Driver("AS_ASM") use "as";
+      for Driver("Ada") use external("ADA_COMPILER", "i686-elf-gnat");
+
+      case Version is 
+         when "debug" =>
+         when "normal" =>
+         when "PreClassic" =>
+            for Switches("Ada") use 
+            (
+               "-I"&PathTo_OS_include,
+               "-I"&PathTo_ADA_INCLUDES,
+               "-I"&PathTo_GNAT_ADC,
+               "-g",
+               "-O0",
+               "-gnatp",
+               "-ffreestanding",
+               "-nostdlib",
+               "-fno-exceptions",
+               "-m32",
+               "-gnatec"&PathTo_GNAT_ADC,
+               "-gnatwa",
+               "-gnatwe"
+            );
+            for Switches("C")use
+            (
+               "-Wall",
+               "-g",
+               "-m32",
+               "-ffreestanding",
+               "-fno-stack-protector",
+               "-fno-pic",
+               "-fno-pie"
+            );
+            for Switches("NASM_ASM") use 
+            (
+               "-i"&PathTo_OS_include,
+               "-i$(PathTo_NASM_default_macroses)/",
+               "-i$(PathTo_IA32Macroses_NASM)/",
+               "-g"
+            );
+      end case;
+   end Compiler;
+
 
    PathTo_Kernel := external("PathTo_Kernel", "No_Path");
    PathTo_LinkerScript := external("PathTo_LinkerScript", "No_Path");
@@ -49,54 +101,7 @@ project BasicOS is
    for Object_Dir use "SourceCode/OBJ_filesDump";
    for Exec_Dir use "SourceCode/BIN_filesDump";
 
-   package Naming is
-      for Body_Suffix("NASM_ASM") use ".nasm";
-   end Naming;
-   package Compiler is
-      for Driver("C") use external("C_COMPILER", "i686-elf-gcc");
-      for Driver("NASM_ASM") use "nasm";
-      for Driver("AS_ASM") use "as";
-      for Driver("Ada") use external("ADA_COMPILER", "i686-elf-gnat");
 
-      case Version is 
-         when "debug" =>
-         when "normal" =>
-         when "PreClassic" =>
-            for Switches("Ada") use 
-            (
-               "-I"&PathTo_OS_include,
-               "-I"&PathTo_ADA_INCLUDES,
-               "-I"&PathTo_GNAT_ADC,
-               "-g",
-               "-O0",
-               "-gnatp",
-               "-ffreestanding",
-               "-nostdlib",
-               "-fno-exceptions",
-               "-m32",
-               "-gnatec"&PathTo_GNAT_ADC,
-               "-gnatwa",
-               "-gnatwe"
-            );
-            for Switches("C")use
-            (
-               "-Wall",
-               "-g",
-               "-m32",
-               "-ffreestanding",
-               "-fno-stack-protector",
-               "-fno-pic",
-               "-fno-pie"
-            );
-            for Switches("NASM_ASM") use 
-            (
-               "-i"&PathTo_OS_include,
-               "-i$(PathTo_NASM_default_macroses)/",
-               "-i$(PathTo_IA32Macroses_NASM)/",
-               "-g"
-            );
-      end case;
-   end Compiler;
 
    package Linker is
       for Switches("Ada") use 
