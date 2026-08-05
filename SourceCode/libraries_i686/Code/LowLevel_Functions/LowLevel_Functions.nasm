@@ -145,6 +145,15 @@ globASM_FUN_get_CR4:;uint32_t globASM_FUN_get_CR4();
 
 
 
+global write_CR0
+global write_CR2
+global write_CR3
+global write_CR4
+
+global globASM_FUN_write_CR0
+global globASM_FUN_write_CR2
+global globASM_FUN_write_CR3
+global globASM_FUN_write_CR4
 
 write_CR0:;void write_CR0(uint32_t Control_Register);
 globASM_FUN_write_CR0:;void globASM_FUN_write_CR0(uint32_t Control_Register);
@@ -174,7 +183,7 @@ globASM_FUN_write_CR4:;void globASM_FUN_write_CR4(uint32_t Control_Register);
     ret
 
 
-
+global X86_Check_CPUID
 X86_Check_CPUID:
     pushfd                               ;Save EFLAGS
     pushfd                               ;Store EFLAGS
@@ -187,6 +196,30 @@ X86_Check_CPUID:
     and eax,0x00200000                   ;eax = zero if ID bit can't be changed, else non-zero
     ret
 
-globASM_FUN_CPUID:;
+global globASM_FUN_CPUID
+struc CPUID_Return
+    .AX_info   resb 8
+    .BX_info   resb 8
+    .CX_info   resb 8
+    .DX_info   resb 8
+endstruc
 
+globASM_FUN_CPUID:; void globASM_FUN_CPUID(struct CPUID_Return* Return_Info, uint32_t Leaf, uint32_t Subleaf)
+    MACRO_ENTER_NATIVE 0,0
+    push   BX_PTRSIZE
+    push   DI_PTRSIZE
+
+    mov   eax, STACK_ARG2_BP32
+    mov   ecx, STACK_ARG3_BP32
+    cpuid
+
+    mov   DI_PTRSIZE, STACK_ARG1_BP
+        mov   [DI_PTRSIZE + CPUID_Return.AX_info], eax
+        mov   [DI_PTRSIZE + CPUID_Return.BX_info], ebx
+        mov   [DI_PTRSIZE + CPUID_Return.CX_info], ecx
+        mov   [DI_PTRSIZE + CPUID_Return.DX_info], edx
+
+    pop    DI_PTRSIZE
+    pop    BX_PTRSIZE
+    leave
     ret

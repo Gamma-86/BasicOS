@@ -1,5 +1,5 @@
 with IA32_Hardware_Registers;
-with Interfaces;
+with Interfaces;use Interfaces;
 with Interfaces.C;use Interfaces.C;
 
 
@@ -139,7 +139,27 @@ procedure write_CR4(WhatWrite : IA32_Hardware_Registers.Control_Register4_r)
    External_Name => "write_CR4";
 
 
+type CPUID_return is record
+   AX : Unsigned_32,
+   BX : Unsigned_32,
+   CX : Unsigned_32,
+   DX : Unsigned_32   
+end record with Size => 256;
+for CPUID_return use record
+   AX at 0 range 0..31,
+   BX at 8 range 0..31,
+   CX at 16 range 0..31,
+   DX at 24 range 0..31
+end record;
 
+procedure CPUID (
+   Returned_info : CPUID_return;
+   Leaf : Unsigned_32;
+   SubLeaf : Unsigned_32
+   ) with
+   Import => True,
+   Convention => C,
+   External_Name => "globASM_FUN_CPUID";
 
 
 end LOWLEVEL_FUNCTIONS;

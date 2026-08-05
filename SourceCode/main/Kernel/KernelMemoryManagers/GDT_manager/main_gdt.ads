@@ -114,8 +114,9 @@ type Segment_Request_r is record
 
    Request_done  : Interfaces.C.unsigned_char;
 
+   TaskGate_TSSSelector : X86_segments.Segment_Selector;
+
    Padding32          : Interfaces.Unsigned_32 range 0..0;--29
-   Padding16          : Interfaces.Unsigned_16 range 0..0;--31
 end record
    with Size => 256;
 for Segment_Request_r use record
@@ -146,8 +147,9 @@ for Segment_Request_r use record
 
    Request_done at 25 range 0 .. 7;
 
-   Padding32 at 26 range 0 .. 31;
-   Padding16 at 30 range 0 .. 15;
+   TaskGate_TSSSelector at 26 range 0 .. 15;
+
+   Padding32 at 28 range 0 .. 31;
 end record;
 for Segment_Request_r'Size use 256;
 --#########################################################

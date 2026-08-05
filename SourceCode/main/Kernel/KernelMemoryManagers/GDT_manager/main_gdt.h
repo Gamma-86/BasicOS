@@ -51,7 +51,9 @@ struct Segment_Request_r
 
     unsigned char Request_done;
 
-    unsigned char Padding[6];
+    uint16_t TaskGate_TSS_Selector;
+
+    unsigned char Padding[4];
 };
 
 

@@ -36,31 +36,39 @@ unsigned long long Read_ModelSpecific_Register(unsigned int WhereRead);
 
 
 
-uint32_t get_CR0();
-uint32_t globASM_FUN_get_CR0();
+size_t get_CR0();
+size_t globASM_FUN_get_CR0();
 
-uint32_t get_CR2();
-uint32_t globASM_FUN_get_CR2();
+size_t get_CR2();
+size_t globASM_FUN_get_CR2();
 
-uint32_t get_CR3();
-uint32_t globASM_FUN_get_CR3();
+size_t get_CR3();
+size_t globASM_FUN_get_CR3();
 
-uint32_t get_CR4();
-uint32_t globASM_FUN_get_CR4();
+size_t get_CR4();
+size_t globASM_FUN_get_CR4();
 
 
 
-void write_CR0(uint32_t Control_Register);
-void globASM_FUN_write_CR0(uint32_t Control_Register);
+void write_CR0(size_t Control_Register);
+void globASM_FUN_write_CR0(size_t Control_Register);
 
-void write_CR2(uint32_t Control_Register);
-void globASM_FUN_write_CR2(uint32_t Control_Register);
+void write_CR2(size_t Control_Register);
+void globASM_FUN_write_CR2(size_t Control_Register);
 
-void write_CR3(uint32_t Control_Register);
-void globASM_FUN_write_CR3(uint32_t Control_Register);
+void write_CR3(size_t Control_Register);
+void globASM_FUN_write_CR3(size_t Control_Register);
 
-void write_CR4(uint32_t Control_Register);
-void globASM_FUN_write_CR4(uint32_t Control_Register)
+void write_CR4(size_t Control_Register);
+void globASM_FUN_write_CR4(size_t Control_Register);
 
+
+struct CPUID_Return{
+    uint64_t AX;
+    uint64_t BX;
+    uint64_t CX;
+    uint64_t DX;
+};
+void globASM_FUN_CPUID(struct CPUID_Return* Return_Info, uint32_t Leaf, uint32_t Subleaf);
 
 #endif
