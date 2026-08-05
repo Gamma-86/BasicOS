@@ -9,11 +9,36 @@ project BasicOS is
       for Body_Suffix("FASM_ASM") use ".fasm";
    end Naming;
 
+
+
+   PathTo_Kernel := external("PathTo_Kernel", "No_Path");
+   PathTo_LinkerScript := external("PathTo_LinkerScript", "No_Path");
+   PathTo_GrubDiskSystem := external("PathTo_GrubDiskSystem", "No_Path");
+
+   ADA_default_flags := external("ADA_default_flags", "-No_ADA_Flags");
+   NASM_default_flags:= external("NASM_default_flags","-No_NASM_Flags");
+   C_default_flags := external("C_default_flags", "-No_C_Flags");
+
+   PathTo_NASM_default_macroses := external("PathTo_NASM_default_macroses", "No_Path");
+   PathTo_IA32Macroses_NASM := external("PathTo_IA32Macroses_NASM", "No_Path");
+
+   PathTo_ADA_INCLUDES := external("PathTo_ADA_INCLUDES", "No_Path");
+   PathTo_GNAT_ADC := external("PathTo_GNAT_ADC", "No_Path");
+
+   PathTo_OS_return_codes := external("PathTo_OS_return_codes", "No_Path");
+   PathTo_OS_include := external("PathTo_OS_include", "No_Path");
+
+   PathToFull_Linker_Script := external("PathToFull_Linker_Script", "No_Path");
+   PathTo_BIN_filesDump := external("PathTo_BIN_filesDump", "No_Path");
+   PathTo_OBJ_filesDump := external("PathTo_OBJ_filesDump", "No_Path");
+
    package Compiler is
       for Driver("C") use external("C_COMPILER", "i686-elf-gcc");
       for Driver("NASM_ASM") use "nasm";
       for Driver("AS_ASM") use "as";
       for Driver("Ada") use external("ADA_COMPILER", "i686-elf-gnat");
+      for Driver("FASM_ASM") use "fasm";
+
 
       case Version is 
          when "debug" =>
@@ -56,31 +81,17 @@ project BasicOS is
    end Compiler;
 
 
-   PathTo_Kernel := external("PathTo_Kernel", "No_Path");
-   PathTo_LinkerScript := external("PathTo_LinkerScript", "No_Path");
-   PathTo_GrubDiskSystem := external("PathTo_GrubDiskSystem", "No_Path");
+
 
    PathTo_Multiboot_files := external("PathTo_Multiboot_files", "No_Path");
-   PathToFull_Linker_Script := external("PathToFull_Linker_Script", "No_Path");
-   PathTo_BIN_filesDump := external("PathTo_BIN_filesDump", "No_Path");
-   PathTo_OBJ_filesDump := external("PathTo_OBJ_filesDump", "No_Path");
 
-   PathTo_OS_return_codes := external("PathTo_OS_return_codes", "No_Path");
-   PathTo_OS_include := external("PathTo_OS_include", "No_Path");
 
    PathTo_MemoryManagers := external("PathTo_MemoryManagers", "No_Path");
    PathTo_IntitalRAMAllocators:=external("PathTo_IntitalRAMAllocators", "No_Path");
    PathTo_GDTManager := external("PathTo_GDTManager", "No_Path");
 
-   PathTo_NASM_default_macroses := external("PathTo_NASM_default_macroses", "No_Path");
-   PathTo_IA32Macroses_NASM := external("PathTo_IA32Macroses_NASM", "No_Path");
 
-   PathTo_ADA_INCLUDES := external("PathTo_ADA_INCLUDES", "No_Path");
-   PathTo_GNAT_ADC := external("PathTo_GNAT_ADC", "No_Path");
 
-   ADA_default_flags := external("ADA_default_flags", "-No_ADA_Flags");
-   NASM_default_flags:= external("NASM_default_flags","-No_NASM_Flags");
-   C_default_flags := external("C_default_flags", "-No_C_Flags");
 
 
 --miscellanious pathes
