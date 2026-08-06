@@ -23,9 +23,9 @@ Call_bootloader:;ReturnBitfield Call_bootloader(uint32_t CallCode, size_t Arg1, 
     push  STACK_ARG6_BP32
     push  STACK_ARG5_BP32
     push  STACK_ARG4_BP32
-    push  STACK_ARG3_BP32
-    push  STACK_ARG2_BP32
-    push  STACK_ARG1_BP32
+    mov   edi, STACK_ARG3_BP32
+    mov   esi, STACK_ARG2_BP32
+    mov   ebx, STACK_ARG1_BP32
     call  CallGate_Selector:0xFFFF_FFFF
     add   esp, SizeOfPTR*6
 

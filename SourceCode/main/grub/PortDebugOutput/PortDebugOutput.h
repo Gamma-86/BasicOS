@@ -1,1 +1,0 @@
-int Print_str_lpt(char* string);

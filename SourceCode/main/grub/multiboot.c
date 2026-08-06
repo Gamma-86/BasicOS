@@ -5,6 +5,8 @@
 #include "./PortDebugOutput/PortDebugOutput.h"
 #include "./panic/multiboot2_panic.h"
 
+#include "MB2_Parsed_Types.h"
+#include "MB2_Parsed_Vars.h"
 
 
 /*
@@ -24,17 +26,6 @@ static inline void* Align_PTR_Roof8(void* PTR){
 static inline void* Add_Xbytes_ToPTR(void* PTR, uintptr_t X){
     return (void*)((uintptr_t)PTR + X);
 }
-
-/*
-##############################################################################
-20
-20
-20
-##############################################################################
-*/
-
-void PrintStringInitial(char* string);
-void PrintInt32HEXIntial(uint32_t);
 
 
 /*
@@ -90,14 +81,14 @@ struct RAMMap_DescriptorEntry
 struct RAMMap_DescriptorEntry* RAMMap_DescriptorsArray;
 
 void Multiboot2_info_main_sorter(\
-    struct MB2Info_TagHead* MB2_BootInfoTags_Pointer,\
+    struct MB2Info_TagHead* MB2BootInfo_InfoTags_Array,\
     struct RAMMap_DescriptorEntry* RAMMap_DescriptorsArray,\
     uint32_t MB2BootInfo_RAMmapEntries_Amount\
 )
 {
     uint32_t Current_MB2Tag_size;
-    struct MB2Info_TagHead* Current_MB2Tag_PTR = MB2_BootInfoTags_Pointer;
-    for(int i = 4096; i>0 ; i--){
+    struct MB2Info_TagHead* Current_MB2Tag_PTR = MB2BootInfo_InfoTags_Array;
+    for(int WatchDog = 4096; WatchDog>0 ; WatchDog--){
         if( Current_MB2Tag_PTR >= (struct MB2Info_TagHead*)MB2Info_absolute_LastByte_PTR )break;
 
         if(Current_MB2Tag_PTR->Type == MB2Info_RAMmap_type){
@@ -107,7 +98,7 @@ void Multiboot2_info_main_sorter(\
             MB2BootInfo_RAMmapEntries_Amount);
         }
 
-        Current_MB2Tag_size = Multiboot2_info_main_parser(MB2_BootInfoTags_Pointer);
+        Current_MB2Tag_size = Multiboot2_info_main_parser(MB2BootInfo_InfoTags_Array);
         Current_MB2Tag_PTR = Add_Xbytes_ToPTR((void*)Current_MB2Tag_PTR, Current_MB2Tag_size);
     }
     return;
@@ -153,22 +144,6 @@ void Multiboot2_info_RAMmap_translator(\
 
     return;
 }
-/*
-##############################################################################
-32
-32
-32
-##############################################################################
-*/
-
-void Multiboot2_info_UEFI_RAMmap_translator(\
-    struct MB2Info_UEFI_RAM_MAP,\
-    struct RAMMap_DescriptorEntry* OS_RAMMap_array\
-){
-
-    return;
-}
-
 
 
 /*
@@ -178,19 +153,18 @@ void Multiboot2_info_UEFI_RAMmap_translator(\
 40
 ##############################################################################
 */
+
+
+
+
+
 
 void* OurBaseAddress;
-unsigned char MB2ParseErrorFlag_RAMMap_IN_C_FUN = 0;
-unsigned char MB2ParseErrorFlag_Unknown_Tag_Type = 0;
-unsigned char MB2ParseErrorFlag_WrongAlignment = 0;
-unsigned char MB2ParseErrorFlag_WrongTagSize = 0;
 /*return size of structure*/
 uint32_t Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
     uint32_t MB2_type = MB2_structure->Type;
     if( (uintptr_t)MB2_structure & 7 ){
-        MB2ParseErrorFlag_WrongAlignment = 1;
-        Print_str_lpt("The alignment of given pointer is wrong");
-        PrintStringInitial("The alignment of given pointer is wrong");
+        MB2_ErrorFlagsReg.WrongAlignment = 1;
     }
 
     switch(MB2_type){
@@ -209,7 +183,7 @@ uint32_t Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
         case MB2Info_BasicRam_type:
             struct MB2Info_BasicRAMInfo* BasicRAMInfo_TagPTR = (struct MB2Info_BasicRAMInfo*)MB2_structure;
             if (BasicRAMInfo_TagPTR->Size != MB2Info_BasicRam_size){
-                MB2ParseErrorFlag_WrongTagSize = 1;
+                MB2_ErrorFlagsReg.WrongTagSize = 1;
                 Print_str_lpt("The size of given tag(Basic RAM info)\
                     is wrong \0");
             }
@@ -218,7 +192,7 @@ uint32_t Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
         case MB2Info_BIOSBootDevice_type:
             struct MB2Info_BIOSBootDevice* BIOSBootDevice_TagPTR = (struct MB2Info_BIOSBootDevice*)MB2_structure;
             if(BIOSBootDevice_TagPTR->Size != MB2Info_BIOSBootDevice_size){
-                MB2ParseErrorFlag_WrongTagSize = 1;
+                MB2_ErrorFlagsReg.WrongAlignment = 1;
                 Print_str_lpt("The size of given multiboot2 tag\
                     (BIOS boot device information)multiboot tag is wrong\0");
             }
@@ -226,9 +200,6 @@ uint32_t Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
             break;
         case MB2Info_RAMmap_type:
             struct MB2Info_RAMMap* RAMMap_TagPTR = (struct MB2Info_RAMMap*)MB2_structure;
-            MB2ParseErrorFlag_RAMMap_IN_C_FUN = 1;
-            Print_str_lpt("The RAM map multiboot tag, \
-                somehow got to C function \0");
             return RAMMap_TagPTR->Size;
             break;
         case MB2Info_APM_type:
@@ -295,7 +266,7 @@ uint32_t Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
             return ThisStructure->size;
             break;
         default:
-            MB2ParseErrorFlag_Unknown_Tag_Type = 1;
+            MB2_ErrorFlagsReg.Unknown_Tag_Type = 1;
             return 0;
             break;
     }

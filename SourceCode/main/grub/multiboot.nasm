@@ -140,11 +140,8 @@ _start:
     mov   eax, [ebx + MB2Info_MainHead.Total_size]
         mov   [MB2_WholeTagStruct_TotalSize], eax
 
-    mov   eax, cr0
-        btr   eax, 1
-        btr   eax, 2
-        btr   eax, 3
-    mov   cr0, eax
+    call Initialize_SSE_FPU
+
     call  Sort_multiboot_struct ;Sort things that multiboot given in EBX*
     emms
     fninit

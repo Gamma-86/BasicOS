@@ -1,5 +1,5 @@
-#ifndef KERNEL_INSPECT_BOOT_H_SENTRY
-#define KERNEL_INSPECT_BOOT_H_SENTRY
+#ifndef INSPECTED_TYPES_H_SENTRY
+#define INSPECTED_TYPES_H_SENTRY
 #include <stdint.h>
 
 enum RAMMap_MemoryType{
