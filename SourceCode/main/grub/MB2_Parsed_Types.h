@@ -14,11 +14,15 @@ struct MB2_ParseErrorFlags{
     unsigned char flag9;
     unsigned char flag10;
     unsigned char flag11;
-    unsigned char flag12;
+    unsigned char Parse_WatchDog_Set;
     unsigned char Unknown_Tag_Type;
     unsigned char WrongAlignment;
     unsigned char WrongTagSize;
 };
+
+
+
+
 
 
 #endif

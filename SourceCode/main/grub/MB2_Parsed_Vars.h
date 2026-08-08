@@ -3,6 +3,6 @@
 
 #include "MB2_Parsed_Types.h"
 
-struct MB2_ParseErrorFlags MB2_ErrorFlagsReg = {0};
+extern struct MB2_ParseErrorFlags MB2_ErrorFlagsReg;
 
 #endif

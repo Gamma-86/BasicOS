@@ -12,4 +12,10 @@ endstruc
     call   multiboot2_LoadPanic
 %endmacro
 
+%macro I_AM_MULTIBOOT_IDK_WANT_CUSTOM_PANIC 1
+section .data
+%%Panic_String: db %1
+section .text
+    push  %%Panic_String
+    call  multiboot2_LoadPanic_customSTR
 %ENDIF

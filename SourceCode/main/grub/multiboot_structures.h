@@ -26,7 +26,7 @@ enum MB2Info_types{
 
 
     MB2Info_APM_type = 10,
-    MB2Info_APMI_size = 28,
+    MB2Info_APM_size = 28,
 
     MB2Info_VBE_type = 7,
     MB2Info_VBE_size = 784,
@@ -177,7 +177,6 @@ struct MB2Info_VRAM{
     char ColourInfo_start;
 };
 
-    struct palette_colour_RGB;
         struct palette_colour_RGB{
             char Red;
             char Green;
@@ -189,7 +188,7 @@ struct MB2Info_VRAM{
         that explains what is rgb encodement of every index in pallettes*/
     };
 
-    struct RGBInfo{
+    struct MB2_RGBInfo{
         char Red_position;
         char Red_bitness;
         char Green_position;

@@ -121,11 +121,14 @@ section .data
 ;50
 ;#############################################################################
 
-MultibootInfoPTR dd 0
-MB2_WholeTagStruct_TotalSize dd 0
-section .text
-extern   kernel_main ;(unsigned int EAX_magic, void* EBX_structure)
+MB2BootInfo_Tags_Array dd 0
+MB2BootInfo_Tags_WholeSize dd 0
+MB2BootInfo_LastByte_PTR dd 0
+MB2BootInfo_FirstByteAfter_PTR dd 0
+
 global _start
+extern   MB2BootInfo_Tags_sorter ;(MB2_Head* Pointer to tags begining, LastByte_PTR, FirstByte_After_PTR, uint32_t Whole size)
+section .text
 _start:
     CLI
     mov   byte[0xb8000], 'A'
@@ -136,15 +139,46 @@ _start:
 
         test  ebx, 0x7 ;check if the address is aligned(it should always be aligned)
         jnz   .not_aligned
-    mov   [MultibootInfoPTR], ebx
-    mov   eax, [ebx + MB2Info_MainHead.Total_size]
-        mov   [MB2_WholeTagStruct_TotalSize], eax
 
     call Initialize_SSE_FPU
 
-    call  Sort_multiboot_struct ;Sort things that multiboot given in EBX*
-    emms
-    fninit
+.Normal_Start:
+    mov   eax, [ebx + MB2Info_MainHead.Total_size]
+        mov   [MB2BootInfo_Tags_WholeSize], eax
+        cmp   eax, INITIAL_STACK_SIZE-4096
+            jnae  .if_Stack_Not_smaller
+        .if_Stack_smaller:
+            I_AM_MULTIBOOT_IDK_WANT_CUSTOM_PANIC "THE multiboot2 tags doesn't fit on stack"
+        .if_Stack_Not_smaller:
+    ;if we are here, we can allocate space on stack
+    mov   [MB2BootInfo_FirstByteAfter_PTR], esp
+        lea   ecx, [esp-1]
+        mov   [MB2BootInfo_LastByte_PTR], ecx
+    sub   esp, eax
+
+        mov   [MB2BootInfo_Tags_Array], esp
+        ;and copy the tags to stack
+        mov   esi, ebx
+        mov   edi, esp
+        mov   ecx, [MB2BootInfo_Tags_WholeSize]
+            shr   ecx, 2
+        cld
+        rep movsd
+
+        mov   ecx, [MB2BootInfo_Tags_WholeSize]
+            and   ecx, 0b011
+        rep movsb
+
+    ;finaly we can call the main sorter
+    push  dword[MB2BootInfo_Tags_WholeSize]
+    push  dword[MB2BootInfo_FirstByteAfter_PTR]
+    push  dword[MB2BootInfo_LastByte_PTR]
+    push  dword[MB2BootInfo_Tags_Array]
+    call  MB2BootInfo_Tags_sorter
+
+
+    mov   byte[0xb8000], 'B'
+    mov   byte[0xb8001], 0x1F
 
     cli
     hlt
@@ -284,6 +318,28 @@ PrintInt32HEXIntial:;void (int32)
 ;80
 ;80
 ;#############################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+%IF 0
+
+
+
+
+
+
+
+
+
 struc RAMMapInfo_DLinkedList_entry
     .next resb 4
     .prev resb 4
@@ -667,12 +723,4 @@ Initial_Sort_multiboot_struct2:;void (ebx=*multiboot structure) Sort them to dif
     %undef MB2struct_pointer_register
 
 
-
-
-
-
-
-
-
-
-
+%endif

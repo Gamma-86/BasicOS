@@ -1,13 +1,10 @@
 #include <stdint.h>
 
-#include "OS_return_codes.h"
 #include "multiboot_structures.h"
-#include "./PortDebugOutput/PortDebugOutput.h"
 #include "./panic/multiboot2_panic.h"
 
 #include "MB2_Parsed_Types.h"
-#include "MB2_Parsed_Vars.h"
-
+#include "OSInspected_Types.h"
 
 /*
 ##############################################################################
@@ -27,79 +24,57 @@ static inline void* Add_Xbytes_ToPTR(void* PTR, uintptr_t X){
     return (void*)((uintptr_t)PTR + X);
 }
 
+/*
+##############################################################################
+
+
+
+##############################################################################
+*/
+
+
 
 /*
 ##############################################################################
-30
-30
-30
+
+
+
 ##############################################################################
 */
-extern struct MB2Info_MainHead* MB2Info_absolute_start_PTR;
-extern uint32_t MB2Info_absolute_total_size;
-    
-extern unsigned char MB2Error_Not_Enough_Stack;
-extern unsigned char MB2Error_MaxIteration_Passed;
-    
-extern void* MB2Info_absolute_LastByte_PTR;
+static void MB2BootInfo_Tags_sorter(\
+    struct MB2Info_TagHead* MB2BootInfo_Tags_Head,\
+    unsigned char*  LastByte_PTR,\
+    unsigned char*  FirstByteAfterTags_PTR,\
+    uint32_t Tags_TotalSize\
+){
+    uint32_t Current_MB2Tag_size = 0;
+    struct MB2Info_TagHead* Current_MB2Tag_PTR = NULL;
 
-enum RAMMap_MemoryType{
-    Available_RAM = 1,
-    ReservedBySomething_RAM = 2,
-    ACPI_RAM = 3,
-    RAM_ForHibernation = 4,
-    Bad_RAM_type = 5,
+    if(MB2BootInfo_Tags_Head->Size != Tags_TotalSize){
+        multiboot2_LoadPanic_customSTR("THE SIZE GIVEN TO\
+            MB2BootInfo_Tags_sorter is not equal to one accessed through\
+            head pointer");
+    }
 
-    EFI_Loader_Code = 6,
-    EFI_Loader_Data = 7,
-    
-    EFI_Boot_Code = 8,
-    EFI_Boot_Data = 9,
+    Current_MB2Tag_PTR = Add_Xbytes_ToPTR(\
+        (void*)MB2BootInfo_Tags_Head,
+        sizeof(struct MB2Info_TagHead)
+    );
 
-    EFI_Runtime_Code = 10,
-    EFI_Runtime_Data = 11,
-
-    ACPI_Reclaim_RAM = 12,
-    ACPI_NVS = 13,
-
-    MMIO_RAM_Type = 14,
-    PMIO_Port_Type = 15,
-
-    MotherBoard_Code = 16,
-    EEPROM_RAM = 17,
-
-    Real_RAM_END = 18
-};
-struct RAMMap_DescriptorEntry
-{
-    uint64_t Physical_Address;
-    uint64_t Virtual_Address;
-    uint64_t Size;
-    enum RAMMap_MemoryType Type;
-    uint32_t Flag_atributes;
-};
-struct RAMMap_DescriptorEntry* RAMMap_DescriptorsArray;
-
-void Multiboot2_info_main_sorter(\
-    struct MB2Info_TagHead* MB2BootInfo_InfoTags_Array,\
-    struct RAMMap_DescriptorEntry* RAMMap_DescriptorsArray,\
-    uint32_t MB2BootInfo_RAMmapEntries_Amount\
-)
-{
-    uint32_t Current_MB2Tag_size;
-    struct MB2Info_TagHead* Current_MB2Tag_PTR = MB2BootInfo_InfoTags_Array;
-    for(int WatchDog = 4096; WatchDog>0 ; WatchDog--){
-        if( Current_MB2Tag_PTR >= (struct MB2Info_TagHead*)MB2Info_absolute_LastByte_PTR )break;
-
-        if(Current_MB2Tag_PTR->Type == MB2Info_RAMmap_type){
-            Multiboot2_info_RAMmap_translator(\
-            (struct MB2Info_RAMMap*)Current_MB2Tag_PTR,\
-            RAMMap_DescriptorsArray,\
-            MB2BootInfo_RAMmapEntries_Amount);
+    for(int WatchDog = 0xFFFF; WatchDog>0 ; WatchDog--){
+        if(WatchDog == 0){
+            MB2_ErrorsReg.Parse_WatchDog_Set=1;
         }
+        if( Current_MB2Tag_PTR >= (struct MB2Info_TagHead*)LastByte_PTR )break;
 
-        Current_MB2Tag_size = Multiboot2_info_main_parser(MB2BootInfo_InfoTags_Array);
-        Current_MB2Tag_PTR = Add_Xbytes_ToPTR((void*)Current_MB2Tag_PTR, Current_MB2Tag_size);
+        Current_MB2Tag_size = MB2BootInfo_TagsRouter(Current_MB2Tag_PTR);
+        Current_MB2Tag_PTR = Add_Xbytes_ToPTR(\
+            (void*)Current_MB2Tag_PTR,\
+            (uintptr_t)Current_MB2Tag_size
+        );
+
+        Align_PTR_Roof8((void*)Current_MB2Tag_PTR);
+
     }
     return;
 }
@@ -111,7 +86,7 @@ void Multiboot2_info_main_sorter(\
 ##############################################################################
 */
 
-void Multiboot2_info_RAMmap_translator(\
+static void MB2info_RAMmap_translator(\
     struct MB2Info_RAMMap* MB2_RAMMap_Tag_PTR,\
     struct RAMMap_DescriptorEntry* OS_RAMmap_array,\
     uint32_t RAMMap_entries_amount\
@@ -148,66 +123,119 @@ void Multiboot2_info_RAMmap_translator(\
 
 /*
 ##############################################################################
+##############################################################################
+
 40
-40
-40
+
+##############################################################################
 ##############################################################################
 */
 
+static struct BasicRamInfo MB2_BasicRamInfo = {0};
+static void* OurBaseAddress;
+static struct MB2_ParseErrorFlags MB2_ErrorsReg;
+static uint32_t LowRam_size;
+static uint32_t HighRam_size;
+
+static struct String_Args MB2OS_CMDArgs = {0};
+
+static struct LegacyBoot_Info MB2OS_LegacyInfo={
+    .BIOS_Booted = 0,
+    
+    .LPT1_State = IDK,
+    .LPT2_State = IDK,
+    .LPT3_State = IDK,
+
+    .COM1_State = IDK,
+    .COM2_State = IDK,
+    .COM3_State = IDK,
+    .COM4_State = IDK,
+
+    .LPT1_Address = 0,
+    .LPT2_Address = 0,
+    .LPT3_Address = 0,
+    .VGA_Reg_Base = 0x300,
+
+    .COM1_Address = 0,
+    .COM2_Address = 0,
+    .COM3_Address = 0,
+    .COM4_Address = 0,
+
+    .HDDInfo_state = IDK,
+    .BootHDD_ID = 0,
+    .HDD_amount = 0,
+
+    .Reserved = {0},
+};
+
+struct BootVarName MB2OS_BootName={0};
 
 
-
-
-
-void* OurBaseAddress;
 /*return size of structure*/
-uint32_t Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
+static uint32_t MB2BootInfo_TagsRouter(struct MB2Info_TagHead* MB2_structure){
     uint32_t MB2_type = MB2_structure->Type;
     if( (uintptr_t)MB2_structure & 7 ){
-        MB2_ErrorFlagsReg.WrongAlignment = 1;
+        MB2_ErrorsReg.WrongAlignment = 1;
+//        multiboot2_LoadPanic(MB2panic_code_Multiboot_UnalignedPTR);
     }
 
     switch(MB2_type){
         case MB2Info_CMDline_type:
             struct MB2Info_CMDline* CMDLine_TagPTR = (struct MB2Info_CMDline*)MB2_structure;
+
+            MB2OS_CMDArgs.Encoding_type = ASCII;
+            MB2OS_CMDArgs.Size = CMDLine_TagPTR->Size;
+            MB2OS_CMDArgs.StringPTR = &(CMDLine_TagPTR->Argument_string);
+
             return CMDLine_TagPTR->Size;
             break;
         case MB2Info_LoaderName_type:
             struct MB2Info_LoaderName* LoaderName_TagPTR = (struct MB2Info_LoaderName*)MB2_structure;
+
+            MB2OS_BootName.Size = LoaderName_TagPTR->Size;
+            MB2OS_BootName.Encoding_type = ASCII;
+            MB2OS_BootName.StringPTR = &(LoaderName_TagPTR->Name_string);
+
             return LoaderName_TagPTR->Size;
             break;
         case MB2Info_Module_type:
             struct MB2Info_Module* Module_TagPTR = (struct MB2Info_Module*)MB2_structure;
+
             return Module_TagPTR->Size;
             break;
         case MB2Info_BasicRam_type:
             struct MB2Info_BasicRAMInfo* BasicRAMInfo_TagPTR = (struct MB2Info_BasicRAMInfo*)MB2_structure;
             if (BasicRAMInfo_TagPTR->Size != MB2Info_BasicRam_size){
-                MB2_ErrorFlagsReg.WrongTagSize = 1;
-                Print_str_lpt("The size of given tag(Basic RAM info)\
-                    is wrong \0");
+                MB2_ErrorsReg.WrongTagSize = 1;
             }
+            LowRam_size = BasicRAMInfo_TagPTR->RAMlow_size;
+            HighRam_size= BasicRAMInfo_TagPTR->RAMhigh_size;
             return BasicRAMInfo_TagPTR->Size;
             break;
         case MB2Info_BIOSBootDevice_type:
             struct MB2Info_BIOSBootDevice* BIOSBootDevice_TagPTR = (struct MB2Info_BIOSBootDevice*)MB2_structure;
             if(BIOSBootDevice_TagPTR->Size != MB2Info_BIOSBootDevice_size){
-                MB2_ErrorFlagsReg.WrongAlignment = 1;
-                Print_str_lpt("The size of given multiboot2 tag\
-                    (BIOS boot device information)multiboot tag is wrong\0");
+                MB2_ErrorsReg.WrongTagSize = 1;
             }
             return BIOSBootDevice_TagPTR->Size;
             break;
         case MB2Info_RAMmap_type:
             struct MB2Info_RAMMap* RAMMap_TagPTR = (struct MB2Info_RAMMap*)MB2_structure;
+
+            struct MB2_RAMMap_entry* Entries_PTR = &(RAMMap_TagPTR->Entries_start);
+
             return RAMMap_TagPTR->Size;
             break;
         case MB2Info_APM_type:
             struct MB2Info_APM* APMtype_TagPTR = (struct MB2Info_APM*)MB2_structure;
+            if(APMtype_TagPTR->Size != MB2Info_APM_size){
+                MB2_ErrorsReg.WrongTagSize = 1;
+            }
             return APMtype_TagPTR->Size;
             break;
         case MB2Info_VBE_type:
             struct MB2Info_VBIOS* VBIOS_TagPTR = (struct MB2Info_VBIOS*)MB2_structure;
+            if(VBIOS_TagPTR->Size != MB2Info_VBE_size)MB2_ErrorsReg.WrongTagSize=1;
             return VBIOS_TagPTR->Size;
             break;
         case MB2Info_VRAM_type:
@@ -266,7 +294,7 @@ uint32_t Multiboot2_info_main_parser(struct MB2Info_TagHead* MB2_structure){
             return ThisStructure->size;
             break;
         default:
-            MB2_ErrorFlagsReg.Unknown_Tag_Type = 1;
+            MB2_ErrorsReg.Unknown_Tag_Type = 1;
             return 0;
             break;
     }
