@@ -170,17 +170,10 @@ enum VRAM_Draw_Type{
     VRAM_TextMode = 1,
     VRAM_RGBbytes = 2,
     VRAM_VGAMode  = 3,
+    VRAM_PlanarMode = 4,
 };
 
-struct VRAM_Info{
-    uint64_t Address;
-    
-    uint32_t Pitch;
-    uint32_t Height;
-    uint32_t Width;
-    enum VRAM_Draw_Type VRAM_Type;
-
-    unsigned char Bytes_P_Pixel;
+struct VRAM_RGB_Info{
     unsigned char RGB_R_BitIndex;
     unsigned char RGB_G_BitIndex;
     unsigned char RGB_B_BitIndex;
@@ -188,6 +181,24 @@ struct VRAM_Info{
 
     uint32_t RGB_G_Bitmask;
     uint32_t RGB_B_Bitmask;
+
+};
+
+
+
+struct VRAM_Info{
+    uint64_t Address;
+    
+    uint32_t Pitch;
+    uint32_t Height;
+
+    uint32_t Width;
+    enum VRAM_Draw_Type VRAM_Type;
+
+    unsigned char Bytes_P_Pixel;
+    unsigned char Reserved1;
+    uint16_t   VGA_Mode;
+    struct VRAM_RGB_Info* RGB_Info;
 
 };
 
