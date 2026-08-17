@@ -168,7 +168,7 @@ static struct LegacyBoot_Info MB2OS_LegacyInfo={
     .Reserved = {0},
 };
 
-struct BootVarName MB2OS_BootName={0};
+static struct BootVarName MB2OS_BootName={0};
 
 
 /*return size of structure*/

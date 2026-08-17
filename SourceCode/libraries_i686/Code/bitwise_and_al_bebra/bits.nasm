@@ -4,17 +4,17 @@ CPU Katmai
 %include "Pos_Indep_Code.nasm"
 
 
-global Bit_scan_forward16
-global Bit_scan_forward32
-;int Bit_scan_forward16(short int scanned_thing)
-Bit_scan_forward16:
+global BitScanForward16
+global BitScanForward32
+;uint32_t BitScanForward16(uint16_t scanned_thing)
+BitScanForward16:
     mov   edx, 16
     bsf   ax, STACK_ARG1_SP16
     cmovZ eax, edx
         movzx   eax, ax
     ret
-;int Bit_scan_forward32(int scanned_thing)
-Bit_scan_forward32:
+;uint32_t BitScanForward32(uint32_t scanned_thing)
+BitScanForward32:
     mov   edx, 32
     bsf   eax, STACK_ARG1_SP
     cmovZ eax, edx
@@ -22,16 +22,17 @@ Bit_scan_forward32:
     ret
 
 
-
-;int Bit_scan_reverse16(short int scanned_thing)
-Bit_scan_reverse16:
+global BitScanReverse16
+global BitScanReverse32
+;uint32_t BitScanReverse16(uint16_t scanned_thing)
+BitScanReverse16:
     mov   edx, 16
     bsr   eax, STACK_ARG1_SP16
     cmovZ eax, edx
 
     ret
-;int Bit_scan_reverse32(int scanned_thing)
-Bit_scan_reverse32:
+;uint32_t BitScanReverse32(uint32_t scanned_thing)
+BitScanReverse32:
     mov   edx, 32
     bsr   eax, STACK_ARG1_SP
     cmovZ eax, edx
@@ -61,9 +62,20 @@ BitTest32: ;unsigned char BitTest32(uint32_t Bitfield, unsigned char Bit_index)
     
     ret
 
+BitTestSet16: ;unsigned char BitTestSet16(uint16_t* Bitfield, unsigned char Bit_index);
+    mov   eax, STACK_ARG1_SP
+    movzx edx, STACK_ARG2_SP8
+    
+    bts   word[eax], edx
+        setc al
+    ret
+BitTestSet32: ;unsigned char BitTestSet32(uint32_t* BitFIeld, unsigned char Bit_index);
+    mov   eax, STACK_ARG1_SP
+    movzx edx, STACK_ARG2_SP8
 
-
-
+    bts   dword[eax], edx
+        setc al
+    ret
 
 
 
@@ -78,6 +90,9 @@ db Bit_Count
 %endrep
 
 section .text
+global BitPopCount8
+global BitPopCount16
+
 BitPopCount8:;unsigned char BitPopCount8(unsigned char BitField);
     movzx edx, STACK_ARG1_SP8
     

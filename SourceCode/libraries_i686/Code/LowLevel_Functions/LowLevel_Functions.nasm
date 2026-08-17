@@ -223,3 +223,10 @@ globASM_FUN_CPUID:; void globASM_FUN_CPUID(struct CPUID_Return* Return_Info, uin
     pop    BX_PTRSIZE
     leave
     ret
+
+
+global IA32_rdtsc
+
+IA32_rdtsc:;uint64_t IA32_rdtsc();
+    rdtsc
+    ret

@@ -71,4 +71,11 @@ struct CPUID_Return{
 };
 void globASM_FUN_CPUID(struct CPUID_Return* Return_Info, uint32_t Leaf, uint32_t Subleaf);
 
+uint64_t IA32_rdtsc();
+
+
+
+
+
+
 #endif

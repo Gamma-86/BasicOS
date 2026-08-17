@@ -99,7 +99,7 @@ type Segment_Request_r is record
    Data_is_writable : Interfaces.C.unsigned_char;--13
    Data_is_E_Down   : Interfaces.C.unsigned_char;--14
 
-   Privelege        : Interfaces.C.unsigned_char;--15
+   Privelege        : Privelege_LVL_t;--15
    IsNot_System     : Interfaces.C.unsigned_char;--16
    Is_Present       : Interfaces.C.unsigned_char;--17
 
@@ -132,7 +132,7 @@ for Segment_Request_r use record
    Data_is_writable at 12 range 0 .. 7;
    Data_is_E_Down at 13 range 0 .. 7;
 
-   Privelege at 14 range 0 .. 7;
+   Privelege at 14 range 0 .. 1;
    IsNot_System at 15 range 0 .. 7;
    Is_Present at 16 range 0 .. 7;
 
