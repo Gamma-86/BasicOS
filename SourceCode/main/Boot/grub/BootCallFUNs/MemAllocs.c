@@ -95,6 +95,18 @@ struct MemAllocs_JTAG{
         uint16_t* TMP1_AddressIndex\
     );
 
+
+    void(*FindFreeHead_StartCalls[MEMALLOCS_JTAG_CALLS_SIZE])(unsigned char** Found);
+    void(*FindFreeHead_EndCalls[MEMALLOCS_JTAG_CALLS_SIZE])(\
+        unsigned char** Found,\
+        unsigned char* FreeIndex,\
+        uint32_t* FreeBit_int\
+    );
+
+
+    void(*BootMalloc_FUN_StartCalls[MEMALLOCS_JTAG_CALLS_SIZE])(uint32_t* Size);
+    void(*BootMalloc_FUN_EndCalls[MEMALLOCS_JTAG_CALLS_SIZE])(uint32_t* Size, unsigned char* FoundFreeHead, uint16_t* Used_Size, unsigned char* BestHeadPTR, unsigned char* NewHeadPTR, struct MemAllocs_head* BestHead, struct MemAllocs_head* NewHead);
+
 };
 
 struct MemAllocs_JTAG MemAlloc_JTAG = {
@@ -277,6 +289,8 @@ static unsigned char Reverse_RAMHeadIndex(void* The_PTR){
         MemAlloc_JTAG.StartCall_is_on.Reverse_RAMHeadIndex\
     )
 
+
+
     unsigned char* UsedPTR = The_PTR;
     uint16_t BytePoolIndex;
     unsigned char HeadIndex = RAMHEAD_NULL_INDEX;
@@ -316,6 +330,10 @@ static unsigned char Reverse_RAMHeadIndex(void* The_PTR){
         }
     }
 
+
+
+
+
     MEMALLOCS_CALL_FUNCTIONS_CALLS(MemAlloc_JTAG.Reverse_RAMHeadIndex_EndCalls,\
         (&The_PTR, &UsedPTR, &BytePoolIndex, &HeadIndex),\
         MemAlloc_JTAG.EndCall_is_on.Reverse_RAMHeadIndex\
@@ -329,6 +347,20 @@ static unsigned char Reverse_RAMHeadIndex(void* The_PTR){
 
 
 static unsigned char MemAllocs_FindFreeHead(unsigned char* Found){
+    if(!MemAlloc_JTAG.FUN_is_on.FindFreeHead){
+        *Found = 0;
+        return 0;
+    }
+    MEMALLOCS_CALL_FUNCTIONS_CALLS(\
+        MemAlloc_JTAG.FindFreeHead_StartCalls,\
+        (&Found),\
+        MemAlloc_JTAG.StartCall_is_on.FindFreeHead\
+    )
+
+
+
+
+
     unsigned char FreeIndex = 0;
     uint32_t FreeBit_int;
     *Found = 0;
@@ -364,12 +396,25 @@ static unsigned char MemAllocs_FindFreeHead(unsigned char* Found){
     if(FreeIndex == 0){
         *Found=0;
     }
+    MEMALLOCS_CALL_FUNCTIONS_CALLS(\
+        MemAlloc_JTAG.FindFreeHead_EndCalls,\
+        (&Found, &FreeIndex, &FreeBit_int),\
+        MemAlloc_JTAG.EndCall_is_on.FindFreeHead\
+    )
+
     return FreeIndex;
 };
 
 static void MemAllocs_HeadXCHG(unsigned char Index1, unsigned char Index2){
     if(!MemAlloc_JTAG.FUN_is_on.HeadXCHG)return;
-    MEMALLOCS_CALL_FUNCTIONS_CALLS(MemAlloc_JTAG.HeadXCHG_Indx_StartCalls, (&Index1, &Index2), MemAlloc_JTAG.StartCall_is_on.HeadXCHG)
+    MEMALLOCS_CALL_FUNCTIONS_CALLS(\
+        MemAlloc_JTAG.HeadXCHG_Indx_StartCalls,\
+        (&Index1, &Index2),\
+        MemAlloc_JTAG.StartCall_is_on.HeadXCHG\
+    )
+    
+    
+    
     unsigned char TMP1_IsAllocated = RAM_HeadersPool[Index1].IsAllocated;
     unsigned char TMP1_Reserved = RAM_HeadersPool[Index1].Reserved2;
     uint16_t TMP1_PoolSize = RAM_HeadersPool[Index1].PoolSize;
@@ -432,6 +477,17 @@ static void MemAllocs_SortHeads(){
 }
 
 static void* BootMalloc_FUN(uint32_t Size){
+    if(MemAlloc_JTAG.FUN_is_on.BootMalloc){
+        return NULL;
+    }
+    MEMALLOCS_CALL_FUNCTIONS_CALLS(\
+        MemAlloc_JTAG.BootMalloc_FUN_StartCalls,\
+        (&Size),\
+        MemAlloc_JTAG.StartCall_is_on.BootMalloc\
+    )
+
+
+
     unsigned char FoundFreeHead;
     uint16_t Used_Size = (uint16_t)Size;
     unsigned char BestHeadPTR = MemAlloc_Data.Entry1;
@@ -440,6 +496,21 @@ static void* BootMalloc_FUN(uint32_t Size){
 
 
     if(Size > UINT16_MAX){
+        MEMALLOCS_CALL_FUNCTIONS_CALLS(\
+            MemAlloc_JTAG.BootMalloc_FUN_EndCalls,\
+            (\
+                &Size,\
+                &FoundFreeHead,\
+                &Used_Size,\
+                &BestHeadPTR,\
+                &NewHeadPTR,\
+                &BestHead,\
+                &NewHeadPTR\
+            ),\
+            MemAlloc_JTAG.EndCall_is_on.BootMalloc\
+        )
+
+
         return NULL;
     }
 
@@ -493,6 +564,22 @@ static void* BootMalloc_FUN(uint32_t Size){
     RAM_HeadersPool[BestHeadPTR] = BestHead;
     RAM_HeadersPool[NewHeadPTR] = NewHead;
 
+
+
+
+    MEMALLOCS_CALL_FUNCTIONS_CALLS(\
+        MemAlloc_JTAG.BootMalloc_FUN_EndCalls,\
+        (\
+            &Size,\
+            &FoundFreeHead,\
+            &Used_Size,\
+            &BestHeadPTR,\
+            &NewHeadPTR,\
+            &BestHead,\
+            &NewHeadPTR\
+        ),\
+        MemAlloc_JTAG.EndCall_is_on.BootMalloc\
+    )
     return &(RAM_BytesPool[NewHead.IndexAddress]);
 };
 
