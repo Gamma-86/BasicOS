@@ -30,6 +30,10 @@ enum OsInspect_CallCodes{
     Get_Above1MB_RamEntry = 10,
     Get_BasicRamInfo = 11,
 
+
+    Custom_AVL14 = 14,
+    Custom_AVL15 = 15,
+
     Get_BootErrors = 16,
     Get_Boot_ISA_info = 17,
     Get_BootEntryName = 18,
@@ -420,7 +424,7 @@ struct Segment_descriptor_request{
     unsigned char Privelege;//15b
     unsigned char IsNot_System;//16b
 
-    unsigned char Is_Avaulable;//17b
+    unsigned char Is_Available;//17b
     unsigned char Is_64;//18b
     unsigned char Is_32;//19b
     unsigned char Is_Granular;//20b
@@ -501,8 +505,8 @@ struct PowerManagement_Info{
     uint32_t Reserved;
 
     struct APM_info* APM_ptr;
-    struct ACPIV1_info ACPIV1_PTR;
-    struct ACPIV2_info ACPIV2_PTR;
+    struct ACPIV1_info* ACPIV1_PTR;
+    struct ACPIV2_info* ACPIV2_PTR;
     uint32_t Reserved;
 };
 
@@ -549,13 +553,6 @@ struct PCI_enum_Info{
     unsigned char Reserved2;//4b
     struct PCI_Address_BasicInfo Busses_BasicInfo[12];//16b
 };
-
-
-
-
-
-
-
 
 
 
