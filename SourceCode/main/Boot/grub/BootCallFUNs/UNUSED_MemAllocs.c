@@ -1,3 +1,12 @@
+#if 0
+
+
+
+
+
+
+
+
 #include <stdint.h>
 #include "Bitwise_Arithmetic.h"
 
@@ -609,3 +618,7 @@ static void* BootFree_FUN(void* PTR){
 static void* BootRealloc_FUN(uint32_t Size){
 
 };
+
+
+
+#endif

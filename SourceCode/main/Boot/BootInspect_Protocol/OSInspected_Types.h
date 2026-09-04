@@ -20,16 +20,16 @@ enum OsInspect_CallCodes{
     EnvironmenPrint = 1,
     Typed_Panic = 2,
     Custom_Panic =3,
-    BootMalloc = 4,
-    BootCalloc = 5,
-    BootRealloc = 6,
-    BootFree = 7,
+
+    Reserved4 = 4,
+    Custom_AVL5 = 5,
+    Custom_AVL6 = 6,
+    Reserved7 = 7,
 
     Get_RAMMap_Size = 8,
     Get_RAMMap = 9,
     Get_Above1MB_RamEntry = 10,
     Get_BasicRamInfo = 11,
-
 
     Custom_AVL14 = 14,
     Custom_AVL15 = 15,
@@ -38,6 +38,11 @@ enum OsInspect_CallCodes{
     Get_Boot_ISA_info = 17,
     Get_BootEntryName = 18,
     Get_VRAM_info = 19,
+
+
+
+
+    End_Boot_Inspection = 32,
 };
 
 static inline int32_t Test_CallPresence(\

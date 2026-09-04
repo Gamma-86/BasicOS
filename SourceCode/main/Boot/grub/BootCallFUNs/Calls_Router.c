@@ -21,14 +21,6 @@ uint32_t MB2BootCalls32_Router(uint32_t Call_Index,\
         break;
     case Custom_Panic:
         break;
-    case BootMalloc:
-        break;
-    case BootCalloc:
-        break;
-    case BootRealloc:
-        break;
-    case BootFree:
-        break;
     case Get_RAMMap_Size:
         break;
     case Get_RAMMap:
@@ -58,17 +50,23 @@ uint32_t MB2BootCalls32_Router(uint32_t Call_Index,\
 
 
 
+
+
+
+
+
+
+
 /*
 ##############################################################################
 ##############################################################################
+##############################################################################
 
-Memory allocator
+    Environment_print
 
+##############################################################################
 ##############################################################################
 ##############################################################################
 */
 
-
-#include "MemAllocs.c"
-
-
+#include "Env_print.c"
