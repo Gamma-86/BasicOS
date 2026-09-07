@@ -3,6 +3,64 @@
 #include <stdint.h>
 
 
+enum OsInspect_CallCodes{
+    CallCode_Test = 0,
+    Typed_Panic = 1,
+    Custom_Panic =2,
+    TestCPUID = 3,
+    Get_CPUIDInfo = 4,
+    Get_BooterID = 5,
+    Custom_AVL6 = 6,
+    Custom_AVL7 = 7,
+
+    Get_RAMMap_Size = 8,
+    Get_RAMMap = 9,
+    Get_Above1MB_RamEntry = 10,
+    Get_BasicRamInfo = 11,
+
+    Reserved12 = 12,
+    Reserved13 = 13,
+    Reserved14 = 14,
+    Reserved15 = 15,
+
+    Get_BootErrors = 16,
+    Get_BootISAinfo = 17,
+    Get_BootEntryName = 18,
+    Get_VRAM_info = 19,
+
+    Get_VESA_info = 20,
+    Get_PCIBIOS_info = 21,
+    Get_BIOS32_info = 22,
+    Reserved23 = 23,
+    EnvironmentSTRPrint = 24,
+    EnvironmentINTPrint = 25,
+    Reserved26 = 26,
+    Reserved27 = 27,
+    Reserved28 = 28,
+    EnvPrint_TestVGASupport = 29,
+    EnvPrint_TestVRAMSupport = 30,
+    Reserved31 = 31,
+
+
+
+    Custom_AVL240 = 0xF0,
+    Custom_AVL241 = 0xF1,
+    Custom_AVL242 = 0xF2,
+    Custom_AVL243 = 0xF3,
+    Custom_AVL244 = 0xF4,
+    Custom_AVL245 = 0xF5,
+    Custom_AVL246 = 0xF6,
+    Custom_AVL247 = 0xF7,
+    Custom_AVL248 = 0xF8,
+    Custom_AVL249 = 0xF9,
+    Custom_AVL250 = 0xFA,
+    Custom_AVL251 = 0xFB,
+    Custom_AVL252 = 0xFC,
+    Custom_AVL253 = 0xFD,
+    Custom_AVL254 = 0xFE,
+    Reserved255 = 0xFF,
+    End_Boot_Inspection = 0x100
+};
 
 int32_t OsBootCall(\
     enum OsInspect_CallCodes CallCode,\
@@ -14,36 +72,6 @@ int32_t OsBootCall(\
     uint32_t Arg6,\
     uint32_t Arg7\
 );
-
-enum OsInspect_CallCodes{
-    CallCode_Test = 0,
-    EnvironmenPrint = 1,
-    Typed_Panic = 2,
-    Custom_Panic =3,
-
-    Reserved4 = 4,
-    Custom_AVL5 = 5,
-    Custom_AVL6 = 6,
-    Reserved7 = 7,
-
-    Get_RAMMap_Size = 8,
-    Get_RAMMap = 9,
-    Get_Above1MB_RamEntry = 10,
-    Get_BasicRamInfo = 11,
-
-    Custom_AVL14 = 14,
-    Custom_AVL15 = 15,
-
-    Get_BootErrors = 16,
-    Get_Boot_ISA_info = 17,
-    Get_BootEntryName = 18,
-    Get_VRAM_info = 19,
-
-
-
-
-    End_Boot_Inspection = 32,
-};
 
 static inline int32_t Test_CallPresence(\
     enum OsInspect_CallCodes Tested_code,\
@@ -66,73 +94,25 @@ static inline int32_t Full_SelfTest(uint32_t* RetArg_PTR){
 
 
 
-static inline void* Call_BootMalloc(uint32_t Size){
-    void* Returned_PTR = NULL; 
-    int32_t return_info;
 
-    if (Size == 0){
-        return (void*)-1;
-    }
-
-    return_info = OsBootCall(BootMalloc,\
-        Size,\
-        (uint32_t)&Returned_PTR,\
-        0, 0, 0, 0, 0\
-    );
-
-    if(return_info < 0){
-        return NULL;
-    }
-    else{
-        return Returned_PTR;
-    }
-}
-
-static inline void* Call_BootCalloc(uint32_t Size){
-    void* Returned_PTR = NULL;
-    int32_t Returned_info;
-
-    if(Size == 0){
-        return (void*)-1;
-    }
-
-    Returned_info= OsBootCall(BootCalloc,\
-        Size,\
-        (uint32_t)&Returned_PTR,\
-        0,0,0,0,0\
-    );
-
-    if(Returned_info < 0) return NULL;
-    else return Returned_PTR;
-}
-
-static inline void* Call_BootRealloc(void* PTR, uint32_t NewSize){
-    void* New_PTR = NULL;
-    int32_t Returned_info;
-
-    if(NewSize != 0){
-        return (void*)-1;
-    }
-
-    Returned_info = OsBootCall(\
-        BootRealloc,\
-        (uint32_t)PTR,\
-        NewSize,\
-        (uint32_t)&New_PTR,\
-        0,0,0,0\
-    );
-
-    if(Returned_info<0)return PTR;
-    else return New_PTR;
-
-}
+enum BootInfo_State{
+    Not_Present = 0,
+    Present = 1,
+    IDK = 2,
+};
 
 
-
-
-
-
-
+enum Booter_IDs{
+    BootedBy_IDK = 0,
+    BootedBy_BIOS = 1,
+    BootedBy_UEFI32 = 2,
+    BootedBy_UEFI64 = 3,
+    BootedBy_Multiboot1 = 4,
+    BootedBy_Multuboot2 = 5,
+    BootedBy_Limine = 6,
+    BootedBy_Linux32 = 7,
+    BootedBy_Linux64 = 8,
+};
 
 
 
@@ -162,7 +142,10 @@ enum RAMMap_MemoryType{
     EEPROM_RAM = 17,
 
     Real_RAM_END = 18,
-    OtherStrange_RAM = 19
+
+    BootInspect_RAM = 19,
+
+    OtherStrange_RAM = 20,
 };
 struct RAMMap_DescriptorEntry
 {
@@ -175,7 +158,7 @@ struct RAMMap_DescriptorEntry
     uint32_t Reserved2;//32b
 };
 
-struct The_RAMmap{
+struct RAMmap_meta{
     uint32_t Descriptors_Amount;
     uint32_t Reserved1;
     uint32_t Reserved2;
@@ -219,7 +202,25 @@ struct BootErrorFlags{
 };
 
 
-
+struct CPUPresenseInfo{
+    unsigned char X87;
+    unsigned char MaxCPUIDLeaf;
+    unsigned char MMX;
+    unsigned char AMD64;
+    unsigned char SSE1;
+    unsigned char SSE2;
+    unsigned char _3DNow;
+    unsigned char flag7;
+    unsigned char flag8;
+    unsigned char flag9;
+    unsigned char flag10;
+    unsigned char PSE36;
+    unsigned char RDRAND;
+    unsigned char SysEnter;
+    unsigned char PAE;
+    unsigned char TSC;
+    unsigned char MSR;
+};
 
 
 
@@ -227,7 +228,7 @@ struct BasicRamInfo{
     uint32_t LowRam_Amount;
     uint32_t HighRam_Amount;//8b
 
-    uint64_t Last_RealAddress;//16b
+    uint64_t Last_RealByte;//16b
     uint64_t FreeRam_Amount;//24b
     uint64_t FreeRam_Above_1MB;//32b
     
@@ -253,28 +254,25 @@ enum StringBootArg_EncodingType{
 };
 struct String_Args{
     uint32_t Size;
-    enum StringBootArg_EncodingType Encoding_type; 
-    uint32_t Reserved;
+    enum StringBootArg_EncodingType Encoding_type;
+    unsigned char IsPascalSTR;
+    unsigned char Reserved[3];
     unsigned char* StringPTR;
 };
 
 
-enum BootInfo_State{
-    Not_Present = 0,
-    Present = 1,
-    IDK = 2,
-};
-struct LegacyBoot_Info{
-    unsigned char BIOS_Booted;
 
-    unsigned char LPT1_State;
-    unsigned char LPT2_State;
-    unsigned char LPT3_State;
+struct LegacyBoot_Info{
+    unsigned char Reserved1;
+
+    unsigned char IDKbout_LPT1;
+    unsigned char IDKbout_LPT2;
+    unsigned char IDKbout_LPT3;
     
-    unsigned char COM1_State;
-    unsigned char COM2_State;
-    unsigned char COM3_State;
-    unsigned char COM4_State;//uint64_1  8b
+    unsigned char IDKbout_COM1;
+    unsigned char IDKbout_COM2;
+    unsigned char IDKbout_COM3;
+    unsigned char IDKbout_COM4;//uint64_1  8b
 
     uint16_t   LPT1_Address;
     uint16_t   LPT2_Address;
@@ -287,10 +285,13 @@ struct LegacyBoot_Info{
     uint16_t   COM4_Address;//uint64_3  24b
 
     unsigned char HDDInfo_state;//25
-    unsigned char BootHDD_ID;
-    uint16_t HDD_amount;//28
+    unsigned char BootHDD_ID;//26
+    
+    unsigned char Partition;//27
+    unsigned char SubPartition;// 28b
 
-    unsigned char Reserved[4];//uint64_4 ############### 32b
+    unsigned char Reserved3[4];
+    unsigned char Reserved4[32];//64b
 };
 
 
@@ -301,7 +302,8 @@ struct LegacyBoot_Info{
 struct BootVarName{
     uint32_t Size;
     enum StringBootArg_EncodingType Encoding_type;
-    uint32_t Available_Bits;
+    uint16_t Available_Bits;
+    uint16_t Reserved1;
     unsigned char* StringPTR;
 };
 
@@ -315,7 +317,6 @@ enum VRAM_Draw_Type{
     VRAMMode_BGR24_Normal=3,
     VRAMMode_RGBA32_Normal=4,
     VRAMMode_BGRA32_Normal=5,
-
 
     VRAMMode_IndexedPalette = 16,
     VRAMMode_Text = 17,
@@ -442,27 +443,22 @@ struct Segment_descriptor_request{
 
     uint16_t TaskGate_TSSSelector;//27b
 
-    unsigned char Padding32[4];//31b
+    unsigned char Is_BootCallGate;//28
+    unsigned char Is_BootCall_CS;//29
+    unsigned char Reserved[2];//31b
 };
 
 #define GDT_Requests_Amount 32
 #define LDT_Requests_Amount 16
 
-void (*InitGDT_FUN_PTR)(\
-    uint64_t* The_GDT,\
-    struct Segment_descriptor_request* Requests_array\
-);
 
-void (*InitLDT_FUN_PTR)(\
-    uint64_t* The_LDT,\
-    struct Segment_descriptor_request* Requests_array\
-);
+struct FirstSentInfo{
+    void (*InitGDT)(uint64_t* TheGDT, struct Segment_descriptor_request* _32Requests);
+    void (*InitLDT)(uint64_t* TheLDT, struct Segment_descriptor_request* _16Requests);
+    int32_t (*CallsRouter)(enum OsInspect_CallCodes, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t arg5, uint32_t arg6, uint32_t arg7);
+};
 
-
-
-
-
-
+void Kernel_start(struct FirstSentInfo* Initializaers);
 
 
 
@@ -555,10 +551,17 @@ struct PCI_enum_Info{
     unsigned char MoreDevices_IsPresent;//1b
     unsigned char InfosAmount;
     unsigned char Mechanisms_presence;
-    unsigned char Reserved2;//4b
+    unsigned char Reserved1;//4b
     struct PCI_Address_BasicInfo Busses_BasicInfo[12];//16b
 };
 
+struct PCI_BIOS_Info{
+    unsigned char IDK[32];
+};
 
+
+struct VESA_BIOS_info{
+    unsigned char IDK[32];
+};
 
 #endif
