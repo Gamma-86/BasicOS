@@ -64,13 +64,13 @@ enum OsInspect_CallCodes{
 
 int32_t OsBootCall(\
     enum OsInspect_CallCodes CallCode,\
+    uint32_t* RetPTR,\
     uint32_t Arg1,\
     uint32_t Arg2,\
     uint32_t Arg3,\
     uint32_t Arg4,\
     uint32_t Arg5,\
-    uint32_t Arg6,\
-    uint32_t Arg7\
+    uint32_t Arg6\
 );
 
 static inline int32_t Test_CallPresence(\
@@ -311,12 +311,26 @@ struct BootVarName{
 
 
 
-enum VRAM_Draw_Type{
+enum VRAM_layouts{
     VRAMMode_VGA_VESA  = 0,
+
     VRAMMode_RGB24_Normal=2,
     VRAMMode_BGR24_Normal=3,
+    
     VRAMMode_RGBA32_Normal=4,
     VRAMMode_BGRA32_Normal=5,
+
+    RGB565=6,
+    BGR565=7,
+
+    RGBX555=8,
+    BGRX555=9,
+
+    RGBA4444=10,
+    BGRA4444=11,
+
+
+
 
     VRAMMode_IndexedPalette = 16,
     VRAMMode_Text = 17,
@@ -329,14 +343,14 @@ enum VRAM_Draw_Type{
 };
 
 struct VRAM_RGB_info{
-    unsigned char RGB_R_BitIndex;
-    unsigned char RGB_G_BitIndex;
-    unsigned char RGB_B_BitIndex;
+    unsigned char R_BitIndex;
+    unsigned char G_BitIndex;
+    unsigned char B_BitIndex;
     unsigned char Reserved1;
-    uint32_t RGB_R_Bitmask;//8b
+    uint32_t R_Bitmask;//8b
 
-    uint32_t RGB_G_Bitmask;
-    uint32_t RGB_B_Bitmask;//16b
+    uint32_t G_Bitmask;
+    uint32_t B_Bitmask;//16b
 
 };
 
@@ -363,20 +377,14 @@ struct VRAM_planar_info{
     unsigned char B_index;
     unsigned char A_index;//4b
 
-    unsigned char Reserved1;
-    unsigned char Reserved2;
-    unsigned char Reserved3;
-    unsigned char Reserved4;//8b
+    uint32_t Reserved1;//8b
 
     unsigned char R_BitSize;
     unsigned char G_BitSize;
     unsigned char B_BitSize;
     unsigned char A_BitSize;//12b
 
-    unsigned char Reserved5;
-    unsigned char Reserved6;
-    unsigned char Reserved7;
-    unsigned char Reserved8;//16b
+    uint32_t Reserved2;//16b
 };
 
 
@@ -388,7 +396,7 @@ struct VRAM_Info{
     uint32_t Height;//16b
 
     uint32_t Width;
-    enum VRAM_Draw_Type VRAM_Type;//24b
+    enum VRAM_layouts VRAM_Type;//24b
 
     unsigned char Bytes_P_Pixel;
     unsigned char Reserved1;
@@ -402,10 +410,9 @@ struct VRAM_Info{
     struct VRAM_RGBA_info* RGBA_Info;//48b
 
     struct VRAM_planar_info* planar_info;
-    uint32_t Reserved5;//56b#####################
+    uint32_t Reserved4;//56b#####################
 
-    uint32_t Reserved6;//########################
-    uint32_t Reserved7;//64b#####################
+    uint64_t Reserved5;//64b#####################
 };
 
 
@@ -432,7 +439,7 @@ struct Segment_descriptor_request{
 
     unsigned char Is_Available;//17b
     unsigned char Is_64;//18b
-    unsigned char Is_32;//19b
+    unsigned char IsNot_16;//19b
     unsigned char Is_Granular;//20b
 
     uint16_t CallGate_Selector;//22b
@@ -444,7 +451,7 @@ struct Segment_descriptor_request{
     uint16_t TaskGate_TSSSelector;//27b
 
     unsigned char Is_BootCallGate;//28
-    unsigned char Is_BootCall_CS;//29
+    unsigned char Is_BootCallCS;//29
     unsigned char Reserved[2];//31b
 };
 
@@ -455,7 +462,7 @@ struct Segment_descriptor_request{
 struct FirstSentInfo{
     void (*InitGDT)(uint64_t* TheGDT, struct Segment_descriptor_request* _32Requests);
     void (*InitLDT)(uint64_t* TheLDT, struct Segment_descriptor_request* _16Requests);
-    int32_t (*CallsRouter)(enum OsInspect_CallCodes, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t arg5, uint32_t arg6, uint32_t arg7);
+    int32_t (*CallsRouter)(enum OsInspect_CallCodes, uint32_t* RetPTR, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t arg5, uint32_t arg6);
 };
 
 void Kernel_start(struct FirstSentInfo* Initializaers);
@@ -479,6 +486,7 @@ struct APM_info{
     uint16_t Cseg32_limit;//16
     uint16_t Cseg286_limit;//18
     uint16_t Dseg286_limit;//20
+
     unsigned char Padding[12];
 };
 
@@ -500,15 +508,15 @@ struct ACPIV2_info{
 
 
 struct PowerManagement_Info{
-    enum BootInfo_State APM_Is_here;//4b
-    enum BootInfo_State ACPIV1_Is_here;//8b
-    enum BootInfo_State ACPIV2_Is_here;//12b
-    uint32_t Reserved;
+    enum BootInfo_State APM_state;//4b
+    enum BootInfo_State ACPIV1_state;//8b
+    enum BootInfo_State ACPIV2_state;//12b
+    uint32_t Reserved1;
 
     struct APM_info* APM_ptr;
     struct ACPIV1_info* ACPIV1_PTR;
     struct ACPIV2_info* ACPIV2_PTR;
-    uint32_t Reserved;
+    uint32_t Reserved2;
 };
 
 
@@ -555,6 +563,7 @@ struct PCI_enum_Info{
     struct PCI_Address_BasicInfo Busses_BasicInfo[12];//16b
 };
 
+/*
 struct PCI_BIOS_Info{
     unsigned char IDK[32];
 };
@@ -563,5 +572,5 @@ struct PCI_BIOS_Info{
 struct VESA_BIOS_info{
     unsigned char IDK[32];
 };
-
+*/
 #endif

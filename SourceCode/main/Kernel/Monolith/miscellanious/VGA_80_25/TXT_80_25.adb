@@ -1,5 +1,5 @@
 with ReturnBitfields;
-package body VGA_80_25 is
+package body TXT_80_25 is
 --briefly what is here :
 --10 procedure new_line: puts the coordinates as if tere was a new line 
 --11 function Set_Internal_Writepage(Index:Integer)

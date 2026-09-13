@@ -1,39 +1,40 @@
 with IA32_Hardware_Registers;
+with IA32_Types;
 with Interfaces;use Interfaces;
 with Interfaces.C;use Interfaces.C;
+with X86_segments;
 
-
-package LOWLEVEL_FUNCTIONS is
+package LowLevel_FUN is
 use Interfaces.C;
 
-procedure globASM_FUN_outb(PortAddress : Unsigned_16; TheByte : Unsigned_8)
+procedure globASM_FUN_outb(PortAddress : IA32_Types.Port_t; TheByte : Unsigned_8)
    with 
       Import => True,
       Convention => C,
       External_Name => "globASM_FUN_outb";
-procedure outb(PortAddress : Unsigned_16; TheByte : Unsigned_8)
+procedure outb(PortAddress : IA32_Types.Port_t; TheByte : Unsigned_8)
    with 
       Import => True,
       Convention => C,
       External_Name => "outb";
 
-procedure outw (PortAddress : Unsigned_16; TheWord16 : Unsigned_16)
+procedure outw (PortAddress : IA32_Types.Port_t; TheWord16 : Unsigned_16)
    with
       Import => True,
       Convention => C,
       External_Name => "outw";
-procedure globASM_FUN_outw (PortAddress : Unsigned_16; TheWord16 : Unsigned_16)
+procedure globASM_FUN_outw (PortAddress : IA32_Types.Port_t; TheWord16 : Unsigned_16)
    with
       Import => True,
       Convention => C,
       External_Name => "globASM_FUN_outw";
 
-procedure outd (PortAddress : Unsigned_16 ; TheDoubleWord32 : Unsigned_32)
+procedure outd (PortAddress : IA32_Types.Port_t ; TheDoubleWord32 : Unsigned_32)
    with
       Import => True,
       Convention => C,
       External_Name => "outd";
-procedure globASM_FUN_outd (PortAddress : Unsigned_16 ; TheDoubleWord32 : Unsigned_32)
+procedure globASM_FUN_outd (PortAddress : IA32_Types.Port_t ; TheDoubleWord32 : Unsigned_32)
    with
       Import => True,
       Convention => C,
@@ -41,34 +42,34 @@ procedure globASM_FUN_outd (PortAddress : Unsigned_16 ; TheDoubleWord32 : Unsign
 
 
 
-function inB (PortAddress : Unsigned_16) return Unsigned_8
+function inB (PortAddress : IA32_Types.Port_t) return Unsigned_8
    with
       Import => True,
       Convention => C,
       External_Name => "inB";
-function globASM_FUN_inB (PortAddress : Unsigned_16) return Unsigned_8
+function globASM_FUN_inB (PortAddress : IA32_Types.Port_t) return Unsigned_8
    with
       Import => True,
       Convention => C,
       External_Name => "globASM_FUN_inB";
 
-function inW (PortAddress : Unsigned_16) return Unsigned_16
+function inW (PortAddress : IA32_Types.Port_t) return Unsigned_16
    with
       Import => True,
       Convention => C,
       External_Name => "inW";
-function globASM_FUN_inW (PortAddress : Unsigned_16) return Unsigned_16
+function globASM_FUN_inW (PortAddress : IA32_Types.Port_t) return Unsigned_16
    with
       Import => True,
       Convention => C,
       External_Name => "globASM_FUN_inW";
 
-function inD (PortAddress : Unsigned_16) return Unsigned_16
+function inD (PortAddress : IA32_Types.Port_t) return Unsigned_16
    with
       Import => True,
       Convention => C,
       External_Name => "inD";
-function globASM_FUN_inD(PortAddress : Unsigned_16) return Unsigned_16
+function globASM_FUN_inD(PortAddress : IA32_Types.Port_t) return Unsigned_16
    with
       Import => True,
       Convention => C,
@@ -76,9 +77,8 @@ function globASM_FUN_inD(PortAddress : Unsigned_16) return Unsigned_16
 
 
 
-type Privelege_LVL_type is mod 2**2;
-   for Privelege_LVL_type'Size use 2;
-procedure set_IOPL_minLvl (PrivelegeLevel : Privelege_LVL_type)
+
+procedure set_IOPL_minLvl (PrivelegeLevel : X86_segments.Privelege_LVL_t)
    with
       Import => True,
       Convention => C,
@@ -140,16 +140,16 @@ procedure write_CR4(WhatWrite : IA32_Hardware_Registers.Control_Register4_r)
 
 
 type CPUID_return is record
-   AX : Unsigned_32,
-   BX : Unsigned_32,
-   CX : Unsigned_32,
-   DX : Unsigned_32   
+   AX : Unsigned_32;
+   BX : Unsigned_32;
+   CX : Unsigned_32;
+   DX : Unsigned_32;  
 end record with Size => 256;
 for CPUID_return use record
-   AX at 0 range 0..31,
-   BX at 8 range 0..31,
-   CX at 16 range 0..31,
-   DX at 24 range 0..31
+   AX at 0 range 0..31;
+   BX at 8 range 0..31;
+   CX at 16 range 0..31;
+   DX at 24 range 0..31;
 end record;
 
 procedure CPUID (
@@ -162,4 +162,4 @@ procedure CPUID (
    External_Name => "globASM_FUN_CPUID";
 
 
-end LOWLEVEL_FUNCTIONS;
+end LowLevel_FUN;

@@ -1,11 +1,14 @@
 with Ada.Unchecked_Conversion;
-with IA32_Types;
 with Interfaces;
 
 
 package IA32_Types is
 --deocumentation required
 
+
+
+type Port_t is mod 2**16 with Size=>16;
+type Port_access is access all Port_t;
 
 type Byte is mod 2 ** 8 with Size => 8;
 for Byte'Size use 8;

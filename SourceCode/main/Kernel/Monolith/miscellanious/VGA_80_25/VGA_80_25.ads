@@ -2,7 +2,6 @@ with ReturnBitfields;
 with System;
 with Interfaces.C; use Interfaces.C;
 package VGA_80_25 is
-
    type CharColour is 
    (Black, 
    Blue, 
@@ -48,11 +47,11 @@ package VGA_80_25 is
 
    type Row is range 0..24;
    type Column is range 0..79;
-   type VGA_VRAM_array is array(Row, Column) of VRAM_word; 
+   type TextPage_a is array(Row, Column) of VRAM_word; 
+   type TextPage_PTR is access all TextPage_a;
 
    type RowPTR is access Row;
    type ColumnPTR is access Column;
-   type VRAM_Array_PTR is access VGA_VRAM_array;
 
    Screen_Width : constant Natural := 80;
    Screen_Height: constant Natural := 25;
@@ -60,30 +59,14 @@ package VGA_80_25 is
 
 
    procedure New_Line;
-
-   function PutChar (Char : Character;ForeColour : CharColour  ;BackColour : CharColour) return ReturnBitfields.GeneralOS
-      with
-         Export => True,
-         Convention => C,
-         External_Name => "PutChar";
-   
-   function PutChar_XY (Char : Character; X:Integer; Y:Integer) return ReturnBitfields.GeneralOS
-      with
-         Export => True,
-         Convention => C,
-         External_Name => "PutChar_XY";
-
-   function Set_Internal_WritePage(Index : Integer) return ReturnBitfields.GeneralOS
-      with
-         Export => True,
-         Convention => C,
-         External_Name => "Set_Internal_WritePage";
-
+   function PutChar (Char : Character;ForeColour : CharColour  ;BackColour : CharColour) return ReturnBitfields.GeneralOS;
+   function PutChar_XY (Char : Character; X:Integer; Y:Integer) return ReturnBitfields.GeneralOS;
+   function Set_Internal_WritePage(Index : Integer) return ReturnBitfields.GeneralOS;
 
 private
    procedure MoveCursorForward;
       procedure MoveCursorForward_Xtimes (X:Integer);
-   procedure ShiftCharsUp(Page : VRAM_Array_PTR);  --for everything in ROW
+   procedure ShiftCharsUp(Page : TextPage_PTR);  --for everything in ROW
    --Move characters in current ROW to the ROW upper
       procedure shiftCharsUp_ByX(X:integer);
    procedure IncreaseYcord_Full(IncreasedYCord_PTR : RowPTR);
@@ -93,19 +76,16 @@ private
 
 
 
-   Main_VRAM_PTR : VGA_VRAM_array;
-   for Main_VRAM_PTR'Address use System'To_Address (16#B_8000#);
-   Main_VRAM_X : Column := 0;
-   Main_VRAM_Y : Row := 0;
+   Main_VRAM : TextPage_a with Address => System'To_Address(16#B_8000#);
 
-   TextPage1, TextPage2, TextPage3, TextPage4 : aliased VGA_VRAM_array;
-   TextPage2_X, TextPage3_X, TextPage4_X : Column := 0;
-   TextPage2_Y, TextPage3_Y, TextPage4_Y : Row := 0;
-   TextPage1_X : Column := 0;
-   TextPage1_Y : Column := 0;
+   Page1 : TextPage_a with Address => System'To_Address(16#B_8000#);
+   Page2 : TextPage_a with Address => System'To_Address(16#B_8000#);
+
+   Page1_X, Page2_X, Page3_X : Column := 0;
+   Page1_Y, Page2_Y, Page3_Y : Row := 0;
 
 
-   CurrentPagePTR : VRAM_Array_PTR := TextPage1'Address;
+   CurrentPagePTR : TextPage_PTR := TextPage1'Address;
    CurrentPageIndex : Integer := 1;
    Current_CursorXCordPTR : ColumnPTR := TextPage1_X'Address;
    Current_CursorYCordPTR : RowPTR := TextPage1_Y'Address;
