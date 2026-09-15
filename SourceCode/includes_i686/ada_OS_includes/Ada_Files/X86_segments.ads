@@ -200,7 +200,7 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
 
    type SystemTypes_t is 
    (
-      Invalid0,
+      --Invalid0
       TSS16_Available,
       LDT,
       TSS16_Busy,
@@ -208,33 +208,33 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
       Task_Gate,
       Interrupt16,
       Trap16,
-      Reserved8,
+      --Reserved8
       TSS32_Available,
       Reserved10,
       TSS32_Busy,
       CallGate32,
-      Reserved13,
+      --Reserved13
       Interrupt32,
       Trap32
    ) with Size => 4;
    for SystemTypes_t use
    (
-      Invalid0 = 0,
-      TSS16_Available = 2#0001#,
+
+      TSS16_Available => 2#0001#,
       LDT  = 2#0010#,
-      TSS16_Busy      = 2#0011#,
-      CallGate16     = 2#0100#,
-      Task_Gate       = 2#0101#,
-      Interrupt16     = 2#0110#,
-      Trap16          = 2#0111#,
-      Reserved8       = 2#1000#,
-      TSS32_Available = 2#1001#,
-      Reserved10      = 2#1010#,
-      TSS32_Busy      = 2#1011#,
-      CallGate32     = 2#1100#,
-      Reserved13      = 2#1101#,
-      Interrupt32     = 2#1110#,
-      Trap32          = 2#1111#
+      TSS16_Busy      => 2#0011#,
+      CallGate16     => 2#0100#,
+      Task_Gate       => 2#0101#,
+      Interrupt16     => 2#0110#,
+      Trap16          => 2#0111#,
+
+      TSS32_Available => 2#1001#,
+
+      TSS32_Busy      => 2#1011#,
+      CallGate32     => 2#1100#,
+      Reserved13      => 2#1101#,
+      Interrupt32     => 2#1110#,
+      Trap32          => 2#1111#
    );
    for SystemTypes_t'Size use 4;
 
@@ -302,7 +302,36 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
 --   subtype SystemTypes_IDT32Types_SubT is SystemTypes_t range Interrupt32 .. Trap32;
 --   subtype SystemTypes_IDTTypes_SubT is SystemTypes_t range Task_Gate .. Trap32;
 
+--#######################################################
+--#######################################################
+--
+--    51
+--
+--#######################################################
+--#######################################################
 
+
+
+type Segment_Descriptor_r(IsNot_System:Boolean ; Is_Executable:Boolean ; Sys_Type : SystemTypes_t)is record
+case IsNot_System is
+   when True =>
+      Limit_Low : Limit_Low_t;
+      Base_Low : Base_Low_t;
+      Was_Accessed : Boolean;
+      case Is_Executable is
+         when True=>
+            Is_Readable : Boolean;
+            Is_Conforming : Boolean;
+         when False=>
+            Is_Writable : Boolean;
+            Is_E_Down : Booelan;
+      end case;
+
+   when False =>
+      case Sys_Type is
+      when TSS      
+end case;
+end record;
 
 --#######################################################
 --#######################################################
