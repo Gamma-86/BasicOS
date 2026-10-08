@@ -5,7 +5,58 @@ with Interfaces.C;use Interfaces.C;
 with X86_segments;
 
 package LowLevel_FUN is
-use Interfaces.C;
+
+--Low level x86 IA32 functions for interfacing with specific assembly instructions
+--10 procedure outb with globASM_FUN prefix
+-- 10.10 procedure outb without prefix both label lead to the same address
+
+--20  OUT instruction for word size number named with globASM)prefix
+-- 20.10 outw instruction function without prefix, both labels lead to the same address
+
+--30 procedure globASM_FUN_outd that executes instruction outd
+-- 30.10 outd procedure without prefix in the name, both labels lead to the same address
+
+--40 function inb that calls in instruction and returns read value
+-- 40.10 the same function as before but with prefix, both labels lead to the same address
+
+--50 function inw that calls in ax, dx instruction and returns read value
+-- 50.10 the same function but with prefix, both labels lead to the same address
+
+--60 InD function that calls in eax, dx and return read value
+-- 60.10 The same function but with globASM_FUN prefix, both labels lead to the same address
+
+--70 set_IOPL_minLvl procedure that means set Input output privelege level
+--   sets the maximum privelege level that can use IN, OUT instruction
+--   without looking at the denied ports bitmap
+--   If set to 1, level 0,1 can use OUT IN instruction freely 
+
+--80 WRMSR_ procedure to write model specific register of CPU
+-- 80.10 the same procedure but labeled by its full name
+--    both labels lead to the same address
+
+--90 RDMSR_ read model specific register of CPU function that returns the value
+-- 90.10 the same function labeled by its full name
+--       both labels lead to the same address
+
+--100    function to Read control registers(they return their state)
+-- 100.10 get CR0
+-- 100.20 get CR2
+-- 100.30 get CR3
+-- 100.40 get CR4
+--    NO CR1 because it is reserved
+--
+--110  PROCEDURES TO WRITE CONTROL REGISTER
+-- 110.10 write control register 0
+-- 110.20 wrtie control register 2
+-- 110.30 write control register 3
+-- 110.40 write control register 4
+--    NO control register 1 because it is reserved fully
+--
+--120 CPUID related things
+-- 120.10 CPUID function returned structure
+-- 120.20 CPUID returned structure representation
+-- 120.30 the CPUID procedure
+--    Note that it does not return the structure because it is too big
 
 procedure globASM_FUN_outb(PortAddress : IA32_Types.Port_t; TheByte : Unsigned_8)
    with 
