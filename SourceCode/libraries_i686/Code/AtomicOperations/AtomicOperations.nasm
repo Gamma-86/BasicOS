@@ -3,9 +3,9 @@ CPU Katmai
 
 %include "NASM_default_macroses.nasm"
 
-global Mutex_Lock
-global Mutex_Lock_Watchdog
-global Mutex_Unlock
+global Bool_Lock
+global Bool_Lock_Watchdog
+global Bool_Unlock
 
 Bool_Lock:;void Bool_Lock(unsigned char* LockingBool)
     mov   AX_PTRSIZE, STACK_ARG1_SP
@@ -22,7 +22,7 @@ Bool_Lock:;void Bool_Lock(unsigned char* LockingBool)
 
     ret
 
-Bool_Lock_Watchdog:;unsigned char Bool_Lock(unsigned char* LockingBool, unsigned int WatchdogTime)
+Bool_Lock_Watchdog:;unsigned char Bool_Lock_Watchdog(unsigned char* LockingBool, unsigned int WatchdogTime)
     mov   AX_PTRSIZE, STACK_ARG1_SP
     mov   CX_INTSIZE, STACK_ARG2_SP
 
@@ -91,8 +91,6 @@ Locked_increment64: ;void Locked_increment64(uint64_t* Incremented)
     ;since cmpxchg is cmp, if initial = [mem] => Zero flag
     je    .lp_increment_end
         pause
-        pause
-        pause
     jmp   .lp_increment_start
 .lp_increment_end:
     pop   SI_PTRSIZE
@@ -137,8 +135,6 @@ Locked_decrement64: ;void Locked_decrement64(uint64_t* Decremented)
     lock cmpxchg8b [SI_PTRSIZE]
     ;since cmpxchg is cmp, if initial = [mem] => Zero flag
     je    .lp_increment_end
-        pause
-        pause
         pause
     jmp   .lp_increment_start
 .lp_decrement_end:
@@ -186,8 +182,6 @@ Locked_sadd64: ;int64_t Locked_sadd64(int64_t* increased, int64_t increase)
         adc   ecx, [STACK_ARG3_BP]
     lock cmpxchg8b [SI_PTRSIZE]
     je    .lp_adding_end
-        pause
-        pause
         pause
     jmp   .lp_adding_start
 .lp_adding_end:
