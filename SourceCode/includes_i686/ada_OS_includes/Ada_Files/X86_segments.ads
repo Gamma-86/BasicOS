@@ -19,12 +19,11 @@
 --40.20 Function To Divide Unsigned into High/Low parts record
 --40.30 Function To Glue the High/Low record into 1 Unsgined number
 
+--    REBUILDING
 --50 System Types enumeration that can be in TYPE filed of system descriptor
---50.9  A Subtypes that are system, but cannot be in GDT
 --50.10 Enumeration of system types that can be in GDT
---50.20 Subtypes of GDT System Type that are very specific for certain system
---    segments
 
+--    REBUILDING
 --60 Type Access Byte (from Typical segment descriptor)
 
 --70 Record Type Segment_Descriptor_Raw, the most generic Descriptor reasonable
@@ -117,12 +116,19 @@ package X86_segments is
 --    30.10
 --#######################################################
 
-   type Base_Separated_r is record
-      Base_Low : Base_Low_t;
-      Base_High : Base_High_t;
+   type Base_Separated_r(Separated : Boolean ) is record
+      case Separated is
+         when False =>
+            Address : System.Address;
+         when True =>
+            Base_Low : Base_Low_t;
+            Base_High : Base_High_t;
+      end case;
    end record
-   with Size => 32;
+   with Size => 32, Unchecked_Union, Convention=>C;
    for Base_Separated_r use record
+      Address at 0 range 0 .. 31;
+
       Base_Low at 0 range 0 .. 23;
       Base_High at 0 range 24 .. 31;
    end record;
@@ -213,13 +219,12 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
       Reserved10,
       TSS32_Busy,
       CallGate32,
-      --Reserved13
+      --Reserved13,
       Interrupt32,
       Trap32
    ) with Size => 4;
    for SystemTypes_t use
    (
-
       TSS16_Available => 2#0001#,
       LDT  = 2#0010#,
       TSS16_Busy      => 2#0011#,
@@ -232,75 +237,39 @@ function Glue_SegmentLimit(Separated_Record_PTR : Limit_Separated_r_PTR) return 
 
       TSS32_Busy      => 2#1011#,
       CallGate32     => 2#1100#,
-      Reserved13      => 2#1101#,
+--      Reserved13      => 2#1101#,
       Interrupt32     => 2#1110#,
       Trap32          => 2#1111#
    );
-   for SystemTypes_t'Size use 4;
-
---#######################################################
---    50.9
---#######################################################
-
-   subtype SystemTypes_TaskGate_SubT is SystemTypes_t range Task_Gate .. Task_Gate;
 
 
 --#######################################################
---    50.10
+--    50.10 System types possible in GDT
 --#######################################################
 
    type GDTSysTypes_t is
    (
-      Invalid0,
       TSS16_Available,
       LDT,
       TSS16_Busy,
       CallGate16,
       Task_Gate,
---      Interrupt16,
---      Trap16,
-      Reserved8,
       TSS32_Available,
-      Reserved10,
       TSS32_Busy,
-      CallGate32,
-      Reserved13
---      Interrupt32,
---      Trap32
+      CallGate32
    ) with Size => 4;
-   for SystemTypes_t use
+   for GDTSysTypes_t use
    (
-      Invalid0 = 0,
-      TSS16_Available = 2#0001#,
-      LDT  = 2#0010#,
-      TSS16_Busy      = 2#0011#,
-      CallGate16     = 2#0100#,
-      Task_Gate       = 2#0101#,
---      Interrupt16     = 2#0110#,
---      Trap16          = 2#0111#,
-      Reserved8       = 2#1000#,
-      TSS32_Available = 2#1001#,
-      Reserved10      = 2#1010#,
-      TSS32_Busy      = 2#1011#,
-      CallGate32     = 2#1100#,
-      Reserved13      = 2#1101#
---      Interrupt32     = 2#1110#,
---      Trap32          = 2#1111#
+      TSS16_Available => 2#0001#,
+      LDT  => 2#0010#,
+      TSS16_Busy      => 2#0011#,
+      CallGate16     => 2#0100#,
+      Task_Gate       => 2#0101#,
+      TSS32_Available => 2#1001#,
+      TSS32_Busy      => 2#1011#,
+      CallGate32     => 2#1100#
    );
-   for GDTSysTypes_t'Size use 4;
---#######################################################
---    50.20
---#######################################################
 
-   subtype GDTSysTypes_LDT_SubT is GDTSysTypes_t range LDT .. LDT;
-   subtype GDTSysTypes_CallGate16_SubT is GDTSysTypes_t range CallGate16 .. CallGate16;
-   subtype GDTSysTypes_CallGate32_SubT is GDTSysTypes_t range CallGate32 .. CallGate32;
-   subtype GDTSysTypes_TSS16_SubT is GDTSysTypes_t range TSS16_Available .. TSS16_Busy;
-   subtype GDTSysTypes_TSS32_SubT is GDTSysTypes_t range TSS32_Available .. TSS32_Busy;
-   subtype GDTSysTypes_TaskGate_SubT is GDTSysTypes_t range Task_Gate .. Task_Gate;
---   subtype SystemTypes_IDT16Types_SubT is SystemTypes_t range Task_Gate .. Trap16;
---   subtype SystemTypes_IDT32Types_SubT is SystemTypes_t range Interrupt32 .. Trap32;
---   subtype SystemTypes_IDTTypes_SubT is SystemTypes_t range Task_Gate .. Trap32;
 
 --#######################################################
 --#######################################################
@@ -324,13 +293,25 @@ case IsNot_System is
             Is_Conforming : Boolean;
          when False=>
             Is_Writable : Boolean;
-            Is_E_Down : Booelan;
+            Is_E_Down : Boolean;
       end case;
-
+      Privelege_LVL : Privelege_LVL_t;
+      Is_Present : Boolean;
+      Limit_High : Limit_High_t;
+      Available_Bit : Boolean;
+      Is_64Bit : Boolean;
+      IsNot_16Bit : Boolean;
+      Is_Granular : Boolean;
+      Base_High : Base_High_t
    when False =>
       case Sys_Type is
-      when TSS      
+      when LDT =>
+      when Task_Gate =>
+      when TSS32_Available =>
+      when TSS32_Busy => 
+      when CallGate32 => 
 end case;
+
 end record;
 
 --#######################################################
