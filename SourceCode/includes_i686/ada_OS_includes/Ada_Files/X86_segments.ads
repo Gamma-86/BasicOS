@@ -173,7 +173,7 @@ function Glue_BaseAddress32 (Separated_Address : Base_Separated_r) return System
    for Limit_Separated_r use record
       Limit_Low at 0 range 0 .. 15;
       Limit_High at 0 range 16 .. 19;
-   end record;
+   end record;h
    for Limit_Separated_r'Size use 20;
 --#######################################################
 --    40.11
